@@ -1,0 +1,54 @@
+---
+title: "R Bridge Week 3 Assignment"
+author: "Kyle Gilde"
+date: "July 28, 2016"
+output: html_document
+---
+
+#Load & subset the mushroom data set
+```{r Mushroom Madness, echo = F}
+require(RCurl)
+require(plyr)
+
+url <- "https://archive.ics.uci.edu/ml/machine-learning-databases/mushroom/agaricus-lepiota.data"
+mush <- getURL(url)
+my.mush <- read.csv(text=mush, header = F, sep = ",", stringsAsFactors = F)
+mush.df <- my.mush[, c(1, 5, 22, 23)]
+print("The data set can be found here:")
+print(url)
+```
+
+#Update column names and all abbreviations to words
+```{r}
+names(mush.df) <- c("edibility", "has_bruises", "population", "habitat")
+
+mush.df$edibility[mush.df$edibility == "e"] <- "edible"
+mush.df$edibility[mush.df$edibility == "p"] <- "poisonous"
+
+mush.df$has_bruises[mush.df$has_bruises == "t"] <- "TRUE"
+mush.df$has_bruises[mush.df$has_bruises == "f"] <- "FALSE"
+
+mush.df$population[mush.df$population == "a"] <- "abundant"
+mush.df$population[mush.df$population == "c"] <- "clustered"
+mush.df$population[mush.df$population == "n"] <- "numerous"
+mush.df$population[mush.df$population == "s"] <- "scattered"
+mush.df$population[mush.df$population == "v"] <- "several"
+mush.df$population[mush.df$population == "y"] <- "solitary"
+
+mush.df$habitat[mush.df$habitat == "g"] <- "grasses"
+mush.df$habitat[mush.df$habitat == "l"] <- "leaves"
+mush.df$habitat[mush.df$habitat == "m"] <- "meadows"
+mush.df$habitat[mush.df$habitat == "p"] <- "paths"
+mush.df$habitat[mush.df$habitat == "u"] <- "urban"
+mush.df$habitat[mush.df$habitat == "w"] <- "waste"
+mush.df$habitat[mush.df$habitat == "d"] <- "woods"
+
+```
+
+
+#Convert back to factors & validate the changes
+```{r, echo = F}
+mush.df[] <- lapply(mush.df, factor)
+head(mush.df)
+str(mush.df)
+```
