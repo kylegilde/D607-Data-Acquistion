@@ -1,0 +1,1539 @@
+---
+title: "606 HW Week 1"
+author: "Kyle Gilde"
+date: "February 2, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 606 HW Week 1
+
+Practice: 1.7 (available in R using the data(iris) command), 1.9, 1.23, 1.33, 1.55, 1.69
+Graded: 1.8, 1.10, 1.28, 1.36, 1.48, 1.50, 1.56, 1.70
+For 1.48, the following R code will create a vector scores that can be used to answer the question:
+
+scores <- c(57, 66, 69, 71, 72, 73, 74, 77, 78, 78, 79, 79, 81, 81, 82, 83, 83, 88, 89, 94)
+
+
+1.1 Migraine and acupuncture. A migraine is a particularly painful type of headache, which
+patients sometimes wish to treat with acupuncture. To determine whether acupuncture relieves
+migraine pain, researchers conducted a randomized controlled study where 89 females diagnosed
+with migraine headaches were randomly assigned to one of two groups: treatment or control.
+43 patients in the treatment group received acupuncture that is specifically designed to treat
+migraines. 46 patients in the control group received placebo acupuncture (needle insertion at nonacupoint
+locations). 24 hours after patients received acupuncture, they were asked if they were
+pain free. Results are summarized in the contingency table below.51
+Pain free
+Yes No Total
+Treatment 10 33 43
+Group
+Control 2 44 46
+Total 12 77 89
+identified on the antero-internal part of the antitragus, the
+anterior part of the lobe and the upper auricular concha, on
+the same side of pain. The majority of these points were
+effective very rapidly (within 1 min), while the remaining
+points produced a slower antalgic response, between 2 and
+5 min. The insertion of a semi-permanent needle in these
+zones allowed stable control of the migraine pain, which
+occurred within 30 min and still persisted 24 h later.
+Since the most active site in controlling migraine pain
+was the antero-internal part of the antitragus, the aim of
+this study was to verify the therapeutic value of this elective
+area (appropriate point) and to compare it with an area
+of the ear (representing the sciatic nerve) which is probably
+inappropriate in terms of giving a therapeutic effect on
+migraine attacks, since it has no somatotopic correlation
+with head pain.
+Materials and methods
+The study enrolled 94 females, diagnosed as migraine
+without aura following the International Classification of
+Headache Disorders [5], who were subsequently examined
+at the Women’s Headache Centre, Department of Gynaecology
+and Obstetrics of Turin University. They were all
+included in the study during a migraine attack provided that
+it started no more than 4 h previously. According to a
+predetermined computer-made randomization list, the eligible
+patients were randomly and blindly assigned to the
+following two groups: group A (n = 46) (average age
+35.93 years, range 15–60), group B (n = 48) (average age
+33.2 years, range 16–58).
+Before enrollment, each patient was asked to give an
+informed consent to participation in the study.
+Migraine intensity was measured by means a VAS
+before applying NCT (T0).
+In group A, a specific algometer exerting a maximum
+pressure of 250 g (SEDATELEC, France) was chosen to
+identify the tender points with Pain–Pressure Test (PPT).
+Every tender point located within the identified area by the
+pilot study (Fig. 1, area M) was tested with NCT for 10 s
+starting from the auricle, that was ipsilateral, to the side of
+prevalent cephalic pain. If the test was positive and the
+reduction was at least 25% in respect to basis, a semipermanent
+needle (ASP SEDATELEC, France) was
+inserted after 1 min. On the contrary, if pain did not lessen
+after 1 min, a further tender point was challenged in the
+same area and so on. When patients became aware of an
+initial decrease in the pain in all the zones of the head
+affected, they were invited to use a specific diary card to
+score the intensity of the pain with a VAS at the following
+intervals: after 10 min (T1), after 30 min (T2), after
+60 min (T3), after 120 min (T4), and after 24 h (T5).
+In group B, the lower branch of the anthelix was
+repeatedly tested with the algometer for about 30 s to
+ensure it was not sensitive. On both the French and Chinese
+auricular maps, this area corresponds to the representation
+of the sciatic nerve (Fig. 1, area S) and is specifically used
+to treat sciatic pain. Four needles were inserted in this area,
+two for each ear.
+In all patients, the ear acupuncture was always performed
+by an experienced acupuncturist. The analysis of
+the diaries collecting VAS data was conducted by an
+impartial operator who did not know the group each patient
+was in.
+The average values of VAS in group A and B were
+calculated at the different times of the study, and a statistical
+evaluation of the differences between the values
+obtained in T0, T1, T2, T3 and T4 in the two groups
+studied was performed using an analysis of variance
+(ANOVA) for repeated measures followed by multiple
+t test of Bonferroni to identify the source of variance.
+Moreover, to evaluate the difference between group B
+and group A, a t test for unpaired data was always performed
+for each level of the variable ‘‘time’’. In the case of
+proportions, a Chi square test was applied. All analyses
+were performed using the Statistical Package for the Social
+Sciences (SPSS) software program. All values given in the
+following text are reported as arithmetic mean (±SEM).
+Results
+Only 89 patients out of the entire group of 94 (43 in group
+A, 46 in group B) completed the experiment. Four patients
+withdrew from the study, because they experienced an
+unbearable exacerbation of pain in the period preceding the
+last control at 24 h (two from group A and two from group
+B) and were excluded from the statistical analysis since
+they requested the removal of the needles. One patient
+from group A did not give her consent to the implant of the
+semi-permanent needles. In group A, the mean number of
+Fig. 1 The appropriate area
+(M) versus the inappropriate
+area (S) used in the treatment
+of migraine attacks
+S174 Neurol Sci (2011) 32 (Suppl 1):S173–S175
+123
+Figure from the original
+paper displaying the appropriate
+area (M) versus
+the inappropriate area (S)
+used in the treatment of
+migraine attacks.
+(a) What percent of patients in the treatment group were pain free 24 hours after receiving
+acupuncture? What percent in the control group?
+(b) At first glance, does acupuncture appear to be an e↵ective treatment for migraines? Explain
+your reasoning.
+(c) Do the data provide convincing evidence that there is a real pain reduction for those patients
+in the treatment group? Or do you think that the observed di↵erence might just be due to
+chance?
+1.2 Sinusitis and antibiotics. Researchers studying the e↵ect of antibiotic treatment for acute
+sinusitis compared to symptomatic treatments randomly assigned 166 adults diagnosed with acute
+sinusitis to one of two groups: treatment or control. Study participants received either a 10-day
+course of amoxicillin (an antibiotic) or a placebo similar in appearance and taste. The placebo
+consisted of symptomatic treatments such as acetaminophen, nasal decongestants, etc. At the end
+of the 10-day period patients were asked if they experienced significant improvement in symptoms.
+The distribution of responses is summarized below.52
+Self-reported significant
+improvement in symptoms
+Yes No Total
+Treatment 66 19 85
+Group
+Control 65 16 81
+Total 131 35 166
+(a) What percent of patients in the treatment group experienced a significant improvement in
+symptoms? What percent in the control group?
+(b) Based on your findings in part (a), which treatment appears to be more e↵ective for sinusitis?
+(c) Do the data provide convincing evidence that there is a di↵erence in the improvement rates
+of sinusitis symptoms? Or do you think that the observed di↵erence might just be due to
+chance?
+51G. Allais et al. “Ear acupuncture in the treatment of migraine attacks: a randomized trial on the
+efficacy of appropriate versus inappropriate acupoints”. In: Neurological Sci. 32.1 (2011), pp. 173–175.
+52J.M. Garbutt et al. “Amoxicillin for Acute Rhinosinusitis: A Randomized Controlled Trial”. In:
+JAMA: The Journal of the American Medical Association 307.7 (2012), pp. 685–692.
+56 CHAPTER 1. INTRODUCTION TO DATA
+1.9.2 Data basics
+1.3 Air pollution and birth outcomes, study components. Researchers collected data to
+examine the relationship between air pollutants and preterm births in Southern California. During
+the study air pollution levels were measured by air quality monitoring stations. Specifically, levels
+of carbon monoxide were recorded in parts per million, nitrogen dioxide and ozone in parts per
+hundred million, and coarse particulate matter (PM10) in μg/m3. Length of gestation data were
+collected on 143,196 births between the years 1989 and 1993, and air pollution exposure during
+gestation was calculated for each birth. The analysis suggested that increased ambient PM10 and,
+to a lesser degree, CO concentrations may be associated with the occurrence of preterm births.53.
+Identify
+(a) the cases,
+(b) the variables and their types, and
+(c) the main research question
+in this study.
+1.4 Buteyko method, study components. The Buteyko method is a shallow breathing technique
+developed by Konstantin Buteyko, a Russian doctor, in 1952. Anecdotal evidence suggests
+that the Buteyko method can reduce asthma symptoms and improve quality of life. In a scientific
+study to determine the e↵ectiveness of this method, researchers recruited 600 asthma patients aged
+18-69 who relied on medication for asthma treatment. These patients were split into two research
+groups: one practiced the Buteyko method and the other did not. Patients were scored on quality
+of life, activity, asthma symptoms, and medication reduction on a scale from 0 to 10. On average,
+the participants in the Buteyko group experienced a significant reduction in asthma symptoms
+and an improvement in quality of life.54. Identify
+(a) the cases,
+(b) the variables and their types, and
+(c) the main research question
+in this study.
+1.5 Cheaters, study components. Researchers studying the relationship between honesty,
+age and self-control conducted an experiment on 160 children between the ages of 5 and 15.
+Participants reported their age, sex, and whether they were an only child or not. The researchers
+asked each child to toss a fair coin in private and to record the outcome (white or black) on a
+paper sheet, and said they would only reward children who report white. Half the students were
+explicitly told not to cheat and the others were not given any explicit instructions. In the no
+instruction group probability of cheating was found to be uniform across groups based on child’s
+characteristics. In the group that was explicitly told to not cheat, girls were less likely to cheat,
+and while rate of cheating didn’t vary by age for boys, it decreased with age for girls.55 Identify
+(a) the cases,
+(b) the variables and their types, and
+(c) the main research question
+in this study.
+53B. Ritz et al. “E↵ect of air pollution on preterm birth among children born in Southern California
+between 1989 and 1993”. In: Epidemiology 11.5 (2000), pp. 502–511.
+54J. McGowan. “Health Education: Does the Buteyko Institute Method make a di↵erence?” In: Thorax
+58 (2003).
+55Alessandro Bucciol and Marco Piovesan. “Luck or cheating? A field experiment on honesty with
+children”. In: Journal of Economic Psychology 32.1 (2011), pp. 73–78.
+1.9. EXERCISES 57
+1.6 Stealers, study components. In a study of the relationship between socio-economic class
+and unethical behavior, 129 University of California undergraduates at Berkeley were asked to
+identify themselves as having low or high social-class by comparing themselves to others with
+the most (least) money, most (least) education, and most (least) respected jobs. They were also
+presented with a jar of individually wrapped candies and informed that the candies were for
+children in a nearby laboratory, but that they could take some if they wanted. After completing
+some unrelated tasks, participants reported the number of candies they had taken. It was found
+that those who were identified as upper-class took more candy than others.56 Identify
+(a) the cases,
+(b) the variables and their types, and
+(c) the main research question
+in this study.
+1.7 Fisher’s irises. Sir Ronald Aylmer Fisher was an English statistician, evolutionary biologist,
+and geneticist who worked on a data set that contained sepal length and width, and petal length
+and width from three species of iris flowers (setosa, versicolor and virginica). There were 50 flowers
+from each species in the data set.57
+(a) How many cases were included in the data?
+(b) How many numerical variables are included
+in the data? Indicate what they are, and if
+they are continuous or discrete.
+(c) How many categorical variables are included
+in the data, and what are they? List
+the corresponding levels (categories).
+Photo by Ryan Claussen
+(http://flic.kr/p/6QTcuX)
+CC BY-SA 2.0 license
+1.8 Smoking habits of UK residents. A survey was conducted to study the smoking habits
+of UK residents. Below is a data matrix displaying a portion of the data collected in this survey.
+Note that “£” stands for British Pounds Sterling, “cig” stands for cigarettes, and “N/A” refers to
+a missing component of the data.58
+sex age marital grossIncome smoke amtWeekends amtWeekdays
+1 Female 42 Single Under£2,600 Yes 12 cig/day 12 cig/day
+2 Male 44 Single £10,400 to £15,600 No N/A N/A
+3 Male 53 Married Above£36,400 Yes 6 cig/day 6 cig/day
+...
+...
+...
+...
+...
+...
+...
+...
+1691 Male 40 Single £2,600 to £5,200 Yes 8 cig/day 8 cig/day
+(a) What does each row of the data matrix represent?
+(b) How many participants were included in the survey?
+(c) Indicate whether each variable in the study is numerical or categorical. If numerical, identify
+as continuous or discrete. If categorical, indicate if the variable is ordinal.
+56P.K. Pi↵ et al. “Higher social class predicts increased unethical behavior”. In: Proceedings of the
+National Academy of Sciences (2012).
+57R.A Fisher. “The Use of Multiple Measurements in Taxonomic Problems”. In: Annals of Eugenics 7
+(1936), pp. 179–188.
+58National STEM Centre, Large Datasets from stats4schools.
+58 CHAPTER 1. INTRODUCTION TO DATA
+1.9.3 Overview of data collection principles
+1.9 Air pollution and birth outcomes, scope of inference. Exercise 1.3 introduces a study
+where researchers collected data to examine the relationship between air pollutants and preterm
+births in Southern California. During the study air pollution levels were measured by air quality
+monitoring stations. Length of gestation data were collected on 143,196 births between the years
+1989 and 1993, and air pollution exposure during gestation was calculated for each birth.
+(a) Identify the population of interest and the sample in this study.
+(b) Comment on whether or not the results of the study can be generalized to the population, and
+if the findings of the study can be used to establish causal relationships.
+1.10 Cheaters, scope of inference. Exercise 1.5 introduces a study where researchers studying
+the relationship between honesty, age, and self-control conducted an experiment on 160 children
+between the ages of 5 and 15. The researchers asked each child to toss a fair coin in private and to
+record the outcome (white or black) on a paper sheet, and said they would only reward children
+who report white. Half the students were explicitly told not to cheat and the others were not given
+any explicit instructions. Di↵erences were observed in the cheating rates in the instruction and no
+instruction groups, as well as some di↵erences across children’s characteristics within each group.
+(a) Identify the population of interest and the sample in this study.
+(b) Comment on whether or not the results of the study can be generalized to the population, and
+if the findings of the study can be used to establish causal relationships.
+1.11 Buteyko method, scope of inference. Exercise 1.4 introduces a study on using the
+Buteyko shallow breathing technique to reduce asthma symptoms and improve quality of life. As
+part of this study 600 asthma patients aged 18-69 who relied on medication for asthma treatment
+were recruited and randomly assigned to two groups: one practiced the Buteyko method and the
+other did not. Those in the Buteyko group experienced, on average, a significant reduction in
+asthma symptoms and an improvement in quality of life.
+(a) Identify the population of interest and the sample in this study.
+(b) Comment on whether or not the results of the study can be generalized to the population, and
+if the findings of the study can be used to establish causal relationships.
+1.12 Stealers, scope of inference. Exercise 1.6 introduces a study on the relationship between
+socio-economic class and unethical behavior. As part of this study 129 University of California
+Berkeley undergraduates were asked to identify themselves as having low or high social-class by
+comparing themselves to others with the most (least) money, most (least) education, and most
+(least) respected jobs. They were also presented with a jar of individually wrapped candies and
+informed that the candies were for children in a nearby laboratory, but that they could take some if
+they wanted. After completing some unrelated tasks, participants reported the number of candies
+they had taken. It was found that those who were identified as upper-class took more candy than
+others.
+(a) Identify the population of interest and the sample in this study.
+(b) Comment on whether or not the results of the study can be generalized to the population, and
+if the findings of the study can be used to establish causal relationships.
+1.9. EXERCISES 59
+1.13 Relaxing after work. The 2010 General Social Survey asked the question, “After an
+average work day, about how many hours do you have to relax or pursue activities that you
+enjoy?” to a random sample of 1,155 Americans. The average relaxing time was found to be 1.65
+hours. Determine which of the following is an observation, a variable, a sample statistic, or a
+population parameter.
+(a) An American in the sample.
+(b) Number of hours spent relaxing after an average work day.
+(c) 1.65.
+(d) Average number of hours all Americans spend relaxing after an average work day.
+1.14 Cats on YouTube. Suppose you want to estimate the percentage of videos on YouTube
+that are cat videos. It is impossible for you to watch all videos on YouTube so you use a random
+video picker to select 1000 videos for you. You find that 2% of these videos are cat videos.Determine
+which of the following is an observation, a variable, a sample statistic, or a population parameter.
+(a) Percentage of all videos on YouTube that are cat videos.
+(b) 2%.
+(c) A video in your sample.
+(d) Whether or not a video is a cat video.
+1.15 GPA and study hours. A survey was conducted on 193 Duke University undergraduates
+who took an introductory statistics course in 2012. Among many other questions, this survey
+asked them about their GPA, which can range between 0 and 4 points, and the number of hours
+they spent studying per week. The scatterplot below displays the relationship between these two
+variables.
+(a) What is the explanatory variable and
+what is the response variable?
+(b) Describe the relationship between the
+two variables. Make sure to discuss unusual
+observations, if any.
+(c) Is this an experiment or an observational
+study?
+(d) Can we conclude that studying longer
+hours leads to higher GPAs?
+Study hours/week
+GPA
+0 20 40 60
+2.5
+3.0
+3.5
+4.0
+1.16 Income and education in US counties. The scatterplot below shows the relationship
+between per capita income (in thousands of dollars) and percent of population with a bachelor’s
+degree in 3,143 counties in the US in 2010.
+(a) What are the explanatory and response
+variables?
+(b) Describe the relationship between the
+two variables. Make sure to discuss unusual
+observations, if any.
+(c) Can we conclude that having a bachelor’s
+degree increases one’s income?
+Percent with Bachelor's degree
+Per capita income (in $1,000)
+10 30 50 70
+20
+40
+60
+60 CHAPTER 1. INTRODUCTION TO DATA
+1.9.4 Observational studies and sampling strategies
+1.17 Course satisfaction across sections. A large college class has 160 students. All 160
+students attend the lectures together, but the students are divided into 4 groups, each of 40
+students, for lab sections administered by di↵erent teaching assistants. The professor wants to
+conduct a survey about how satisfied the students are with the course, and he believes that the
+lab section a student is in might a↵ect the student’s overall satisfaction with the course.
+(a) What type of study is this?
+(b) Suggest a sampling strategy for carrying out this study.
+1.18 Housing proposal across dorms. On a large college campus first-year students and
+sophomores live in dorms located on the eastern part of the campus and juniors and seniors live in
+dorms located on the western part of the campus. Suppose you want to collect student opinions
+on a new housing structure the college administration is proposing and you want to make sure
+your survey equally represents opinions from students from all years.
+(a) What type of study is this?
+(b) Suggest a sampling strategy for carrying out this study.
+1.19 Internet use and life expectancy. The following scatterplot was created as part of
+a study evaluating the relationship between estimated life expectancy at birth (as of 2014) and
+percentage of internet users (as of 2009) in 208 countries for which such data were available.59
+(a) Describe the relationship between life
+expectancy and percentage of internet
+users.
+(b) What type of study is this?
+(c) State a possible confounding variable
+that might explain this relationship
+and describe its potential e↵ect.
+0 20 40 60 80 100
+50
+60
+70
+80
+90
+% Internet users
+Life expectancy at birth
+1.20 Stressed out, Part I. A study that surveyed a random sample of otherwise healthy high
+school students found that they are more likely to get muscle cramps when they are stressed. The
+study also noted that students drink more co↵ee and sleep less when they are stressed.
+(a) What type of study is this?
+(b) Can this study be used to conclude a causal relationship between increased stress and muscle
+cramps?
+(c) State possible confounding variables that might explain the observed relationship between
+increased stress and muscle cramps.
+1.21 Evaluate sampling methods. A university wants to determine what fraction of its
+undergraduate student body support a new $25 annual fee to improve the student union. For each
+proposed method below, indicate whether the method is reasonable or not.
+(a) Survey a simple random sample of 500 students.
+(b) Stratify students by their field of study, then sample 10% of students from each stratum.
+(c) Cluster students by their ages (e.g. 18 years old in one cluster, 19 years old in one cluster,
+etc.), then randomly sample three clusters and survey all students in those clusters.
+59CIA Factbook, Country Comparisons, 2014.
+1.9. EXERCISES 61
+1.22 Random digit dialing. The Gallup Poll uses a procedure called random digit dialing,
+which creates phone numbers based on a list of all area codes in America in conjunction with the
+associated number of residential households in each area code. Give a possible reason the Gallup
+Poll chooses to use random digit dialing instead of picking phone numbers from the phone book.
+1.23 Haters are gonna hate, study confirms. A study published in the Journal of Personality
+and Social Psychology asked a group of 200 randomly sampled men and women to evaluate how
+they felt about various subjects, such as camping, health care, architecture, taxidermy, crossword
+puzzles, and Japan in order to measure their dispositional attitude towards mostly independent
+stimuli. Then, they presented the participants with information about a new product: a microwave
+oven. This microwave oven does not exist, but the participants didn’t know this, and were given
+three positive and three negative fake reviews. People who reacted positively to the subjects on
+the dispositional attitude measurement also tended to react positively to the microwave oven, and
+those who reacted negatively also tended to react negatively to it. Researchers concluded that
+“some people tend to like things, whereas others tend to dislike things, and a more thorough
+understanding of this tendency will lead to a more thorough understanding of the psychology of
+attitudes.”60
+(a) What are the cases?
+(b) What is (are) the response variable(s) in this study?
+(c) What is (are) the explanatory variable(s) in this study?
+(d) Does the study employ random sampling?
+(e) Is this an observational study or an experiment? Explain your reasoning.
+(f) Can we establish a causal link between the explanatory and response variables?
+(g) Can the results of the study be generalized to the population at large?
+1.24 Family size. Suppose we want to estimate household size, where a “household” is defined
+as people living together in the same dwelling, and sharing living accommodations. If we select
+students at random at an elementary school and ask them what their family size is, will this be
+a good measure of household size? Or will our average be biased? If so, will it overestimate or
+underestimate the true value?
+1.25 Flawed reasoning. Identify the flaw(s) in reasoning in the following scenarios. Explain
+what the individuals in the study should have done di↵erently if they wanted to make such strong
+conclusions.
+(a) Students at an elementary school are given a questionnaire that they are asked to return after
+their parents have completed it. One of the questions asked is, “Do you find that your work
+schedule makes it difficult for you to spend time with your kids after school?” Of the parents
+who replied, 85% said “no”. Based on these results, the school officials conclude that a great
+majority of the parents have no difficulty spending time with their kids after school.
+(b) A survey is conducted on a simple random sample of 1,000 women who recently gave birth,
+asking them about whether or not they smoked during pregnancy. A follow-up survey asking
+if the children have respiratory problems is conducted 3 years later, however, only 567 of these
+women are reached at the same address. The researcher reports that these 567 women are
+representative of all mothers.
+(c) An orthopedist administers a questionnaire to 30 of his patients who do not have any joint
+problems and finds that 20 of them regularly go running. He concludes that running decreases
+the risk of joint problems.
+60Justin Hepler and Dolores Albarrac´ın. “Attitudes without objects - Evidence for a dispositional
+attitude, its measurement, and its consequences”. In: Journal of personality and social psychology 104.6
+(2013), p. 1060.
+62 CHAPTER 1. INTRODUCTION TO DATA
+1.26 City council survey. A city council has requested a household survey be conducted in
+a suburban area of their city. The area is broken into many distinct and unique neighborhoods,
+some including large homes, some with only apartments, and others a diverse mixture of housing
+structures. Identify the sampling methods described below, and comment on whether or not you
+think they would be e↵ective in this setting.
+(a) Randomly sample 50 households from the city.
+(b) Divide the city into neighborhoods, and sample 20 households from each neighborhood.
+(c) Divide the city into neighborhoods, randomly sample 10 neighborhoods, and sample all households
+from those neighborhoods.
+(d) Divide the city into neighborhoods, randomly sample 10 neighborhoods, and then randomly
+sample 20 households from those neighborhoods.
+(e) Sample the 200 households closest to the city council offices.
+1.27 Sampling strategies. A statistics student who is curious about the relationship between
+the amount of time students spend on social networking sites and their performance at school
+decides to conduct a survey. Various research strategies for collecting data are described below.
+In each, name the sampling method proposed and any bias you might expect.
+(a) He randomly samples 40 students from the study’s population, gives them the survey, asks
+them to fill it out and bring it back the next day.
+(b) He gives out the survey only to his friends, making sure each one of them fills out the survey.
+(c) He posts a link to an online survey on Facebook and asks his friends to fill out the survey.
+(d) He randomly samples 5 classes and asks a random sample of students from those classes to fill
+out the survey.
+1.28 Reading the paper. Below are excerpts from two articles published in the NY Times:
+(a) An article titled Risks: Smokers Found More Prone to Dementia states the following:61
+“Researchers analyzed data from 23,123 health plan members who participated in a voluntary
+exam and health behavior survey from 1978 to 1985, when they were 50-60 years old. 23 years
+later, about 25% of the group had dementia, including 1,136 with Alzheimer’s disease and 416
+with vascular dementia. After adjusting for other factors, the researchers concluded that pack-aday
+smokers were 37% more likely than nonsmokers to develop dementia, and the risks went up
+with increased smoking; 44% for one to two packs a day; and twice the risk for more than two
+packs.”
+Based on this study, can we conclude that smoking causes dementia later in life? Explain your
+reasoning.
+(b) Another article titled The School Bully Is Sleepy states the following:62
+“The University of Michigan study, collected survey data from parents on each child’s sleep habits
+and asked both parents and teachers to assess behavioral concerns. About a third of the students
+studied were identified by parents or teachers as having problems with disruptive behavior or
+bullying. The researchers found that children who had behavioral issues and those who were
+identified as bullies were twice as likely to have shown symptoms of sleep disorders.”
+A friend of yours who read the article says, “The study shows that sleep disorders lead to
+bullying in school children.” Is this statement justified? If not, how best can you describe the
+conclusion that can be drawn from this study?
+61R.C. Rabin. “Risks: Smokers Found More Prone to Dementia”. In: New York Times (2010).
+62T. Parker-Pope. “The School Bully Is Sleepy”. In: New York Times (2011).
+1.9. EXERCISES 63
+1.29 Shyness on Facebook. Given the anonymity a↵orded to individuals in online interactions,
+researchers hypothesized that shy individuals might have more favorable attitudes toward
+Facebook, and that shyness might be positively correlated with time spent on Facebook. They
+also hypothesized that shy individuals might have fewer Facebook “friends” as they tend to have
+fewer friends than non-shy individuals have in the o✏ine world. 103 undergraduate students at an
+Ontario university were surveyed via online questionnaires. The study states “Participants were
+recruited through the university’s psychology participation pool. After indicating an interest in
+the study, participants were sent an e-mail containing the study’s URL.” Are the results of this
+study generalizable to the population of all Facebook users?63
+1.9.5 Experiments
+1.30 Stressed out, Part II. In a study evaluating the relationship between stress and muscle
+cramps, half the subjects are randomly assigned to be exposed to increased stress by being placed
+into an elevator that falls rapidly and stops abruptly and the other half are left at no or baseline
+stress.
+(a) What type of study is this?
+(b) Can this study be used to conclude a causal relationship between increased stress and muscle
+cramps?
+1.31 Light and exam performance. A study is designed to test the e↵ect of light level on
+exam performance of students. The researcher believes that light levels might have di↵erent e↵ects
+on males and females, so wants to make sure both are equally represented in each treatment. The
+treatments are fluorescent overhead lighting, yellow overhead lighting, no overhead lighting (only
+desk lamps).
+(a) What is the response variable?
+(b) What is the explanatory variable? What are its levels?
+(c) What is the blocking variable? What are its levels?
+1.32 Vitamin supplements. In order to assess the e↵ectiveness of taking large doses of vitamin
+C in reducing the duration of the common cold, researchers recruited 400 healthy volunteers from
+sta↵ and students at a university. A quarter of the patients were assigned a placebo, and the
+rest were evenly divided between 1g Vitamin C, 3g Vitamin C, or 3g Vitamin C plus additives
+to be taken at onset of a cold for the following two days. All tablets had identical appearance
+and packaging. The nurses who handed the prescribed pills to the patients knew which patient
+received which treatment, but the researchers assessing the patients when they were sick did not.
+No significant di↵erences were observed in any measure of cold duration or severity between the
+four medication groups, and the placebo group had the shortest duration of symptoms.64
+(a) Was this an experiment or an observational study? Why?
+(b) What are the explanatory and response variables in this study?
+(c) Were the patients blinded to their treatment?
+(d) Was this study double-blind?
+(e) Participants are ultimately able to choose whether or not to use the pills prescribed to them.
+We might expect that not all of them will adhere and take their pills. Does this introduce a
+confounding variable to the study? Explain your reasoning.
+63E.S. Orr et al. “The influence of shyness on the use of Facebook in an undergraduate sample”. In:
+CyberPsychology & Behavior 12.3 (2009), pp. 337–340.
+64C. Audera et al. “Mega-dose vitamin C in treatment of the common cold: a randomised controlled
+trial”. In: Medical Journal of Australia 175.7 (2001), pp. 359–362.
+64 CHAPTER 1. INTRODUCTION TO DATA
+1.33 Light, noise, and exam performance. A study is designed to test the e↵ect of light
+level and noise level on exam performance of students. The researcher believes that light and noise
+levels might have di↵erent e↵ects on males and females, so wants to make sure both are equally
+represented in each treatment. The light treatments considered are fluorescent overhead lighting,
+yellow overhead lighting, no overhead lighting (only desk lamps). The noise treatments considered
+are no noise, construction noise, and human chatter noise.
+(a) What is the response variable?
+(b) How many factors are considered in this study? Identify them, and describe their levels.
+(c) What is the role of the sex variable in this study?
+1.34 Music and learning. You would like to conduct an experiment in class to see if students
+learn better if they study without any music, with music that has no lyrics (instrumental), or with
+music that has lyrics. Briefly outline a design for this study.
+1.35 Soda preference. You would like to conduct an experiment in class to see if your classmates
+prefer the taste of regular Coke or Diet Coke. Briefly outline a design for this study.
+1.36 Exercise and mental health. A researcher is interested in the e↵ects of exercise on
+mental health and he proposes the following study: Use stratified random sampling to ensure representative
+proportions of 18-30, 31-40 and 41- 55 year olds from the population. Next, randomly
+assign half the subjects from each age group to exercise twice a week, and instruct the rest not
+to exercise. Conduct a mental health exam at the beginning and at the end of the study, and
+compare the results.
+(a) What type of study is this?
+(b) What are the treatment and control groups in this study?
+(c) Does this study make use of blocking? If so, what is the blocking variable?
+(d) Does this study make use of blinding?
+(e) Comment on whether or not the results of the study can be used to establish a causal relationship
+between exercise and mental health, and indicate whether or not the conclusions can
+be generalized to the population at large.
+(f) Suppose you are given the task of determining if this proposed study should get funding.
+Would you have any reservations about the study proposal?
+1.37 Chia seeds and weight loss. Chia Pets – those terra-cotta figurines that sprout fuzzy
+green hair – made the chia plant a household name. But chia has gained an entirely new reputation
+as a diet supplement. In one 2009 study, a team of researchers recruited 38 men and divided them
+randomly into two groups: treatment or control. They also recruited 38 women, and they randomly
+placed half of these participants into the treatment group and the other half into the control group.
+One group was given 25 grams of chia seeds twice a day, and the other was given a placebo. The
+subjects volunteered to be a part of the study. After 12 weeks, the scientists found no significant
+di↵erence between the groups in appetite or weight loss.65
+(a) What type of study is this?
+(b) What are the experimental and control treatments in this study?
+(c) Has blocking been used in this study? If so, what is the blocking variable?
+(d) Has blinding been used in this study?
+(e) Comment on whether or not we can make a causal statement, and indicate whether or not we
+can generalize the conclusion to the population at large.
+65D.C. Nieman et al. “Chia seed does not promote weight loss or alter disease risk factors in overweight
+adults”. In: Nutrition Research 29.6 (2009), pp. 414–418.
+1.9. EXERCISES 65
+1.9.6 Examining numerical data
+1.38 Mammal life spans. Data were collected on life spans (in years) and gestation lengths
+(in days) for 62 mammals. A scatterplot of life span versus length of gestation is shown below.66
+(a) What type of an association is apparent
+between life span and length of gestation?
+(b) What type of an association would you
+expect to see if the axes of the plot were
+reversed, i.e. if we plotted length of
+gestation versus life span?
+(c) Are life span and length of gestation
+independent? Explain your reasoning.
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+Gestation (days)
+Life Span (years)
+0 200 400 600
+0
+25
+50
+75
+100
+1.39 Associations. Indicate which of the plots show a
+(a) positive association
+(b) negative association
+(c) no association
+Also determine if the positive and
+negative associations are linear or
+nonlinear. Each part may refer to
+more than one plot.
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+(1)
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+(2)
+●●
+●
+●
+●
+●●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●●
+●●●●
+●
+●●●●
+●●
+●
+●●
+●
+●
+●●
+●
+●●
+●●
+●
+●
+●●●
+●
+●●
+●
+●
+●
+●
+●●
+●
+●●
+●●
+●●●
+●
+●
+●
+●●
+●
+●
+●●●
+●●
+●
+●
+●
+●●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●●
+(3)
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●
+●●
+●
+●
+●
+●
+●●
+●
+●
+●
+●●●
+●
+●
+●
+(4)
+1.40 Office productivity. Office productivity is relatively low when the employees feel no stress
+about their work or job security. However, high levels of stress can also lead to reduced employee
+productivity. Sketch a plot to represent the relationship between stress and productivity.
+1.41 Reproducing bacteria. Suppose that there is only sufficient space and nutrients to
+support one million bacterial cells in a petri dish. You place a few bacterial cells in this petri dish,
+allow them to reproduce freely, and record the number of bacterial cells in the dish over time.
+Sketch a plot representing the relationship between number of bacterial cells and time.
+1.42 Sleeping in college. A recent article in a college newspaper stated that college students
+get an average of 5.5 hrs of sleep each night. A student who was skeptical about this value decided
+to conduct a survey by randomly sampling 25 students. On average, the sampled students slept
+6.25 hours per night. Identify which value represents the sample mean and which value represents
+the claimed population mean.
+66T. Allison and D.V. Cicchetti. “Sleep in mammals: ecological and constitutional correlates”. In:
+Arch. Hydrobiol 75 (1975), p. 442.
+66 CHAPTER 1. INTRODUCTION TO DATA
+1.43 Parameters and statistics. Identify which value represents the sample mean and which
+value represents the claimed population mean.
+(a) American households spent an average of about $52 in 2007 on Halloween merchandise such as
+costumes, decorations and candy. To see if this number had changed, researchers conducted
+a new survey in 2008 before industry numbers were reported. The survey included 1,500
+households and found that average Halloween spending was $58 per household.
+(b) The average GPA of students in 2001 at a private university was 3.37. A survey on a sample of
+203 students from this university yielded an average GPA of 3.59 in Spring semester of 2012.
+1.44 Make-up exam. In a class of 25 students, 24 of them took an exam in class and 1 student
+took a make-up exam the following day. The professor graded the first batch of 24 exams and
+found an average score of 74 points with a standard deviation of 8.9 points. The student who took
+the make-up the following day scored 64 points on the exam.
+(a) Does the new student’s score increase or decrease the average score?
+(b) What is the new average?
+(c) Does the new student’s score increase or decrease the standard deviation of the scores?
+1.45 Days o↵ at a mining plant. Workers at a particular mining site receive an average of 35
+days paid vacation, which is lower than the national average. The manager of this plant is under
+pressure from a local union to increase the amount of paid time o↵. However, he does not want
+to give more days o↵ to the workers because that would be costly. Instead he decides he should
+fire 10 employees in such a way as to raise the average number of days o↵ that are reported by his
+employees. In order to achieve this goal, should he fire employees who have the most number of
+days o↵, least number of days o↵, or those who have about the average number of days o↵?
+1.46 Medians and IQRs. For each part, compare distributions (1) and (2) based on their
+medians and IQRs. You do not need to calculate these statistics; simply state how the medians
+and IQRs compare. Make sure to explain your reasoning.
+(a) (1) 3, 5, 6, 7, 9
+(2) 3, 5, 6, 7, 20
+(b) (1) 3, 5, 6, 7, 9
+(2) 3, 5, 7, 8, 9
+(c) (1) 1, 2, 3, 4, 5
+(2) 6, 7, 8, 9, 10
+(d) (1) 0, 10, 50, 60, 100
+(2) 0, 100, 500, 600, 1000
+1.47 Means and SDs. For each part, compare distributions (1) and (2) based on their means
+and standard deviations. You do not need to calculate these statistics; simply state how the means
+and the standard deviations compare. Make sure to explain your reasoning. Hint: It may be useful
+to sketch dot plots of the distributions.
+(a) (1) 3, 5, 5, 5, 8, 11, 11, 11, 13
+(2) 3, 5, 5, 5, 8, 11, 11, 11, 20
+(b) (1) -20, 0, 0, 0, 15, 25, 30, 30
+(2) -40, 0, 0, 0, 15, 25, 30, 30
+(c) (1) 0, 2, 4, 6, 8, 10
+(2) 20, 22, 24, 26, 28, 30
+(d) (1) 100, 200, 300, 400, 500
+(2) 0, 50, 300, 550, 600
+1.48 Stats scores. Below are the final exam scores of twenty introductory statistics students.
+57, 66, 69, 71, 72, 73, 74, 77, 78, 78, 79, 79, 81, 81, 82, 83, 83, 88, 89, 94
+Create a box plot of the distribution of these scores. The five number summary provided below
+may be useful.
+Min Q1 Q2 (Median) Q3 Max
+57 72.5 78.5 82.5 94
+1.9. EXERCISES 67
+1.49 Infant mortality. The infant mortality rate is defined as the number of infant deaths per
+1,000 live births. This rate is often used as an indicator of the level of health in a country. The
+relative frequency histogram below shows the distribution of estimated infant death rates for 224
+countries for which such data were available in 2014.67
+(a) Estimate Q1, the median, and Q3
+from the histogram.
+(b) Would you expect the mean of this
+data set to be smaller or larger than
+the median? Explain your reasoning.
+Infant mortality
+0 20 40 60 80 100 120
+0
+0.1
+0.2
+0.3
+0.4
+1.50 Mix-and-match. Describe the distribution in the histograms below and match them to
+the box plots.
+(a)
+50 60 70
+(b)
+0 50 100
+(c)
+0 2 4 6
+(1)
+0
+2
+4
+6
+(2)
+55
+60
+65
+70
+(3)
+0
+20
+40
+60
+80
+100
+1.51 Air quality. Daily air quality is measured by the air quality index (AQI) reported by
+the Environmental Protection Agency. This index reports the pollution level and what associated
+health e↵ects might be a concern. The index is calculated for five major air pollutants
+regulated by the Clean Air Act and takes values from 0 to 300, where a higher value indicates
+lower air quality. AQI was reported for a sample of 91 days in 2011 in Durham, NC.
+The relative frequency histogram below shows the distribution of the AQI values on these days.68
+(a) Estimate the median AQI value of this sample.
+(b) Would you expect the mean AQI value of this sample
+to be higher or lower than the median? Explain
+your reasoning.
+(c) Estimate Q1, Q3, and IQR for the distribution.
+(d) Would any of the days in this sample be considered
+to have an unusually low or high AQI? Explain
+your reasoning.
+Daily AQI
+10 20 30 40 50 60
+0
+0.05
+0.1
+0.15
+0.2
+67CIA Factbook, Country Comparisons, 2014.
+68US Environmental Protection Agency, AirData, 2011.
+68 CHAPTER 1. INTRODUCTION TO DATA
+1.52 Median vs. mean. Estimate the median for the 400 observations shown in the histogram,
+and note whether you expect the mean to be higher or lower than the median.
+40 50 60 70 80 90 100
+0
+20
+40
+60
+80
+1.53 Histograms vs. box plots. Compare the two plots below. What characteristics of the
+distribution are apparent in the histogram and not in the box plot? What characteristics are
+apparent in the box plot but not in the histogram?
+5 10 15 20 25
+0
+50
+100
+150
+200
+5
+10
+15
+20
+25
+1.54 Marathon winners. The histogram and box plots below show the distribution of finishing
+times for male and female winners of the New York Marathon between 1970 and 1999.
+2.0 2.4 2.8 3.2
+0
+10
+20
+Marathon times
+2.0
+2.4
+2.8
+3.2
+(a) What features of the distribution are apparent in the histogram and not the box plot? What
+features are apparent in the box plot but not in the histogram?
+(b) What may be the reason for the bimodal distribution? Explain.
+(c) Compare the distribution of marathon times for men and women based on the box plot shown
+below.
+2.0 2.4 2.8 3.2
+Women
+Men
+(d) The time series plot shown below is another way to look at these data. Describe what is visible
+in this plot but not in the others.
+● ● ● ●
+●
+● ● ●
+● ●
+●
+● ● ● ● ● ●
+● ● ●
+●
+●
+●
+●
+●
+●
+● ● ● ●
+Marathon times
+1970 1975 1980 1985 1990 1995 2000
+2.0
+2.4
+2.8
+3.2
+●
+Women
+Men
+1.9. EXERCISES 69
+1.55 Distributions and appropriate statistics, Part I. For each of the following, state
+whether you expect the distribution to be symmetric, right skewed, or left skewed. Also specify
+whether the mean or median would best represent a typical observation in the data, and whether
+the variability of observations would be best represented using the standard deviation or IQR.
+Explain your reasoning.
+(a) Number of pets per household.
+(b) Distance to work, i.e. number of miles between work and home.
+(c) Heights of adult males.
+1.56 Distributions and appropriate statistics, Part II . For each of the following, state
+whether you expect the distribution to be symmetric, right skewed, or left skewed. Also specify
+whether the mean or median would best represent a typical observation in the data, and whether
+the variability of observations would be best represented using the standard deviation or IQR.
+Explain your reasoning.
+(a) Housing prices in a country where 25% of the houses cost below $350,000, 50% of the houses
+cost below $450,000, 75% of the houses cost below $1,000,000 and there are a meaningful
+number of houses that cost more than $6,000,000.
+(b) Housing prices in a country where 25% of the houses cost below $300,000, 50% of the houses
+cost below $600,000, 75% of the houses cost below $900,000 and very few houses that cost
+more than $1,200,000.
+(c) Number of alcoholic drinks consumed by college students in a given week. Assume that most of
+these students don’t drink since they are under 21 years old, and only a few drink excessively.
+(d) Annual salaries of the employees at a Fortune 500 company where only a few high level
+executives earn much higher salaries than all the other employees.
+1.57 TV watchers. Students in an AP Statistics class were asked how many hours of television
+they watch per week (including online streaming). This sample yielded an average of 4.71 hours,
+with a standard deviation of 4.18 hours. Is the distribution of number of hours students watch
+television weekly symmetric? If not, what shape would you expect this distribution to have?
+Explain your reasoning.
+1.58 Exam scores. The average on a history exam (scored out of 100 points) was 85, with a
+standard deviation of 15. Is the distribution of the scores on this exam symmetric? If not, what
+shape would you expect this distribution to have? Explain your reasoning.
+1.59 Facebook friends. Facebook data indicate that 50% of Facebook users have 100 or more
+friends, and that the average friend count of users is 190. What do these findings suggest about
+the shape of the distribution of number of friends of Facebook users?69
+1.60 A new statistic. The statistic ¯x
+median can be used as a measure of skewness. Suppose we
+have a distribution where all observations are greater than 0, xi > 0. What is the expected shape
+of the distribution under the following conditions? Explain your reasoning.
+(a) ¯x
+median = 1
+(b) ¯x
+median < 1
+(c) ¯x
+median > 1
+69Lars Backstrom. “Anatomy of Facebook”. In: Facebook Data Teams Notes (2011).
+70 CHAPTER 1. INTRODUCTION TO DATA
+1.61 Income at the co↵ee shop. The first histogram below shows the distribution of the
+yearly incomes of 40 patrons at a college co↵ee shop. Suppose two new people walk into the co↵ee
+shop: one making $225,000 and the other $250,000. The second histogram shows the new income
+distribution. Summary statistics are also provided.
+(1)
+60000 62500 65000 67500 70000
+(2)
+60000 110000 160000 210000 260000
+(1) (2)
+n 40 42
+Min. 60,680 60,680
+1st Qu. 63,620 63,710
+Median 65,240 65,350
+Mean 65,090 73,300
+3rd Qu. 66,160 66,540
+Max. 69,890 250,000
+SD 2,122 37,321
+(a) Would the mean or the median best represent what we might think of as a typical income
+for the 42 patrons at this co↵ee shop? What does this say about the robustness of the two
+measures?
+(b) Would the standard deviation or the IQR best represent the amount of variability in the
+incomes of the 42 patrons at this co↵ee shop? What does this say about the robustness of the
+two measures?
+1.62 Midrange. The midrange of a distribution is defined as the average of the maximum and
+the minimum of that distribution. Is this statistic robust to outliers and extreme skew? Explain
+your reasoning
+1.63 Commute times. The US census collects data on time it takes Americans to commute
+to work, among many other variables. The histogram below shows the distribution of average
+commute times in 3,143 US counties in 2010. Also shown below is a spatial intensity map of the
+same data.
+Mean work travel (in min)
+10 20 30 40
+0
+100
+200
+4
+19
+>33
+(a) Describe the numerical distribution and comment on whether or not a log transformation may
+be advisable for these data.
+(b) Describe the spatial distribution of commuting times using the map below.
+1.9. EXERCISES 71
+1.64 Hispanic population. The US census collects data on race and ethnicity of Americans,
+among many other variables. The histogram below shows the distribution of the percentage of the
+population that is Hispanic in 3,143 counties in the US in 2010. Also shown is a histogram of logs
+of these values.
+Hispanic %
+0 20 40 60 80 100
+0
+500
+1000
+1500
+2000
+log(% Hispanic)
+−2 −1 0 1 2 3 4
+0
+50
+100
+150
+200
+250
+0
+20
+>40
+(a) Describe the numerical distribution and comment on why we might want to use log-transformed
+values in analyzing or modeling these data.
+(b) What features of the distribution of the Hispanic population in US counties are apparent in
+the map but not in the histogram? What features are apparent in the histogram but not the
+map?
+(c) Is one visualization more appropriate or helpful than the other? Explain your reasoning.
+1.9.7 Considering categorical data
+1.65 Antibiotic use in children. The bar plot and the pie chart below show the distribution of
+pre-existing medical conditions of children involved in a study on the optimal duration of antibiotic
+use in treatment of tracheitis, which is an upper respiratory infection.
+Gastrointestinal
+Immunocompromised
+Genetic/metabolic
+Neuromuscular
+Trauma
+Respiratory
+Cardiovascular
+Prematurity
+Relative frequency
+0.00 0.10 0.20 0.30
+Gastrointestinal
+Immunocompromised
+Genetic/metabolic
+Neuromuscular
+Trauma
+Respiratory
+Cardiovascular
+Prematurity
+(a) What features are apparent in the bar plot but not in the pie chart?
+(b) What features are apparent in the pie chart but not in the bar plot?
+(c) Which graph would you prefer to use for displaying these categorical data?
+72 CHAPTER 1. INTRODUCTION TO DATA
+1.66 Views on immigration. 910 randomly sampled registered voters from Tampa, FL were
+asked if they thought workers who have illegally entered the US should be (i) allowed to keep their
+jobs and apply for US citizenship, (ii) allowed to keep their jobs as temporary guest workers but
+not allowed to apply for US citizenship, or (iii) lose their jobs and have to leave the country. The
+results of the survey by political ideology are shown below.70
+Political ideology
+Conservative Moderate Liberal Total
+(i) Apply for citizenship 57 120 101 278
+(ii) Guest worker 121 113 28 262
+Response
+(iii) Leave the country 179 126 45 350
+(iv) Not sure 15 4 1 20
+Total 372 363 175 910
+(a) What percent of these Tampa, FL voters identify themselves as conservatives?
+(b) What percent of these Tampa, FL voters are in favor of the citizenship option?
+(c) What percent of these Tampa, FL voters identify themselves as conservatives and are in favor
+of the citizenship option?
+(d) What percent of these Tampa, FL voters who identify themselves as conservatives are also in
+favor of the citizenship option? What percent of moderates share this view? What percent of
+liberals share this view?
+(e) Do political ideology and views on immigration appear to be independent? Explain your
+reasoning.
+1.67 Views on the DREAM Act. A random sample of registered voters from Tampa, FL were
+asked if they support the DREAM Act, a proposed law which would provide a path to citizenship
+for people brought illegally to the US as children. The survey also collected information on the
+political ideology of the respondents. Based on the mosaic plot shown below, do views on the
+DREAM Act and political ideology appear to be independent? Explain your reasoning.71
+Conservative Moderate Liberal
+Support
+Not support
+Not sure
+70SurveyUSA, News Poll #18927, data collected Jan 27-29, 2012.
+71SurveyUSA, News Poll #18927, data collected Jan 27-29, 2012.
+1.9. EXERCISES 73
+1.68 Raise taxes. A random sample of registered voters nationally were asked whether they
+think it’s better to raise taxes on the rich or raise taxes on the poor. The survey also collected
+information on the political party affiliation of the respondents. Based on the mosaic plot shown
+below, do views on raising taxes and political affiliation appear to be independent? Explain your
+reasoning.72
+Democrat Republican Indep / Other
+Raise taxes on the rich
+Raise taxes on the poor
+Not sure
+1.9.8 Case study: gender discrimination
+1.69 Side e↵ects of Avandia. Rosiglitazone is the active ingredient in the controversial type 2
+diabetes medicine Avandia and has been linked to an increased risk of serious cardiovascular problems
+such as stroke, heart failure, and death. A common alternative treatment is pioglitazone, the
+active ingredient in a diabetes medicine called Actos. In a nationwide retrospective observational
+study of 227,571 Medicare beneficiaries aged 65 years or older, it was found that 2,593 of the 67,593
+patients using rosiglitazone and 5,386 of the 159,978 using pioglitazone had serious cardiovascular
+problems. These data are summarized in the contingency table below.73
+Cardiovascular problems
+Yes No Total
+Treatment
+Rosiglitazone 2,593 65,000 67,593
+Pioglitazone 5,386 154,592 159,978
+Total 7,979 219,592 227,571
+(a) Determine if each of the following statements is true or false. If false, explain why. Be careful:
+The reasoning may be wrong even if the statement’s conclusion is correct. In such cases, the
+statement should be considered false.
+i. Since more patients on pioglitazone had cardiovascular problems (5,386 vs. 2,593), we can
+conclude that the rate of cardiovascular problems for those on a pioglitazone treatment is
+higher.
+ii. The data suggest that diabetic patients who are taking rosiglitazone are more likely to
+have cardiovascular problems since the rate of incidence was (2,593 / 67,593 = 0.038)
+3.8% for patients on this treatment, while it was only (5,386 / 159,978 = 0.034) 3.4% for
+patients on pioglitazone.
+iii. The fact that the rate of incidence is higher for the rosiglitazone group proves that rosiglitazone
+causes serious cardiovascular problems.
+iv. Based on the information provided so far, we cannot tell if the di↵erence between the
+rates of incidences is due to a relationship between the two variables or due to chance.
+(See the next page for additional parts to this question.)
+72Public Policy Polling, Americans on College Degrees, Classic Literature, the Seasons, and More, data
+collected Feb 20-22, 2015.
+73D.J. Graham et al. “Risk of acute myocardial infarction, stroke, heart failure, and death in elderly
+Medicare patients treated with rosiglitazone or pioglitazone”. In: JAMA 304.4 (2010), p. 411. issn:
+0098-7484.
+74 CHAPTER 1. INTRODUCTION TO DATA
+(b) What proportion of all patients had cardiovascular problems?
+(c) If the type of treatment and having cardiovascular problems were independent, about how
+many patients in the rosiglitazone group would we expect to have had cardiovascular problems?
+(d) We can investigate the relationship between outcome and treatment in this study using a
+randomization technique. While in reality we would carry out the simulations required for
+randomization using statistical software, suppose we actually simulate using index cards. In
+order to simulate from the independence model, which states that the outcomes were independent
+of the treatment, we write whether or not each patient had a cardiovascular problem
+on cards, shu✏ed all the cards together, then deal them into two groups of size 67,593 and
+159,978. We repeat this simulation 1,000 times and each time record the number of people in
+the rosiglitazone group who had cardiovascular problems. Use the relative frequency histogram
+of these counts to answer (i)-(iii).
+i. What are the claims being tested?
+ii. Compared to the number calculated in part
+(b), which would provide more support for
+the alternative hypothesis, more or fewer patients
+with cardiovascular problems in the
+rosiglitazone group?
+iii. What do the simulation results suggest about
+the relationship between taking rosiglitazone
+and having cardiovascular problems in diabetic
+patients? Simulated rosiglitazone cardiovascular events
+2250 2350 2450
+0
+0.1
+0.2
+1.70 Heart transplants. The Stanford University Heart Transplant Study was conducted to
+determine whether an experimental heart transplant program increased lifespan. Each patient
+entering the program was designated an official heart transplant candidate, meaning that he was
+gravely ill and would most likely benefit from a new heart. Some patients got a transplant and
+some did not. The variable transplant indicates which group the patients were in; patients in the
+treatment group got a transplant and those in the control group did not. Another variable called
+survived was used to indicate whether or not the patient was alive at the end of the study. Of
+the 34 patients in the control group, 30 died. Of the 69 people in the treatment group, 45 died.74
+control treatment
+alive
+dead
+Survival Time (days)
+control treatment
+0
+500
+1000
+1500
+(a) Based on the mosaic plot, is survival independent of whether or not the patient got a transplant?
+Explain your reasoning.
+(See the next page for additional parts to this question.)
+74B. Turnbull et al. “Survivorship of Heart Transplant Data”. In: Journal of the American Statistical
+Association 69 (1974), pp. 74–80.
+1.9. EXERCISES 75
+(b) What do the box plots below suggest about the efficacy (e↵ectiveness) of the heart transplant
+treatment.
+(c) What proportion of patients in the treatment group and what proportion of patients in the
+control group died?
+(d) One approach for investigating whether or not the treatment is e↵ective is to use a randomization
+technique.
+i. What are the claims being tested?
+ii. The paragraph below describes the set up for such approach, if we were to do it without
+using statistical software. Fill in the blanks with a number or phrase, whichever is
+appropriate.
+We write alive on cards representing patients who were alive at
+the end of the study, and dead on cards representing patients
+who were not. Then, we shu✏e these cards and split them into two groups:
+one group of size representing treatment, and another group of
+size representing control. We calculate the di↵erence between
+the proportion of dead cards in the treatment and control groups (treatment -
+control) and record this value. We repeat this 100 times to build a distribution
+centered at . Lastly, we calculate the fraction of simulations where
+the simulated di↵erences in proportions are . If this fraction is low,
+we conclude that it is unlikely to have observed such an outcome by chance and
+that the null hypothesis should be rejected in favor of the alternative.
+iii. What do the simulation results shown below suggest about the e↵ectiveness of the transplant
+program?
+
+
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
