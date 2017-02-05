@@ -1,54 +1,79 @@
 ---
-title: "R Bridge Week 3 Assignment"
+title: "607 Data Aquisition - Week 1"
 author: "Kyle Gilde"
-date: "July 28, 2016"
+date: "Feb. 4, 2017"
 output: html_document
 ---
+<style>
+div.beige pre { background-color:beige; }
+</style>
+ <div class = "beige">
 
-#Load & subset the mushroom data set
-```{r Mushroom Madness, echo = F}
+####Your task is to study the dataset and the associated description of the data (i.e. "data dictionary"). You may need to look around a bit, but it's there! 
++ You should take the data, and create a data frame with a subset of the columns in the dataset. 
++ You should include the column that indicates edible or poisonous and three or four other columns. 
++ You should also add meaningful column names and replace the abbreviations used in the data-for example, in the appropriate column, "e" might become "edible." 
+
+####Your deliverable is the R code to perform these transformation tasks
+
+
+
+#Setup & Load Data
+```{r setup & load data, echo=F} 
+knitr::opts_chunk$set(#echo=FALSE, 
+                      warning=FALSE, 
+                      message=FALSE,
+                      #tidy=TRUE,
+                      comment = "",
+                      dev="png", 
+                      #fig.width = 6, 
+                      #fig.height = 4, 
+                      #dpi=200, 
+                      dev.args=list(type="cairo"))
 require(RCurl)
 require(plyr)
 
 url <- "https://archive.ics.uci.edu/ml/machine-learning-databases/mushroom/agaricus-lepiota.data"
 mush <- getURL(url)
 my.mush <- read.csv(text=mush, header = F, sep = ",", stringsAsFactors = F)
-mush.df <- my.mush[, c(1, 5, 22, 23)]
-print("The data set can be found here:")
-print(url)
+
+
 ```
 
-#Update column names and all abbreviations to words
+#Subset & transform data
 ```{r}
-names(mush.df) <- c("edibility", "has_bruises", "population", "habitat")
+my.mush <- my.mush[, c(1, 5, 22, 23)]
 
-mush.df$edibility[mush.df$edibility == "e"] <- "edible"
-mush.df$edibility[mush.df$edibility == "p"] <- "poisonous"
+names(my.mush) <- c("edibility", "has_bruises", "population", "habitat")
 
-mush.df$has_bruises[mush.df$has_bruises == "t"] <- "TRUE"
-mush.df$has_bruises[mush.df$has_bruises == "f"] <- "FALSE"
+my.mush$edibility[my.mush$edibility == "e"] <- "edible"
+my.mush$edibility[my.mush$edibility == "p"] <- "poisonous"
 
-mush.df$population[mush.df$population == "a"] <- "abundant"
-mush.df$population[mush.df$population == "c"] <- "clustered"
-mush.df$population[mush.df$population == "n"] <- "numerous"
-mush.df$population[mush.df$population == "s"] <- "scattered"
-mush.df$population[mush.df$population == "v"] <- "several"
-mush.df$population[mush.df$population == "y"] <- "solitary"
+my.mush$has_bruises[my.mush$has_bruises == "t"] <- "TRUE"
+my.mush$has_bruises[my.mush$has_bruises == "f"] <- "FALSE"
 
-mush.df$habitat[mush.df$habitat == "g"] <- "grasses"
-mush.df$habitat[mush.df$habitat == "l"] <- "leaves"
-mush.df$habitat[mush.df$habitat == "m"] <- "meadows"
-mush.df$habitat[mush.df$habitat == "p"] <- "paths"
-mush.df$habitat[mush.df$habitat == "u"] <- "urban"
-mush.df$habitat[mush.df$habitat == "w"] <- "waste"
-mush.df$habitat[mush.df$habitat == "d"] <- "woods"
+my.mush$population[my.mush$population == "a"] <- "abundant"
+my.mush$population[my.mush$population == "c"] <- "clustered"
+my.mush$population[my.mush$population == "n"] <- "numerous"
+my.mush$population[my.mush$population == "s"] <- "scattered"
+my.mush$population[my.mush$population == "v"] <- "several"
+my.mush$population[my.mush$population == "y"] <- "solitary"
+
+my.mush$habitat[my.mush$habitat == "g"] <- "grasses"
+my.mush$habitat[my.mush$habitat == "l"] <- "leaves"
+my.mush$habitat[my.mush$habitat == "m"] <- "meadows"
+my.mush$habitat[my.mush$habitat == "p"] <- "paths"
+my.mush$habitat[my.mush$habitat == "u"] <- "urban"
+my.mush$habitat[my.mush$habitat == "w"] <- "waste"
+my.mush$habitat[my.mush$habitat == "d"] <- "woods"
 
 ```
 
 
-#Convert back to factors & validate the changes
+#Sample Data & Convert back to factors
 ```{r, echo = F}
-mush.df[] <- lapply(mush.df, factor)
-head(mush.df)
-str(mush.df)
+my.mush[] <- lapply(my.mush, factor)
+head(my.mush)
+str(my.mush)
 ```
+</div>
