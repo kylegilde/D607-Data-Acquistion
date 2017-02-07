@@ -1,8 +1,11 @@
 ---
 title: "607 Data Aquisition - Week 1"
 author: "Kyle Gilde"
-date: "Feb. 4, 2017"
-output: html_document
+date: "Feb. 5, 2017"
+output: 
+  html_document:
+    toc: true
+    #code_folding: hide
 ---
 <style>
 div.beige pre { background-color:beige; }
@@ -18,8 +21,9 @@ div.beige pre { background-color:beige; }
 
 
 
-#Setup & Load Data
-```{r setup & load data, echo=F} 
+#Setup
+##[Mushroom Documentation](https://archive.ics.uci.edu/ml/datasets/Mushroom)
+```{r setup, echo=F} 
 knitr::opts_chunk$set(#echo=FALSE, 
                       warning=FALSE, 
                       message=FALSE,
@@ -32,48 +36,64 @@ knitr::opts_chunk$set(#echo=FALSE,
                       dev.args=list(type="cairo"))
 require(RCurl)
 require(plyr)
+```
 
+
+#Load & Sample Data
+```{r load data}
 url <- "https://archive.ics.uci.edu/ml/machine-learning-databases/mushroom/agaricus-lepiota.data"
 mush <- getURL(url)
 my.mush <- read.csv(text=mush, header = F, sep = ",", stringsAsFactors = F)
-
-
+head(my.mush)
 ```
 
+
 #Subset & transform data
-```{r}
-my.mush <- my.mush[, c(1, 5, 22, 23)]
+```{r transform}
+new.mush <- my.mush[, c(1, 5, 22, 23)]
 
-names(my.mush) <- c("edibility", "has_bruises", "population", "habitat")
+names(new.mush) <- c("edibility", "has_bruises", "population", "habitat")
+#alternative: rename()
 
-my.mush$edibility[my.mush$edibility == "e"] <- "edible"
-my.mush$edibility[my.mush$edibility == "p"] <- "poisonous"
+new.mush$edibility[new.mush$edibility == "e"] <- "edible"
+new.mush$edibility[new.mush$edibility == "p"] <- "poisonous"
 
-my.mush$has_bruises[my.mush$has_bruises == "t"] <- "TRUE"
-my.mush$has_bruises[my.mush$has_bruises == "f"] <- "FALSE"
+new.mush$has_bruises[new.mush$has_bruises == "t"] <- "TRUE"
+new.mush$has_bruises[new.mush$has_bruises == "f"] <- "FALSE"
 
-my.mush$population[my.mush$population == "a"] <- "abundant"
-my.mush$population[my.mush$population == "c"] <- "clustered"
-my.mush$population[my.mush$population == "n"] <- "numerous"
-my.mush$population[my.mush$population == "s"] <- "scattered"
-my.mush$population[my.mush$population == "v"] <- "several"
-my.mush$population[my.mush$population == "y"] <- "solitary"
+new.mush$population[new.mush$population == "a"] <- "abundant"
+new.mush$population[new.mush$population == "c"] <- "clustered"
+new.mush$population[new.mush$population == "n"] <- "numerous"
+new.mush$population[new.mush$population == "s"] <- "scattered"
+new.mush$population[new.mush$population == "v"] <- "several"
+new.mush$population[new.mush$population == "y"] <- "solitary"
 
-my.mush$habitat[my.mush$habitat == "g"] <- "grasses"
-my.mush$habitat[my.mush$habitat == "l"] <- "leaves"
-my.mush$habitat[my.mush$habitat == "m"] <- "meadows"
-my.mush$habitat[my.mush$habitat == "p"] <- "paths"
-my.mush$habitat[my.mush$habitat == "u"] <- "urban"
-my.mush$habitat[my.mush$habitat == "w"] <- "waste"
-my.mush$habitat[my.mush$habitat == "d"] <- "woods"
+new.mush$habitat[new.mush$habitat == "g"] <- "grasses"
+new.mush$habitat[new.mush$habitat == "l"] <- "leaves"
+new.mush$habitat[new.mush$habitat == "m"] <- "meadows"
+new.mush$habitat[new.mush$habitat == "p"] <- "paths"
+new.mush$habitat[new.mush$habitat == "u"] <- "urban"
+new.mush$habitat[new.mush$habitat == "w"] <- "waste"
+new.mush$habitat[new.mush$habitat == "d"] <- "woods"
 
 ```
 
 
 #Sample Data & Convert back to factors
-```{r, echo = F}
-my.mush[] <- lapply(my.mush, factor)
-head(my.mush)
-str(my.mush)
+```{r sample}
+new.mush[] <- lapply(new.mush, factor)
+head(new.mush)
+str(new.mush)
+
 ```
+
+#How is the poisonous mushroom population distributed proportionally?
+```{r }
+p.mush <- subset(new.mush$population, new.mush$edibility == "poisonous")
+
+round(t(t(prop.table(table(p.mush)))),2)
+
+```
+
+
 </div>
