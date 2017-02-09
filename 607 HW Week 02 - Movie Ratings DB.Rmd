@@ -1,0 +1,77 @@
+---
+title: "D607 Week 2 - Movie Ratings DB"
+---
+title: "607 Data Aquisition - Week 1"
+author: "Kyle Gilde"
+date: "Feb. 5, 2017"
+output: 
+  html_document:
+    toc: true
+    #code_folding: hide
+---
+<style>
+div.beige pre { background-color:beige; }
+</style>
+ <div class = "beige">
+
+#The Task
+
+Choose six recent popular movies.  Ask at least five people that you know (friends, family, classmates, imaginary friends) to rate each of these movie that they have seen on a scale of 1 to 5.  Take the results (observations) and store them in a SQL database.  Load the information into an R dataframe.
+
+Your deliverables should include your SQL scripts and your R Markdown code, posted to GitHub.
+
+#Setup
+```{r setup, include=F} 
+knitr::opts_chunk$set(#echo=FALSE, 
+                      warning=FALSE, 
+                      message=FALSE,
+                      #tidy=TRUE,
+                      comment = "",
+                      dev="png", 
+                      #fig.width = 6, 
+                      #fig.height = 4, 
+                      #dpi=200, 
+                      dev.args=list(type="cairo"))
+#require(plyr)
+#require(RODBC)
+require(RMySQL)
+require(sqldf)
+require(htmlTable)
+```
+
+
+```{r Connect}
+my.db <- dbConnect(MySQL(), user="root", password="kmgkmg", dbname="movie_ratings", host="localhost", port=3306)
+
+my.tables <- dbGetQuery(my.db, "show tables")
+htmlTable(my.tables, rnames=F, header="Tables in Movie Ratings DB")
+
+friends <- dbGetQuery(my.db, "select * from friends")
+movies <- dbGetQuery(my.db, "select * from movies")
+movies_ratings_friends <- dbGetQuery(my.db, "select * from movies_ratings_friends")
+ratings <- dbGetQuery(my.db, "select * from ratings")
+
+
+a <- search()
+a
+agg_table <- dbGetQuery(my.db, 
+          "select m.movie
+          , f.name
+          , r.rating 
+          , r.rating_score
+          from movies_ratings_friends mrf
+          join movies m on mrf.movie_id = m.id
+          join friends f on mrf.friend_id = f.id
+          join ratings r on mrf.rating_id = r.id
+          "
+           )
+htmlTable(agg_table, rnames=F)
+
+#sqldf("select * from agg_table")
+dbDisconnect(my.db)
+
+```
+
+
+
+</div>
