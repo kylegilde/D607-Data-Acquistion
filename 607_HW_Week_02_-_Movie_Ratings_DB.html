@@ -132,7 +132,30 @@ div.beige pre { background-color:beige; }
 <pre class="r"><code>my.db &lt;- dbConnect(MySQL(), user=&quot;root&quot;, password=&quot;kmgkmg&quot;, dbname=&quot;movie_ratings&quot;, host=&quot;localhost&quot;, port=3306)
 
 my.tables &lt;- dbGetQuery(my.db, &quot;show tables&quot;)
-htmlTable(my.tables, rnames=F, header=&quot;Tables in Movie Ratings DB&quot;)</code></pre>
+kable(my.tables, caption=&quot;Tables in Movie Ratings DB&quot;)</code></pre>
+<table>
+<caption>Tables in Movie Ratings DB</caption>
+<thead>
+<tr class="header">
+<th align="left">Tables_in_movie_ratings</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">friends</td>
+</tr>
+<tr class="even">
+<td align="left">movies</td>
+</tr>
+<tr class="odd">
+<td align="left">movies_ratings_friends</td>
+</tr>
+<tr class="even">
+<td align="left">ratings</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>htmlTable(my.tables, rnames=F, header=&quot;Tables in Movie Ratings DB&quot;)</code></pre>
 <table class='gmisc_table' style='border-collapse: collapse; margin-top: 1em; margin-bottom: 1em;' >
 <thead>
 <tr>
@@ -162,12 +185,12 @@ ratings &lt;- dbGetQuery(my.db, &quot;select * from ratings&quot;)
 
 a &lt;- search()
 a</code></pre>
-<pre><code> [1] &quot;.GlobalEnv&quot;        &quot;package:htmlTable&quot; &quot;package:sqldf&quot;    
- [4] &quot;package:RSQLite&quot;   &quot;package:gsubfn&quot;    &quot;package:proto&quot;    
- [7] &quot;package:RMySQL&quot;    &quot;package:DBI&quot;       &quot;package:stats&quot;    
-[10] &quot;package:graphics&quot;  &quot;package:grDevices&quot; &quot;package:utils&quot;    
-[13] &quot;package:datasets&quot;  &quot;package:methods&quot;   &quot;Autoloads&quot;        
-[16] &quot;package:base&quot;     </code></pre>
+<pre><code> [1] &quot;.GlobalEnv&quot;        &quot;package:knitr&quot;     &quot;package:htmlTable&quot;
+ [4] &quot;package:sqldf&quot;     &quot;package:RSQLite&quot;   &quot;package:gsubfn&quot;   
+ [7] &quot;package:proto&quot;     &quot;package:RMySQL&quot;    &quot;package:DBI&quot;      
+[10] &quot;package:stats&quot;     &quot;package:graphics&quot;  &quot;package:grDevices&quot;
+[13] &quot;package:utils&quot;     &quot;package:datasets&quot;  &quot;package:methods&quot;  
+[16] &quot;Autoloads&quot;         &quot;package:base&quot;     </code></pre>
 <pre class="r"><code>agg_table &lt;- dbGetQuery(my.db, 
           &quot;select m.movie
           , f.name
@@ -179,323 +202,53 @@ a</code></pre>
           join ratings r on mrf.rating_id = r.id
           &quot;
            )
-htmlTable(agg_table, rnames=F)</code></pre>
-<table class='gmisc_table' style='border-collapse: collapse; margin-top: 1em; margin-bottom: 1em;' >
+#htmlTable(agg_table, rnames=F)
+kable(head(agg_table))</code></pre>
+<table>
 <thead>
-<tr>
-<th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;'>movie</th>
-<th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;'>name</th>
-<th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;'>rating</th>
-<th style='border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;'>rating_score</th>
+<tr class="header">
+<th align="left">movie</th>
+<th align="left">name</th>
+<th align="left">rating</th>
+<th align="right">rating_score</th>
 </tr>
 </thead>
 <tbody>
-<tr>
-<td style='text-align: center;'>Arrival
-</td>
-<td style='text-align: center;'>Dave
-</td>
-<td style='text-align: center;'>Eh... kinda boring</td>
-<td style='text-align: center;'>2</td>
+<tr class="odd">
+<td align="left">Arrival</td>
+<td align="left">Dave</td>
+<td align="left">Eh… kinda boring</td>
+<td align="right">2</td>
 </tr>
-<tr>
-<td style='text-align: center;'>Arrival
-</td>
-<td style='text-align: center;'>Kyle
-</td>
-<td style='text-align: center;'>It was Ok</td>
-<td style='text-align: center;'>3</td>
+<tr class="even">
+<td align="left">Arrival</td>
+<td align="left">Kyle</td>
+<td align="left">It was Ok</td>
+<td align="right">3</td>
 </tr>
-<tr>
-<td style='text-align: center;'>Arrival
-</td>
-<td style='text-align: center;'>Rachel
-</td>
-<td style='text-align: center;'>Eh... kinda boring</td>
-<td style='text-align: center;'>2</td>
+<tr class="odd">
+<td align="left">Arrival</td>
+<td align="left">Rachel</td>
+<td align="left">Eh… kinda boring</td>
+<td align="right">2</td>
 </tr>
-<tr>
-<td style='text-align: center;'>Arrival
-</td>
-<td style='text-align: center;'>Chris
-</td>
-<td style='text-align: center;'>Horrible!</td>
-<td style='text-align: center;'>1</td>
+<tr class="even">
+<td align="left">Arrival</td>
+<td align="left">Chris</td>
+<td align="left">Horrible!</td>
+<td align="right">1</td>
 </tr>
-<tr>
-<td style='text-align: center;'>Arrival
-</td>
-<td style='text-align: center;'>Tomas</td>
-<td style='text-align: center;'>It was Ok</td>
-<td style='text-align: center;'>3</td>
+<tr class="odd">
+<td align="left">Arrival</td>
+<td align="left">Tomas</td>
+<td align="left">It was Ok</td>
+<td align="right">3</td>
 </tr>
-<tr>
-<td style='text-align: center;'>Fences
-</td>
-<td style='text-align: center;'>Dave
-</td>
-<td style='text-align: center;'>Good...but not great</td>
-<td style='text-align: center;'>4</td>
-</tr>
-<tr>
-<td style='text-align: center;'>Fences
-</td>
-<td style='text-align: center;'>Kyle
-</td>
-<td style='text-align: center;'>Great!</td>
-<td style='text-align: center;'>5</td>
-</tr>
-<tr>
-<td style='text-align: center;'>Fences
-</td>
-<td style='text-align: center;'>Rachel
-</td>
-<td style='text-align: center;'>Horrible!</td>
-<td style='text-align: center;'>1</td>
-</tr>
-<tr>
-<td style='text-align: center;'>Fences
-</td>
-<td style='text-align: center;'>Chris
-</td>
-<td style='text-align: center;'>Good...but not great</td>
-<td style='text-align: center;'>4</td>
-</tr>
-<tr>
-<td style='text-align: center;'>Fences
-</td>
-<td style='text-align: center;'>Tomas</td>
-<td style='text-align: center;'>It was Ok</td>
-<td style='text-align: center;'>3</td>
-</tr>
-<tr>
-<td style='text-align: center;'>Hacksaw Ridge
-</td>
-<td style='text-align: center;'>Dave
-</td>
-<td style='text-align: center;'>Good...but not great</td>
-<td style='text-align: center;'>4</td>
-</tr>
-<tr>
-<td style='text-align: center;'>Hacksaw Ridge
-</td>
-<td style='text-align: center;'>Kyle
-</td>
-<td style='text-align: center;'>Horrible!</td>
-<td style='text-align: center;'>1</td>
-</tr>
-<tr>
-<td style='text-align: center;'>Hacksaw Ridge
-</td>
-<td style='text-align: center;'>Rachel
-</td>
-<td style='text-align: center;'>It was Ok</td>
-<td style='text-align: center;'>3</td>
-</tr>
-<tr>
-<td style='text-align: center;'>Hacksaw Ridge
-</td>
-<td style='text-align: center;'>Chris
-</td>
-<td style='text-align: center;'>It was Ok</td>
-<td style='text-align: center;'>3</td>
-</tr>
-<tr>
-<td style='text-align: center;'>Hacksaw Ridge
-</td>
-<td style='text-align: center;'>Tomas</td>
-<td style='text-align: center;'>Horrible!</td>
-<td style='text-align: center;'>1</td>
-</tr>
-<tr>
-<td style='text-align: center;'>Hell or High Water
-</td>
-<td style='text-align: center;'>Dave
-</td>
-<td style='text-align: center;'>It was Ok</td>
-<td style='text-align: center;'>3</td>
-</tr>
-<tr>
-<td style='text-align: center;'>Hell or High Water
-</td>
-<td style='text-align: center;'>Kyle
-</td>
-<td style='text-align: center;'>Great!</td>
-<td style='text-align: center;'>5</td>
-</tr>
-<tr>
-<td style='text-align: center;'>Hell or High Water
-</td>
-<td style='text-align: center;'>Rachel
-</td>
-<td style='text-align: center;'>Great!</td>
-<td style='text-align: center;'>5</td>
-</tr>
-<tr>
-<td style='text-align: center;'>Hell or High Water
-</td>
-<td style='text-align: center;'>Chris
-</td>
-<td style='text-align: center;'>Good...but not great</td>
-<td style='text-align: center;'>4</td>
-</tr>
-<tr>
-<td style='text-align: center;'>Hell or High Water
-</td>
-<td style='text-align: center;'>Tomas</td>
-<td style='text-align: center;'>It was Ok</td>
-<td style='text-align: center;'>3</td>
-</tr>
-<tr>
-<td style='text-align: center;'>Hidden Figures
-</td>
-<td style='text-align: center;'>Dave
-</td>
-<td style='text-align: center;'>Great!</td>
-<td style='text-align: center;'>5</td>
-</tr>
-<tr>
-<td style='text-align: center;'>Hidden Figures
-</td>
-<td style='text-align: center;'>Kyle
-</td>
-<td style='text-align: center;'>Good...but not great</td>
-<td style='text-align: center;'>4</td>
-</tr>
-<tr>
-<td style='text-align: center;'>Hidden Figures
-</td>
-<td style='text-align: center;'>Rachel
-</td>
-<td style='text-align: center;'>Eh... kinda boring</td>
-<td style='text-align: center;'>2</td>
-</tr>
-<tr>
-<td style='text-align: center;'>Hidden Figures
-</td>
-<td style='text-align: center;'>Chris
-</td>
-<td style='text-align: center;'>Horrible!</td>
-<td style='text-align: center;'>1</td>
-</tr>
-<tr>
-<td style='text-align: center;'>Hidden Figures
-</td>
-<td style='text-align: center;'>Tomas</td>
-<td style='text-align: center;'>Good...but not great</td>
-<td style='text-align: center;'>4</td>
-</tr>
-<tr>
-<td style='text-align: center;'>La La Land
-</td>
-<td style='text-align: center;'>Dave
-</td>
-<td style='text-align: center;'>Good...but not great</td>
-<td style='text-align: center;'>4</td>
-</tr>
-<tr>
-<td style='text-align: center;'>La La Land
-</td>
-<td style='text-align: center;'>Kyle
-</td>
-<td style='text-align: center;'>It was Ok</td>
-<td style='text-align: center;'>3</td>
-</tr>
-<tr>
-<td style='text-align: center;'>La La Land
-</td>
-<td style='text-align: center;'>Rachel
-</td>
-<td style='text-align: center;'>Great!</td>
-<td style='text-align: center;'>5</td>
-</tr>
-<tr>
-<td style='text-align: center;'>La La Land
-</td>
-<td style='text-align: center;'>Chris
-</td>
-<td style='text-align: center;'>Good...but not great</td>
-<td style='text-align: center;'>4</td>
-</tr>
-<tr>
-<td style='text-align: center;'>La La Land
-</td>
-<td style='text-align: center;'>Tomas</td>
-<td style='text-align: center;'>Good...but not great</td>
-<td style='text-align: center;'>4</td>
-</tr>
-<tr>
-<td style='text-align: center;'>Lion
-</td>
-<td style='text-align: center;'>Dave
-</td>
-<td style='text-align: center;'>Great!</td>
-<td style='text-align: center;'>5</td>
-</tr>
-<tr>
-<td style='text-align: center;'>Lion
-</td>
-<td style='text-align: center;'>Kyle
-</td>
-<td style='text-align: center;'>Eh... kinda boring</td>
-<td style='text-align: center;'>2</td>
-</tr>
-<tr>
-<td style='text-align: center;'>Lion
-</td>
-<td style='text-align: center;'>Rachel
-</td>
-<td style='text-align: center;'>Good...but not great</td>
-<td style='text-align: center;'>4</td>
-</tr>
-<tr>
-<td style='text-align: center;'>Lion
-</td>
-<td style='text-align: center;'>Chris
-</td>
-<td style='text-align: center;'>Horrible!</td>
-<td style='text-align: center;'>1</td>
-</tr>
-<tr>
-<td style='text-align: center;'>Lion
-</td>
-<td style='text-align: center;'>Tomas</td>
-<td style='text-align: center;'>It was Ok</td>
-<td style='text-align: center;'>3</td>
-</tr>
-<tr>
-<td style='text-align: center;'>Manchester by the Sea</td>
-<td style='text-align: center;'>Dave
-</td>
-<td style='text-align: center;'>Good...but not great</td>
-<td style='text-align: center;'>4</td>
-</tr>
-<tr>
-<td style='text-align: center;'>Manchester by the Sea</td>
-<td style='text-align: center;'>Kyle
-</td>
-<td style='text-align: center;'>Horrible!</td>
-<td style='text-align: center;'>1</td>
-</tr>
-<tr>
-<td style='text-align: center;'>Manchester by the Sea</td>
-<td style='text-align: center;'>Rachel
-</td>
-<td style='text-align: center;'>Eh... kinda boring</td>
-<td style='text-align: center;'>2</td>
-</tr>
-<tr>
-<td style='text-align: center;'>Manchester by the Sea</td>
-<td style='text-align: center;'>Chris
-</td>
-<td style='text-align: center;'>Great!</td>
-<td style='text-align: center;'>5</td>
-</tr>
-<tr>
-<td style='border-bottom: 2px solid grey; text-align: center;'>Manchester by the Sea</td>
-<td style='border-bottom: 2px solid grey; text-align: center;'>Tomas</td>
-<td style='border-bottom: 2px solid grey; text-align: center;'>Horrible!</td>
-<td style='border-bottom: 2px solid grey; text-align: center;'>1</td>
+<tr class="even">
+<td align="left">Fences</td>
+<td align="left">Dave</td>
+<td align="left">Good…but not great</td>
+<td align="right">4</td>
 </tr>
 </tbody>
 </table>

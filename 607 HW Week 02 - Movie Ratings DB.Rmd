@@ -34,9 +34,10 @@ knitr::opts_chunk$set(#echo=FALSE,
                       dev.args=list(type="cairo"))
 #require(plyr)
 #require(RODBC)
-require(RMySQL)
-require(sqldf)
-require(htmlTable)
+library(RMySQL)
+library(sqldf)
+library(htmlTable)
+library(knitr)
 ```
 
 
@@ -44,6 +45,7 @@ require(htmlTable)
 my.db <- dbConnect(MySQL(), user="root", password="kmgkmg", dbname="movie_ratings", host="localhost", port=3306)
 
 my.tables <- dbGetQuery(my.db, "show tables")
+kable(my.tables, caption="Tables in Movie Ratings DB")
 htmlTable(my.tables, rnames=F, header="Tables in Movie Ratings DB")
 
 friends <- dbGetQuery(my.db, "select * from friends")
@@ -52,8 +54,6 @@ movies_ratings_friends <- dbGetQuery(my.db, "select * from movies_ratings_friend
 ratings <- dbGetQuery(my.db, "select * from ratings")
 
 
-a <- search()
-a
 agg_table <- dbGetQuery(my.db, 
           "select m.movie
           , f.name
@@ -65,9 +65,15 @@ agg_table <- dbGetQuery(my.db,
           join ratings r on mrf.rating_id = r.id
           "
            )
-htmlTable(agg_table, rnames=F)
-
+#htmlTable(agg_table, rnames=F)
+kable(head(agg_table, 10))
 #sqldf("select * from agg_table")
+
+
+
+```
+```{r disconnect include = F}
+
 dbDisconnect(my.db)
 
 ```

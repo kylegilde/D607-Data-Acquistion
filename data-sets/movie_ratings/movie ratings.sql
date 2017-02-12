@@ -10,28 +10,28 @@ CREATE TABLE friends (
   name varchar(30) NOT NULL
   );
   
-LOAD DATA LOCAL INFILE 'C:/Users/kyleg/D607-Data-Acquisition/data-sets/movie_ratings/friends.csv' 
-INTO TABLE friends 
-FIELDS TERMINATED BY ',' 
-#ENCLOSED BY '"'
-LINES TERMINATED BY '\n'
-IGNORE 1 ROWS;
+-- LOAD DATA LOCAL INFILE 'C:/Users/kyleg/D607-Data-Acquisition/data-sets/movie_ratings/friends.csv' 
+-- INTO TABLE friends 
+-- FIELDS TERMINATED BY ',' 
+-- #ENCLOSED BY '"'
+-- LINES TERMINATED BY '\n'
+-- IGNORE 1 ROWS;
 
-select * from friends;
+-- select * from friends;
 
 CREATE TABLE movies (
   id integer primary key,
   movie varchar(100)
   );
   
-LOAD DATA LOCAL INFILE 'C:/Users/kyleg/D607-Data-Acquisition/data-sets/movie_ratings/movies.csv' 
-INTO TABLE movies 
-FIELDS TERMINATED BY ',' 
-#ENCLOSED BY '"'
-LINES TERMINATED BY '\n'
-IGNORE 1 ROWS;
+-- LOAD DATA LOCAL INFILE 'C:/Users/kyleg/D607-Data-Acquisition/data-sets/movie_ratings/movies.csv' 
+-- INTO TABLE movies 
+-- FIELDS TERMINATED BY ',' 
+-- #ENCLOSED BY '"'
+-- LINES TERMINATED BY '\n'
+-- IGNORE 1 ROWS;
 
-select * from movies;
+-- select * from movies;
 
 CREATE TABLE ratings (
 	id integer primary key,
@@ -39,14 +39,14 @@ CREATE TABLE ratings (
 	rating_score integer
 	);
 
-LOAD DATA LOCAL INFILE 'C:/Users/kyleg/D607-Data-Acquisition/data-sets/movie_ratings/ratings.csv' 
-INTO TABLE ratings
-FIELDS TERMINATED BY ',' 
-#ENCLOSED BY '"'
-LINES TERMINATED BY '\n'
-IGNORE 1 ROWS;
+-- LOAD DATA LOCAL INFILE 'C:/Users/kyleg/D607-Data-Acquisition/data-sets/movie_ratings/ratings.csv' 
+-- INTO TABLE ratings
+-- FIELDS TERMINATED BY ',' 
+-- #ENCLOSED BY '"'
+-- LINES TERMINATED BY '\n'
+-- IGNORE 1 ROWS;
 
-select * from ratings;
+-- select * from ratings;
 
 CREATE TABLE movies_ratings_friends (
 	id integer,
@@ -55,14 +55,14 @@ CREATE TABLE movies_ratings_friends (
 	rating_id integer
 	);
 
-LOAD DATA LOCAL INFILE 'C:/Users/kyleg/D607-Data-Acquisition/data-sets/movie_ratings/movies_ratings_friends.csv' 
-INTO TABLE movies_ratings_friends
-FIELDS TERMINATED BY ',' 
-#ENCLOSED BY '"'
-LINES TERMINATED BY '\n'
-IGNORE 1 ROWS;
+-- LOAD DATA LOCAL INFILE 'C:/Users/kyleg/D607-Data-Acquisition/data-sets/movie_ratings/movies_ratings_friends.csv' 
+-- INTO TABLE movies_ratings_friends
+-- FIELDS TERMINATED BY ',' 
+-- #ENCLOSED BY '"'
+-- LINES TERMINATED BY '\n'
+-- IGNORE 1 ROWS;
 
-select * from movies_ratings_friends;
+-- select * from movies_ratings_friends;
 
 SELECT 'friends', COUNT(*) FROM friends
   UNION
