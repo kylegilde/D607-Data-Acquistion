@@ -1,13 +1,11 @@
 ---
 title: "D607 Week 2 - Movie Ratings DB"
----
-title: "607 Data Aquisition - Week 1"
 author: "Kyle Gilde"
-date: "Feb. 5, 2017"
+date: "Feb. 12, 2017"
 output: 
   html_document:
     toc: true
-    #code_folding: hide
+    code_folding: hide
 ---
 <style>
 div.beige pre { background-color:beige; }
@@ -20,40 +18,49 @@ Choose six recent popular movies.  Ask at least five people that you know (frien
 
 Your deliverables should include your SQL scripts and your R Markdown code, posted to GitHub.
 
-#Setup
-```{r setup, include=F} 
+#Load Packages
+```{r setup} 
 knitr::opts_chunk$set(#echo=FALSE, 
                       warning=FALSE, 
                       message=FALSE,
-                      #tidy=TRUE,
+                      tidy=TRUE,
                       comment = "",
                       dev="png", 
-                      #fig.width = 6, 
-                      #fig.height = 4, 
-                      #dpi=200, 
                       dev.args=list(type="cairo"))
-#require(plyr)
-#require(RODBC)
-library(RMySQL)
-library(sqldf)
-library(htmlTable)
-library(knitr)
+
+load.packages <- c(
+  "RMySQL"
+  #, "htmlTable"
+  , "knitr"
+)
+ipak <- function(pkg){
+    #Function source: https://gist.github.com/stevenworthington/3178163
+    new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
+    if (length(new.pkg)) 
+        install.packages(new.pkg, dependencies = TRUE)
+    sapply(pkg, require, character.only = TRUE)
+}
+ipak(load.packages)
 ```
 
 
+#Connect to the DB and list the tables.
 ```{r Connect}
 my.db <- dbConnect(MySQL(), user="root", password="kmgkmg", dbname="movie_ratings", host="localhost", port=3306)
 
 my.tables <- dbGetQuery(my.db, "show tables")
-kable(my.tables, caption="Tables in Movie Ratings DB")
-htmlTable(my.tables, rnames=F, header="Tables in Movie Ratings DB")
+kable(my.tables, caption ="Tables")
 
-friends <- dbGetQuery(my.db, "select * from friends")
-movies <- dbGetQuery(my.db, "select * from movies")
-movies_ratings_friends <- dbGetQuery(my.db, "select * from movies_ratings_friends")
-ratings <- dbGetQuery(my.db, "select * from ratings")
+# friends <- dbGetQuery(my.db, "select * from friends")
+# movies <- dbGetQuery(my.db, "select * from movies")
+# movies_ratings_friends <- dbGetQuery(my.db, "select * from movies_ratings_friends")
+# ratings <- dbGetQuery(my.db, "select * from ratings")
+```
 
 
+
+#Join all tables into one aggregate table. View the 1st 10 rows.
+```{r aggtable}
 agg_table <- dbGetQuery(my.db, 
           "select m.movie
           , f.name
@@ -62,17 +69,63 @@ agg_table <- dbGetQuery(my.db,
           from movies_ratings_friends mrf
           join movies m on mrf.movie_id = m.id
           join friends f on mrf.friend_id = f.id
-          join ratings r on mrf.rating_id = r.id
-          "
+          join ratings r on mrf.rating_id = r.id"
            )
-#htmlTable(agg_table, rnames=F)
+
 kable(head(agg_table, 10))
-#sqldf("select * from agg_table")
+```
 
+#The rating scores are 1 through 5, 1 being the lowest score.
+```{r ratings}
+my.ratings <- dbGetQuery(my.db,
+                         "select rating
+                          , rating_score
+                          from ratings
+                          order by 2")
 
+kable(my.ratings)
 
 ```
-```{r disconnect include = F}
+
+
+#Which movie received the highest average rating from my friends?
+```{r highest_rating}
+
+highest_rating <- 
+          dbGetQuery(my.db, 
+          "select m.movie
+          , avg(r.rating_score) avg_score
+          from movies_ratings_friends mrf
+          join movies m on mrf.movie_id = m.id
+          join ratings r on mrf.rating_id = r.id
+          group by 1
+          order by 2 desc"
+           )
+
+kable(highest_rating, caption = "We have a tie between La La Land and Hell or High Water!")
+```
+
+#Which of my friends gave out the lowest ratings on average?
+
+```{r most_critical_friend}
+most_critical_friend <- dbGetQuery(my.db, 
+          "select f.name
+          , avg(r.rating_score) avg_rating
+          from movies_ratings_friends mrf
+          join friends f on mrf.friend_id = f.id
+          join ratings r on mrf.rating_id = r.id
+          group by 1
+          order by 2"
+          )
+
+kable(most_critical_friend, caption = "Tomas gave out the lowest ratings!")
+```
+
+
+
+
+# Disconnect from DB
+```{r disconnect}
 
 dbDisconnect(my.db)
 
