@@ -30,9 +30,6 @@ knitr::opts_chunk$set(#echo=FALSE,
                       dev="png", 
                       dev.args=list(type="cairo"))
 
-#https://www.rstudio.com/wp-content/uploads/2015/03/rmarkdown-reference.pdf
-
-
 load.packages <- c(
   "RMySQL"
   , "RCurl"

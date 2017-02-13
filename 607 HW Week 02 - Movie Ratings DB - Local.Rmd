@@ -1,11 +1,11 @@
 ---
-title: "D607 Week 2 - Movie Ratings DB - Reproducible"
+title: "D607 Week 2 - Movie Ratings DB - Local"
 author: "Kyle Gilde"
 date: "Feb. 12, 2017"
 output: 
   html_document:
     toc: true
-    #code_folding: hide
+    code_folding: hide
 ---
 <style>
 div.beige pre { background-color:beige; }
@@ -18,10 +18,8 @@ Choose six recent popular movies.  Ask at least five people that you know (frien
 
 Your deliverables should include your SQL scripts and your R Markdown code, posted to GitHub.
 
-This is by design a very open ended assignment.  A variety of reasonable approaches are acceptable.  You can (and should) blank out your SQL password if your solution requires it; otherwise, full credit requires that your code is "reproducible," with the assumption that I have the same database server and R software.
-
 #Load Packages
-```{r setup, results='hide'} 
+```{r setup} 
 knitr::opts_chunk$set(#echo=FALSE, 
                       warning=FALSE, 
                       message=FALSE,
@@ -30,16 +28,13 @@ knitr::opts_chunk$set(#echo=FALSE,
                       dev="png", 
                       dev.args=list(type="cairo"))
 
-#https://www.rstudio.com/wp-content/uploads/2015/03/rmarkdown-reference.pdf
-
-
 load.packages <- c(
   "RMySQL"
-  , "RCurl"
+  #, "htmlTable"
   , "knitr"
 )
 ipak <- function(pkg){
-    #FUNCTION SOURCE: https://gist.github.com/stevenworthington/3178163
+    #Function source: https://gist.github.com/stevenworthington/3178163
     new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
     if (length(new.pkg)) 
         install.packages(new.pkg, dependencies = TRUE)
@@ -47,52 +42,17 @@ ipak <- function(pkg){
 }
 ipak(load.packages)
 ```
-	
- 
-	
 
 
-#Connect to the DB
+#Connect to the DB and list the tables.
 ```{r Connect}
 my.db <- dbConnect(MySQL(), user="root", password="kmgkmg", dbname="movie_ratings", host="localhost", port=3306)
-```
 
-#Create & Load Tables
-```{r create_load, results='hide'}
-create.tables <- getURL("https://raw.githubusercontent.com/kylegilde/D607-Data-Acquistion/master/data-sets/movie_ratings/movie%20ratings.sql")
-create.tables <- unlist(strsplit(gsub("[\n\t]", "",create.tables), split=";"))
-dbGetQuery(my.db, create.tables)
-dbGetQuery(my.db,create.tables[5])
-####Do you have any idea why I have to run the 5th query on its own to create that table?
-
-my.URLs <- getURL(gsub(" ","",paste("https://raw.githubusercontent.com/kylegilde/D607-Data-Acquistion/master/data-sets/movie_ratings/",c(
-  "friends.csv"
-  ,"movies.csv"
-  ,"movies_ratings_friends.csv"
-  ,"ratings.csv"
-))))
-
-#https://www.r-bloggers.com/accessing-mysql-through-r/
-
-friends <- read.csv(text = my.URLs[1], sep = ",")
-movies <- read.csv(text = my.URLs[2], sep = ",")
-movies_ratings_friends <- read.csv(text = my.URLs[3], sep = ",")
-ratings <- read.csv(text = my.URLs[4], sep = ",")
-
-dbWriteTable(my.db, "friends", friends, overwrite = T, row.names = F)
-dbWriteTable(my.db, "movies", movies, overwrite = T, row.names = F)
-dbWriteTable(my.db, "movies_ratings_friends", movies_ratings_friends, overwrite = T, row.names = F)
-dbWriteTable(my.db, "ratings", ratings, overwrite = T, row.names = F)
-
-# dbGetQuery(my.db, "describe movies")
-# dbGetQuery(my.db,"select * from ratings")
-```
-
-#List the Tables
-```{r}
 my.tables <- dbGetQuery(my.db, "show tables")
 kable(my.tables, caption ="Tables")
+
 ```
+
 
 
 #Join all tables into one aggregate table. View the 1st 10 rows.
@@ -161,7 +121,7 @@ kable(most_critical_friend, caption = "Tomas gave out the lowest ratings!")
 
 
 # Disconnect from DB
-```{r disconnect, results='hide'}
+```{r disconnect}
 
 dbDisconnect(my.db)
 

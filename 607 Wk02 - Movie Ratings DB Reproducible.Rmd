@@ -26,18 +26,14 @@ knitr::opts_chunk$set(#echo=FALSE,
                       warning=FALSE, 
                       message=FALSE,
                       tidy=TRUE,
-                      comment = "",
+                      #comment = "",
                       dev="png", 
                       dev.args=list(type="cairo"))
 
 #https://www.rstudio.com/wp-content/uploads/2015/03/rmarkdown-reference.pdf
 
+load.packages <- c("RMySQL", "RCurl", "knitr")
 
-load.packages <- c(
-  "RMySQL"
-  , "RCurl"
-  , "knitr"
-)
 ipak <- function(pkg){
     #FUNCTION SOURCE: https://gist.github.com/stevenworthington/3178163
     new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
@@ -59,10 +55,11 @@ my.db <- dbConnect(MySQL(), user="root", password="kmgkmg", dbname="movie_rating
 
 #Create & Load Tables
 ```{r create_load, results='hide'}
-create.tables <- getURL("https://raw.githubusercontent.com/kylegilde/D607-Data-Acquistion/master/data-sets/movie_ratings/movie%20ratings.sql")
-create.tables <- unlist(strsplit(gsub("[\n\t]", "",create.tables), split=";"))
-dbGetQuery(my.db, create.tables)
-dbGetQuery(my.db,create.tables[5])
+###This code doesn't seem necessary
+# create.tables <- getURL("https://raw.githubusercontent.com/kylegilde/D607-Data-Acquistion/master/data-sets/movie_ratings/movie%20ratings.sql")
+# create.tables <- unlist(strsplit(gsub("[\n\t]", "",create.tables), split=";"))
+# dbGetQuery(my.db, create.tables)
+# dbGetQuery(my.db,create.tables[5])
 ####Do you have any idea why I have to run the 5th query on its own to create that table?
 
 my.URLs <- getURL(gsub(" ","",paste("https://raw.githubusercontent.com/kylegilde/D607-Data-Acquistion/master/data-sets/movie_ratings/",c(
@@ -83,9 +80,6 @@ dbWriteTable(my.db, "friends", friends, overwrite = T, row.names = F)
 dbWriteTable(my.db, "movies", movies, overwrite = T, row.names = F)
 dbWriteTable(my.db, "movies_ratings_friends", movies_ratings_friends, overwrite = T, row.names = F)
 dbWriteTable(my.db, "ratings", ratings, overwrite = T, row.names = F)
-
-# dbGetQuery(my.db, "describe movies")
-# dbGetQuery(my.db,"select * from ratings")
 ```
 
 #List the Tables
