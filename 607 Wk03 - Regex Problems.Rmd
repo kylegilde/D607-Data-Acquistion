@@ -15,11 +15,6 @@ div.beige pre { background-color:beige; }
 #The Task
 Please deliver links to an R Markdown file (in GitHub and rpubs.com) with solutions to problems 3 and 4 from chapter 8 of Automated Data Collection in R.  Problem 9 is extra credit.  
 
-Here is the referenced code for the introductory example in #3:
-
-
-
-
 http://www.r-datacollection.com/materials/regex/code_exercise.txt
 
 
@@ -35,7 +30,7 @@ knitr::opts_chunk$set(#echo=FALSE,
 
 #https://www.rstudio.com/wp-content/uploads/2015/03/rmarkdown-reference.pdf
 
-load.packages <- c("RCurl", "knitr", "tesseract")
+load.packages <- c("RCurl", "knitr", "tesseract","stringr")
 
 
 ipak <- function(pkg){
@@ -67,6 +62,21 @@ sub("fopy","Copy", my.list[1])
 cat(my.list[5], sub("Jv","_n", my.list[6]))
 
 raw.data <-"555-1239Moe Szyslak(636) 555-0113Burns, C. Montgomery555-6542Rev. Timothy Lovejoy555 8904Ned Flanders636-555-3226Simpson, Homer5553642Dr. Julius Hibbert" 
+
+names <- unlist(str_extract_all(raw.data, "[[:alpha:]., ]{2,}"))
+# [1] "Moe Szyslak"          "Burns, C. Montgomery" "Rev. Timothy Lovejoy" "Ned Flanders"        
+# [5] "Simpson, Homer"       "Dr. Julius Hibbert"  
+names
+
+str_detect(names, ",")
+str_split_fixed(names,",")
+
+my.list[7]
+str_detect(names, "[[:alpha:]]{2,3}\\.")
+
+my.list[8]
+str_detect(names, "[[:alpha:].]{2,3}[.]")
+
 ```
 
 #List the Tables
