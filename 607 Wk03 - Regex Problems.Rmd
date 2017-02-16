@@ -75,7 +75,7 @@ my.list[7]
 str_detect(names, "[[:alpha:]]{2,3}\\.")
 
 my.list[8]
-str_detect(names, "[[:alpha:].]{2,3}[.]")
+str_detect(names, "[[:alpha:]]?[^.]")
 
 ```
 
