@@ -66,18 +66,14 @@ raw.data <-"555-1239Moe Szyslak(636) 555-0113Burns, C. Montgomery555-6542Rev. Ti
 names <- unlist(str_extract_all(raw.data, "[[:alpha:]., ]{2,}"))
 # [1] "Moe Szyslak"          "Burns, C. Montgomery" "Rev. Timothy Lovejoy" "Ned Flanders"        
 # [5] "Simpson, Homer"       "Dr. Julius Hibbert"  
-names$v1 <- as.data.frame(names, stringAsFactors=F)
-str_split
-str(names)
-class(names)
+names_df <- data.frame(names, stringsAsFactors = FALSE)
 
-str_sub(names$v1, str_locate(names,","))
-str_extract(names,"(, ).+")
-str_extract(names,".+(, )")
+names_df$first_half <- str_trim(str_replace(str_extract(names_df$names,"(, ).+"),",",""))
+names_df$last_half <- str_trim(str_replace(str_extract(names_df$names,".+(, )"),",",""))
+names_df
+names_df$first_last_name <- ifelse(is.na(names_df$first_half),names_df$names, paste(names_df$first_half, " ",names_df$last_half))
+t(t(names_df$first_last_name))
 
-
-str_detect(names, ",")
-str_split_fixed(names,",")
 
 
 
