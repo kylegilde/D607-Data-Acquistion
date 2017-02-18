@@ -130,7 +130,6 @@ div.beige pre { background-color:beige; }
 <div class="beige">
 <h1 id="the-task">The Task</h1>
 <p>Please deliver links to an R Markdown file (in GitHub and rpubs.com) with solutions to problems 3 and 4 from chapter 8 of Automated Data Collection in R. Problem 9 is extra credit.</p>
-<p><a href="http://www.r-datacollection.com/materials/regex/code_exercise.txt" class="uri">http://www.r-datacollection.com/materials/regex/code_exercise.txt</a></p>
 <h1 id="load-packages">Load Packages</h1>
 <pre class="r"><code>knitr::opts_chunk$set(#echo=FALSE, 
                       warning=FALSE, 
@@ -142,7 +141,7 @@ div.beige pre { background-color:beige; }
 
 #https://www.rstudio.com/wp-content/uploads/2015/03/rmarkdown-reference.pdf
 
-load.packages &lt;- c(&quot;RCurl&quot;, &quot;knitr&quot;, &quot;tesseract&quot;,&quot;stringr&quot;)
+load.packages &lt;- c(&quot;RCurl&quot;, &quot;knitr&quot;, &quot;tesseract&quot;,&quot;stringr&quot;,&quot;htmlTable&quot;)
 
 
 ipak &lt;- function(pkg){
@@ -158,47 +157,21 @@ ipak(load.packages)</code></pre>
 <pre><code>## Loading required package: knitr</code></pre>
 <pre><code>## Loading required package: tesseract</code></pre>
 <pre><code>## Loading required package: stringr</code></pre>
-<h1 id="just-for-fun-use-optical-character-recognition-pkg-on-the-textbook-image">Just for fun: Use optical character recognition pkg on the textbook image</h1>
-<pre class="r"><code>text &lt;- ocr(&quot;https://raw.githubusercontent.com/kylegilde/D607-Data-Acquistion/master/week3_problems.jpg&quot;)
-# text &lt;-
-# ocr('https://lh5.googleusercontent.com/tmXWA2iBD1UlNQjUVlQqd99iotUWMB_XkWvUnLSMDKSifB4viKnMGnxTrz69h3bvJY98XGu1pLIragc=w1807-h862-rw')
-my.list &lt;- unlist(strsplit(text, &quot;\n&quot;))
-
-my.list</code></pre>
-<pre><code>##  [1] &quot;fopy the introductory example. The vector name stores the extracted names.&quot;                           
-##  [2] &quot;in name&quot;                                                                                              
-##  [3] &quot;in mm szysiaw 'nums. c. antgomery' 'aerv. nmrhy mech'&quot;                                                
-##  [4] &quot;Hi med Fhmers' &lt;U+0092&gt;Slmson, Hmer' \&quot;Dr. mans mbbert'&quot;                                                     
-##  [5] &quot;1. Use the tools of this chapter to rearrange the Vector so that all elements conform to the standard&quot;
-##  [6] &quot;FirstJvame last_name.&quot;                                                                                
-##  [7] &quot;2. Construct a logical vector indicating whether a character has a title (i.e., Rev. and Dr.).&quot;       
-##  [8] &quot;3. Construct a logical vector indicating whether a character has a second name.&quot;                      
-##  [9] &quot;&lt;U+0091&gt;escribe the types of strings that conform to the following regular expressions and constnlct an&quot;     
-## [10] &quot;example that is matched by the regular expression.&quot;                                                   
-## [11] &quot;1. [e-s]+\\\\$&quot;                                                                                       
-## [12] &quot;2. \\\\b[a-z]{1,4}\\\\b&quot;                                                                              
-## [13] &quot;3. .&lt;U+0091&gt;?\\\\.txt$&quot;                                                                                      
-## [14] &quot;4. \\\\d{Z)/\\\\d{2}/\\\\d(A}&quot;                                                                        
-## [15] &quot;5. &lt;(.+?)&gt;.+?&lt;/\\\\1&gt;&quot;                                                                                
-## [16] &quot;are following code hides a secret message, Crack it with R and regular expressions. Hint: Some ofthe&quot; 
-## [17] &quot;characters are more revealing than others} The code snippet is also available in the materials at&quot;    
-## [18] &quot;www.r-datacallectionmom.&quot;                                                                             
-## [19] &quot;&lt;lrop&lt;owlzmstwda7wnkig70vditpnuggvhryh926]uwrziahqrfpwxssn]Edwpnmanwo&quot;                                
-## [20] &quot;and)17L]EkaBBAYSIerwreb&lt;U+FB02&gt;i/rz]amass!)SStZIlJBne&lt;U+FB01&gt;rASfek.r-lwlvwwapgo&quot;                     
-## [21] &quot;ammm.7mmzgmms:mop.Mm.mumpsimwmmnmzqes&quot;                                                                
-## [22] &quot;nyQnsrldkand&lt;U+FB02&gt;aesgmrd&lt;U+FB01&gt;gxosnhnk&lt;U+0091&gt;gv&lt;U+0091&gt;&quot;                                                      
-## [23] &quot;&quot;</code></pre>
+<pre><code>## Loading required package: htmlTable</code></pre>
+<h3 id="just-for-fun-i-used-the-optical-character-recognition-pkg-to-get-the-text-off-of-the-textbook-image.">Just for fun, I used the optical character recognition pkg to get the text off of the textbook image.</h3>
+<h4 id="i-wanted-to-see-if-it-could-be-done.-it-worked-for-more-than-half-of-the-text.">I wanted to see if it could be done. It worked for more than half of the text.</h4>
+<pre class="r"><code># text &lt;-
+# ocr('https://raw.githubusercontent.com/kylegilde/D607-Data-Acquistion/master/week3_problems.jpg')
+# my.list &lt;- unlist(strsplit(text, '\n'))</code></pre>
 <h1 id="problem-3">Problem 3</h1>
-<pre class="r"><code>sub(&quot;fopy&quot;, &quot;Copy&quot;, my.list[1])</code></pre>
-<pre><code>## [1] &quot;Copy the introductory example. The vector name stores the extracted names.&quot;</code></pre>
-<pre class="r"><code>cat(my.list[5], sub(&quot;Jv&quot;, &quot;_n&quot;, my.list[6]))</code></pre>
-<pre><code>## 1. Use the tools of this chapter to rearrange the Vector so that all elements conform to the standard First_name last_name.</code></pre>
-<pre class="r"><code>raw.data &lt;- &quot;555-1239Moe Szyslak(636) 555-0113Burns, C. Montgomery555-6542Rev. Timothy Lovejoy555 8904Ned Flanders636-555-3226Simpson, Homer5553642Dr. Julius Hibbert&quot;
+<ol style="list-style-type: lower-alpha">
+<li>Use the tools of this chapter to rearrange the Vector so that all elements conform to the standard First_name last_name.</li>
+</ol>
+<pre class="r"><code># sub('fopy','Copy', my.list[1]) cat(my.list[5], sub('Jv','_n', my.list[6]))
+
+raw.data &lt;- &quot;555-1239Moe Szyslak(636) 555-0113Burns, C. Montgomery555-6542Rev. Timothy Lovejoy555 8904Ned Flanders636-555-3226Simpson, Homer5553642Dr. Julius Hibbert&quot;
 
 names &lt;- unlist(str_extract_all(raw.data, &quot;[[:alpha:]., ]{2,}&quot;))
-# [1] 'Moe Szyslak' 'Burns, C. Montgomery' 'Rev. Timothy Lovejoy' 'Ned
-# Flanders' [5] 'Simpson, Homer' 'Dr. Julius Hibbert'
-
 names_df &lt;- data.frame(names, stringsAsFactors = FALSE)
 names_df$first_half &lt;- str_trim(str_replace(str_extract(names_df$names, &quot;(, ).+&quot;), 
     &quot;,&quot;, &quot;&quot;))
@@ -206,76 +179,182 @@ names_df$last_half &lt;- str_trim(str_replace(str_extract(names_df$names, &quot;
     &quot;,&quot;, &quot;&quot;))
 names_df$first_last_name &lt;- ifelse(is.na(names_df$first_half), names_df$names, 
     str_c(names_df$first_half, &quot; &quot;, names_df$last_half))
-kable(names_df$first_last_name, col.names = &quot;Normalized Names&quot;)</code></pre>
-<h2 id="normalized-names">Normalized Names</h2>
-<p>Moe Szyslak<br />
-C. Montgomery Burns<br />
-Rev. Timothy Lovejoy Ned Flanders<br />
-Homer Simpson<br />
-Dr. Julius Hibbert</p>
-<pre class="r"><code>str_replace(my.list[7], &quot;Lew&quot;, &quot;i.e.&quot;)</code></pre>
-<pre><code>## [1] &quot;2. Construct a logical vector indicating whether a character has a title (i.e., Rev. and Dr.).&quot;</code></pre>
-<pre class="r"><code>regex1 &lt;- &quot;[[:alpha:]]{2,3}\\.&quot;
-
-kable(str_detect(names_df$first_last_name, regex1), col.names = &quot;Has Title&quot;)</code></pre>
-<h2 id="has-title">Has Title</h2>
-<p>FALSE<br />
-FALSE<br />
-TRUE<br />
-FALSE<br />
-FALSE<br />
-TRUE</p>
-<pre class="r"><code>my.list[8]</code></pre>
-<pre><code>## [1] &quot;3. Construct a logical vector indicating whether a character has a second name.&quot;</code></pre>
-<pre class="r"><code>regex2 &lt;- &quot;^[[:alpha:]]\\.\\s&quot;
-kable(str_detect(names_df$first_last_name, regex2), col.names = &quot;Has 2nd Name&quot;, 
-    caption = &quot;I think this is referring to Mr. Burns' first initial&quot;)</code></pre>
+kable(names_df[, c(1, 4)])</code></pre>
 <table>
-<caption>I think this is referring to Mr. Burns’ first initial</caption>
 <thead>
 <tr class="header">
-<th align="left">Has 2nd Name</th>
+<th align="left">names</th>
+<th align="left">first_last_name</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">FALSE</td>
+<td align="left">Moe Szyslak</td>
+<td align="left">Moe Szyslak</td>
 </tr>
 <tr class="even">
-<td align="left">TRUE</td>
+<td align="left">Burns, C. Montgomery</td>
+<td align="left">C. Montgomery Burns</td>
 </tr>
 <tr class="odd">
-<td align="left">FALSE</td>
+<td align="left">Rev. Timothy Lovejoy</td>
+<td align="left">Rev. Timothy Lovejoy</td>
 </tr>
 <tr class="even">
-<td align="left">FALSE</td>
+<td align="left">Ned Flanders</td>
+<td align="left">Ned Flanders</td>
 </tr>
 <tr class="odd">
-<td align="left">FALSE</td>
+<td align="left">Simpson, Homer</td>
+<td align="left">Homer Simpson</td>
 </tr>
 <tr class="even">
-<td align="left">FALSE</td>
+<td align="left">Dr. Julius Hibbert</td>
+<td align="left">Dr. Julius Hibbert</td>
 </tr>
 </tbody>
 </table>
-<h1 id="problem-4">Problem 4</h1>
-<p>[9] “’escl’ibe the types of strings that conform to the following regular expressions and consmlct an”<br />
-[10] “example thax is maxched by Khe regular expression.”<br />
-a. [e-s]+\\$&quot;</p>
 <ol start="2" style="list-style-type: lower-alpha">
-<li>\\b[a-z]{1,4}\\b&quot;<br />
-</li>
-<li>’?\\Vtxt$&quot;<br />
-</li>
-<li>\\d{Z)/\\d{2}/\\d(A}&quot;<br />
-</li>
-<li>&lt;(.+?)&gt;.+?&lt;/\\1&gt;&quot;</li>
+<li>Construct a logical vector indicating whether a character has a title (i.e., Rev. and Dr.).</li>
 </ol>
-<h1 id="join-all-tables-into-one-aggregate-table.-view-the-1st-10-rows.">Join all tables into one aggregate table. View the 1st 10 rows.</h1>
-<h1 id="the-rating-scores-are-1-through-5-1-being-the-lowest-score.">The rating scores are 1 through 5, 1 being the lowest score.</h1>
-<h1 id="which-movie-received-the-highest-average-rating-from-my-friends">Which movie received the highest average rating from my friends?</h1>
-<h1 id="which-of-my-friends-gave-out-the-lowest-ratings-on-average">Which of my friends gave out the lowest ratings on average?</h1>
-<h1 id="disconnect-from-db">Disconnect from DB</h1>
+<pre class="r"><code># str_replace(my.list[7],'Lew','i.e.')
+regex1 &lt;- &quot;[[:alpha:]]{2,3}\\.&quot;
+
+names_df$has_title &lt;- str_detect(names_df$first_last_name, regex1)
+kable(names_df[, c(4, 5)])</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">first_last_name</th>
+<th align="left">has_title</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Moe Szyslak</td>
+<td align="left">FALSE</td>
+</tr>
+<tr class="even">
+<td align="left">C. Montgomery Burns</td>
+<td align="left">FALSE</td>
+</tr>
+<tr class="odd">
+<td align="left">Rev. Timothy Lovejoy</td>
+<td align="left">TRUE</td>
+</tr>
+<tr class="even">
+<td align="left">Ned Flanders</td>
+<td align="left">FALSE</td>
+</tr>
+<tr class="odd">
+<td align="left">Homer Simpson</td>
+<td align="left">FALSE</td>
+</tr>
+<tr class="even">
+<td align="left">Dr. Julius Hibbert</td>
+<td align="left">TRUE</td>
+</tr>
+<tr class="odd">
+<td align="left">c. Construct a logical</td>
+<td align="left">vector indicating whether a character has a second name.</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code># my.list[8]
+regex2 &lt;- &quot;^[[:alpha:]]\\.\\s&quot;
+
+names_df$has_2nd_name &lt;- str_detect(names_df$first_last_name, regex2)
+kable(names_df[, c(4, 6)])</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">first_last_name</th>
+<th align="left">has_2nd_name</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Moe Szyslak</td>
+<td align="left">FALSE</td>
+</tr>
+<tr class="even">
+<td align="left">C. Montgomery Burns</td>
+<td align="left">TRUE</td>
+</tr>
+<tr class="odd">
+<td align="left">Rev. Timothy Lovejoy</td>
+<td align="left">FALSE</td>
+</tr>
+<tr class="even">
+<td align="left">Ned Flanders</td>
+<td align="left">FALSE</td>
+</tr>
+<tr class="odd">
+<td align="left">Homer Simpson</td>
+<td align="left">FALSE</td>
+</tr>
+<tr class="even">
+<td align="left">Dr. Julius Hibbert</td>
+<td align="left">FALSE</td>
+</tr>
+<tr class="odd">
+<td align="left">#Problem 4</td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left">Describe the types of s</td>
+<td align="left">trings that conform to the following regular expressions and construct an example that is matched by the regular expression.“</td>
+</tr>
+<tr class="odd">
+<td align="left">a. [0-9]+\$ **look fo</td>
+<td align="left">r numeric characters one or more times, followed by a dollar sign**</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code># my.list[9:15]
+a &lt;- &quot;[0-9]+\\$&quot;
+a.ex &lt;- &quot;3425452345adsfas12351$asdfasdf&quot;
+str_extract(a.ex, a)</code></pre>
+<pre><code>## [1] &quot;12351$&quot;</code></pre>
+<ol start="2" style="list-style-type: lower-alpha">
+<li>\b[a-z]{1,4}\b <strong>look for strings composed of between 1 and 4 lowercase letters that also are word edges at both ends</strong></li>
+</ol>
+<pre class="r"><code>b &lt;- &quot;\\b[a-z]{1,4}\\b&quot;
+b.ex &lt;- &quot; adsfas 54 cs asdff dae4 asds&quot;
+str_extract_all(b.ex, b)</code></pre>
+<pre><code>## [[1]]
+## [1] &quot;cs&quot;   &quot;asds&quot;</code></pre>
+<ol start="3" style="list-style-type: lower-alpha">
+<li>.*?\.txt$<br />
+<strong>look for strings that have any character zero or more times and that end with .txt</strong></li>
+</ol>
+<pre class="r"><code>c &lt;- &quot;.*?\\.txt$&quot;
+c.ex &lt;- &quot;34w54%&amp;$YTAas54.txt&quot;
+str_extract_all(c.ex, c)</code></pre>
+<pre><code>## [[1]]
+## [1] &quot;34w54%&amp;$YTAas54.txt&quot;</code></pre>
+<ol start="4" style="list-style-type: lower-alpha">
+<li>\d{2}/\d{2}/\d{4} <strong>look for strings that have exactly 2 digits, followed by a forward slash, then exactly 2 digits and a forward slash, followed by exactly 4 digits</strong></li>
+</ol>
+<pre class="r"><code>d &lt;- &quot;\\d{2}/\\d{2}/\\d{4}&quot;
+d.ex &lt;- &quot;1/1/2011 12-05-2025sas22/43/520033551&quot;
+str_extract_all(d.ex, d)</code></pre>
+<pre><code>## [[1]]
+## [1] &quot;22/43/5200&quot;</code></pre>
+<ol start="5" style="list-style-type: lower-alpha">
+<li>&lt;(.+?)&gt;.+?&lt;/\1&gt; <strong>look for HTML start tag w/o attributes, its content and its end tag</strong></li>
+</ol>
+<pre class="r"><code>e &lt;- &quot;&lt;(.+?)&gt;.+?&lt;/\\1&gt;&quot;
+e.ex &lt;- &quot;wg45qa4d&lt;title&gt; 12-05-2025sas22/43/520033551&lt;/title&gt;dfasdfadsf&quot;
+str_extract_all(e.ex, e)</code></pre>
+<pre><code>## [[1]]
+## [1] &quot;&lt;title&gt; 12-05-2025sas22/43/520033551&lt;/title&gt;&quot;</code></pre>
+<h1 id="problem-9">Problem 9</h1>
+<p>One following code hides a secret message, Crack it whh R and regular expressions. Hint: Some of the characters are more revealing than others</p>
+<pre class="r"><code>jibberish &lt;- getURL(&quot;http://www.r-datacollection.com/materials/regex/code_exercise.txt&quot;)
+answer &lt;- unlist(str_extract_all(jibberish, &quot;[A-Z.]&quot;))
+cat(str_replace(answer, &quot;\\.&quot;, &quot; &quot;))</code></pre>
+<pre><code>## C O N G R A T U L A T I O N S   Y O U   A R E   A   S U P E R N E R D</code></pre>
 </div>
 
 

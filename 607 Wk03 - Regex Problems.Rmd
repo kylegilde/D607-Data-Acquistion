@@ -15,9 +15,6 @@ div.beige pre { background-color:beige; }
 #The Task
 Please deliver links to an R Markdown file (in GitHub and rpubs.com) with solutions to problems 3 and 4 from chapter 8 of Automated Data Collection in R.  Problem 9 is extra credit.  
 
-
-
-
 #Load Packages
 ```{r setup, results='hide'} 
 knitr::opts_chunk$set(#echo=FALSE, 
@@ -44,20 +41,18 @@ ipak(load.packages)
 ```
 
 
-#Just for fun: Use optical character recognition pkg to get the text off of the textbook image
+###Just for fun, I used the optical character recognition pkg to get the text off of the textbook image. 
+####I wanted to see if it could be done. It worked for more than half of the text. 
 ```{r ocr}
-text <- ocr("https://raw.githubusercontent.com/kylegilde/D607-Data-Acquistion/master/week3_problems.jpg")
-my.list <- unlist(strsplit(text, "\n"))
-
-
+# text <- ocr("https://raw.githubusercontent.com/kylegilde/D607-Data-Acquistion/master/week3_problems.jpg")
+# my.list <- unlist(strsplit(text, "\n"))
 ```
 
 
 
 #Problem 3
-Use the tools of this chap'er to rearrange Khe Vector so mat all elements conform to the standard First_name last_name.
-```{r 3}
-
+a. Use the tools of this chapter to rearrange the Vector so that all elements conform to the standard First_name last_name.
+```{r 3a}
 # sub("fopy","Copy", my.list[1])
 # cat(my.list[5], sub("Jv","_n", my.list[6]))
 
@@ -68,46 +63,65 @@ names_df <- data.frame(names, stringsAsFactors = FALSE)
 names_df$first_half <- str_trim(str_replace(str_extract(names_df$names,"(, ).+"),",",""))
 names_df$last_half <- str_trim(str_replace(str_extract(names_df$names,".+(, )"),",",""))
 names_df$first_last_name <- ifelse(is.na(names_df$first_half),names_df$names, str_c(names_df$first_half, " ",names_df$last_half))
-kable(names_df$first_last_name, col.names = "Normalized Names")
+kable(names_df[,c(1,4)])
+```
 
-
-
-str_replace(my.list[7],"Lew","i.e.")
+b. Construct a logical vector indicating whether a character has a title (i.e., Rev. and Dr.).
+```{r 3b}
+#str_replace(my.list[7],"Lew","i.e.")
 regex1 <- "[[:alpha:]]{2,3}\\."
 
-kable(str_detect(names_df$first_last_name, regex1), col.names = "Has Title")
+names_df$has_title <- str_detect(names_df$first_last_name, regex1)
+kable(names_df[,c(4,5)])
 
-my.list[8]
-regex2 <- "^[[:alpha:]]\\.\\s"
-kable(str_detect(names_df$first_last_name, regex2), col.names = "Has 2nd Name", caption="I think this is referring to Mr. Burns' first initial")
 
 ```
+c. Construct a logical vector indicating whether a character has a second name.
+```{r 3c}
+#my.list[8]
+regex2 <- "^[[:alpha:]]\\.\\s"
 
+names_df$has_2nd_name <- str_detect(names_df$first_last_name, regex2)
+kable(names_df[,c(4,6)])
+```
 #Problem 4
 Describe the types of strings that conform to the following regular expressions and construct an example that is matched by the regular expression."                                                  
-a. [e-s]+\\\\$      
+a. [0-9]+\\$  **look for numeric characters one or more times, followed by a dollar sign**
 ```{r 4a}
 #my.list[9:15]
-
+a <- "[0-9]+\\$"
+a.ex <- "3425452345adsfas12351$asdfasdf"
+str_extract(a.ex, a)
 ```
 
-b. \\\\b[a-z]{1,4}\\\\b"      
-```{r 4a}
+b. \\b[a-z]{1,4}\\b **look for strings composed of between 1 and 4 lowercase letters that also are word edges at both ends**       
+```{r 4b}
+
+b <- "\\b[a-z]{1,4}\\b"
+b.ex <- " adsfas 54 cs asdff dae4 asds"
+str_extract_all(b.ex, b)
+
 
 ```
-c. '?\\\\Vtxt$"           
-```{r 4a}
+c. .*?\\.txt$  
+**look for strings that have any character zero or more times and that end with .txt**
+```{r 4c}
 
+c <- ".*?\\.txt$"
+c.ex <- "34w54%&$YTAas54.txt"
+str_extract_all(c.ex, c)
 ```
-d. \\\\d{Z)/\\\\d{2}/\\\\d(A}"    
-```{r 4a}
-
+d. \\d{2}/\\d{2}/\\d{4}  **look for strings that have exactly 2 digits, followed by a forward slash, then exactly 2 digits and a forward slash, followed by exactly 4 digits**
+```{r 4d}
+d <- "\\d{2}/\\d{2}/\\d{4}"
+d.ex <- "1/1/2011 12-05-2025sas22/43/520033551"
+str_extract_all(d.ex, d)
 ```
-e. <(.+?)>.+?</\\\\1>"  
+e. <(.+?)>.+?</\\1> **look for HTML start tag w/o attributes, its content and its end tag**
 ```{r 4e}
-
-subset
-
+e <- "<(.+?)>.+?</\\1>"
+e.ex <- "wg45qa4d<title> 12-05-2025sas22/43/520033551</title>dfasdfadsf"
+str_extract_all(e.ex, e)
 ```
 
 
