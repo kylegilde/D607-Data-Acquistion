@@ -1,0 +1,73 @@
+---
+title: "regex and stringr"
+author: "catlin"
+date: "February 16, 2017"
+output:
+  rmarkdown::html_document:
+    theme: journal
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+#install.packages("stringr")
+library(stringr)
+
+```
+
+## learning more about stringr
+
+Where do we go to get more information about an R package?
+
+Sometimes, the newest (or only) version of a package may not yet be on CRAN.  You can use the devtools package to pull from (for example) GitHub, if you trust the package source.
+
+```{r eval=FALSE}
+
+vignette(package="stringr")
+
+browseVignettes(package="stringr")
+
+data(package="stringr")   # fruit, sentences, words
+```
+
+See also the documentation at https://cran.r-project.org/web/packages/stringr/stringr.pdf
+
+## is the letter k more likely to appear as the first letter or the third letter in common words?
+
+Concept: anchors
+
+```{r}
+str_subset(words, "k")
+
+```
+
+
+![](https://github.com/maddogdatascience/msda/blob/master/MisshulaQuote.png?raw=true)
+
+
+```{r}
+str_subset(words, "^k")
+str_subset(words, "^..k")
+```
+
+## In the English language, are fruit names more likely to have repeated pairs of characters than common words overall?
+
+Concepts: groups, backreferences
+
+```{r}
+str_view(fruit, "(..)\\1", match=TRUE)
+str_view(words, "(..)\\1", match=TRUE)
+
+str_detect(fruit, "(..)\\1")
+
+mean(str_detect(fruit, "(..)\\1"))
+mean(str_detect(words, "(..)\\1"))
+```
+
+Looking at sentences
+
+```{r}
+str_view(sentences, "(..)\\1", match=TRUE)
+str_view(sentences, "([[:alpha:]][[:alpha:]])\\1", match=TRUE)
+```
+

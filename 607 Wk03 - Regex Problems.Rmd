@@ -47,9 +47,10 @@ ipak(load.packages)
 #Just for fun: Use optical character recognition pkg on the textbook image
 ```{r ocr}
 text <- ocr("https://raw.githubusercontent.com/kylegilde/D607-Data-Acquistion/master/week3_problems.jpg")
+#text <- ocr("https://lh5.googleusercontent.com/tmXWA2iBD1UlNQjUVlQqd99iotUWMB_XkWvUnLSMDKSifB4viKnMGnxTrz69h3bvJY98XGu1pLIragc=w1807-h862-rw")
 my.list <- unlist(strsplit(text, "\n"))
 
-my.list
+my.list 
 
 ```
 
@@ -66,29 +67,35 @@ raw.data <-"555-1239Moe Szyslak(636) 555-0113Burns, C. Montgomery555-6542Rev. Ti
 names <- unlist(str_extract_all(raw.data, "[[:alpha:]., ]{2,}"))
 # [1] "Moe Szyslak"          "Burns, C. Montgomery" "Rev. Timothy Lovejoy" "Ned Flanders"        
 # [5] "Simpson, Homer"       "Dr. Julius Hibbert"  
-names_df <- data.frame(names, stringsAsFactors = FALSE)
 
+names_df <- data.frame(names, stringsAsFactors = FALSE)
 names_df$first_half <- str_trim(str_replace(str_extract(names_df$names,"(, ).+"),",",""))
 names_df$last_half <- str_trim(str_replace(str_extract(names_df$names,".+(, )"),",",""))
-names_df
-names_df$first_last_name <- ifelse(is.na(names_df$first_half),names_df$names, paste(names_df$first_half, " ",names_df$last_half))
-t(t(names_df$first_last_name))
+names_df$first_last_name <- ifelse(is.na(names_df$first_half),names_df$names, str_c(names_df$first_half, " ",names_df$last_half))
+kable(names_df$first_last_name, col.names = "Normalized Names")
 
 
 
+str_replace(my.list[7],"Lew","i.e.")
+regex1 <- "[[:alpha:]]{2,3}\\."
 
-
-
-
-my.list[7]
-str_detect(names, "[[:alpha:]]{2,3}\\.")
+kable(str_detect(names_df$first_last_name, regex1), col.names = "Has Title")
 
 my.list[8]
-str_detect(names, "[[:alpha:]]?[^.]")
+regex2 <- "^[[:alpha:]]\\.\\s"
+kable(str_detect(names_df$first_last_name, regex2), col.names = "Has 2nd Name", caption="I think this is referring to Mr. Burns' first initial")
 
 ```
 
-#List the Tables
+#Problem 4
+[9] "'escl'ibe the types of strings that conform to the following regular expressions and consmlct an"    
+[10] "example thax is maxched by Khe regular expression."                                                  
+a. [e-s]+\\\\$"      
+
+b. \\\\b[a-z]{1,4}\\\\b"                                                                             
+c. '?\\\\Vtxt$"                                                                                     
+d. \\\\d{Z)/\\\\d{2}/\\\\d(A}"                                                                       
+e. <(.+?)>.+?</\\\\1>"  
 ```{r 4}
 
 ```
