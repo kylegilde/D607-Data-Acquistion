@@ -15,7 +15,7 @@ div.beige pre { background-color:beige; }
 #The Task
 Please deliver links to an R Markdown file (in GitHub and rpubs.com) with solutions to problems 3 and 4 from chapter 8 of Automated Data Collection in R.  Problem 9 is extra credit.  
 
-http://www.r-datacollection.com/materials/regex/code_exercise.txt
+
 
 
 #Load Packages
@@ -30,7 +30,7 @@ knitr::opts_chunk$set(#echo=FALSE,
 
 #https://www.rstudio.com/wp-content/uploads/2015/03/rmarkdown-reference.pdf
 
-load.packages <- c("RCurl", "knitr", "tesseract","stringr")
+load.packages <- c("RCurl", "knitr", "tesseract","stringr","htmlTable")
 
 
 ipak <- function(pkg){
@@ -44,30 +44,26 @@ ipak(load.packages)
 ```
 
 
-#Just for fun: Use optical character recognition pkg on the textbook image
+#Just for fun: Use optical character recognition pkg to get the text off of the textbook image
 ```{r ocr}
 text <- ocr("https://raw.githubusercontent.com/kylegilde/D607-Data-Acquistion/master/week3_problems.jpg")
-#text <- ocr("https://lh5.googleusercontent.com/tmXWA2iBD1UlNQjUVlQqd99iotUWMB_XkWvUnLSMDKSifB4viKnMGnxTrz69h3bvJY98XGu1pLIragc=w1807-h862-rw")
 my.list <- unlist(strsplit(text, "\n"))
 
-my.list 
 
 ```
 
 
 
 #Problem 3
+Use the tools of this chap'er to rearrange Khe Vector so mat all elements conform to the standard First_name last_name.
 ```{r 3}
 
-sub("fopy","Copy", my.list[1])
-cat(my.list[5], sub("Jv","_n", my.list[6]))
+# sub("fopy","Copy", my.list[1])
+# cat(my.list[5], sub("Jv","_n", my.list[6]))
 
 raw.data <-"555-1239Moe Szyslak(636) 555-0113Burns, C. Montgomery555-6542Rev. Timothy Lovejoy555 8904Ned Flanders636-555-3226Simpson, Homer5553642Dr. Julius Hibbert" 
 
 names <- unlist(str_extract_all(raw.data, "[[:alpha:]., ]{2,}"))
-# [1] "Moe Szyslak"          "Burns, C. Montgomery" "Rev. Timothy Lovejoy" "Ned Flanders"        
-# [5] "Simpson, Homer"       "Dr. Julius Hibbert"  
-
 names_df <- data.frame(names, stringsAsFactors = FALSE)
 names_df$first_half <- str_trim(str_replace(str_extract(names_df$names,"(, ).+"),",",""))
 names_df$last_half <- str_trim(str_replace(str_extract(names_df$names,".+(, )"),",",""))
@@ -88,51 +84,39 @@ kable(str_detect(names_df$first_last_name, regex2), col.names = "Has 2nd Name", 
 ```
 
 #Problem 4
-[9] "'escl'ibe the types of strings that conform to the following regular expressions and consmlct an"    
-[10] "example thax is maxched by Khe regular expression."                                                  
-a. [e-s]+\\\\$"      
+Describe the types of strings that conform to the following regular expressions and construct an example that is matched by the regular expression."                                                  
+a. [e-s]+\\\\$      
+```{r 4a}
+#my.list[9:15]
 
-b. \\\\b[a-z]{1,4}\\\\b"                                                                             
-c. '?\\\\Vtxt$"                                                                                     
-d. \\\\d{Z)/\\\\d{2}/\\\\d(A}"                                                                       
+```
+
+b. \\\\b[a-z]{1,4}\\\\b"      
+```{r 4a}
+
+```
+c. '?\\\\Vtxt$"           
+```{r 4a}
+
+```
+d. \\\\d{Z)/\\\\d{2}/\\\\d(A}"    
+```{r 4a}
+
+```
 e. <(.+?)>.+?</\\\\1>"  
-```{r 4}
+```{r 4e}
+
+subset
 
 ```
 
 
-#Join all tables into one aggregate table. View the 1st 10 rows.
-```{r aggtable}
-
+#Problem 9
+One following code hides a secret message, Crack it whh R and regular expressions. Hint: Some of the 
+characters are more revealing than others
+```{r 9}
+jibberish <- getURL("http://www.r-datacollection.com/materials/regex/code_exercise.txt")
+answer <- unlist(str_extract_all(jibberish, "[A-Z.]"))
+cat(str_replace(answer,"\\."," "))
 ```
-
-#The rating scores are 1 through 5, 1 being the lowest score.
-```{r ratings}
-
-
-```
-
-
-#Which movie received the highest average rating from my friends?
-```{r highest_rating}
-
-```
-
-#Which of my friends gave out the lowest ratings on average?
-
-```{r most_critical_friend}
-
-```
-
-
-
-
-# Disconnect from DB
-```{r disconnect, results='hide'}
-
-
-```
-
-
-
 </div>
