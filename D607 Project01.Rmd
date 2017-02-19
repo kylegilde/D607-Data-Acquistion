@@ -17,7 +17,7 @@ output:
 </style>
 <div class = "beige">
 
-#The Task
+##The Task
 In this project, you're given a text file with chess tournament results where the information has some structure. Your job is to create an R Markdown file that generates a .CSV file (that could for example be imported into a SQL database) with the following information for all of the players:
 
 Player's Name, Player's State, Total Number of Points, Player's Pre-Rating, and Average Pre Chess Rating of Opponents
@@ -25,7 +25,7 @@ Player's Name, Player's State, Total Number of Points, Player's Pre-Rating, and 
 For the first player, the information would be:
 Gary Hua, ON, 6.0, 1794, 1605
 
-#Load Packages
+##Load Packages
 ```{r setup, results='hide'} 
 knitr::opts_chunk$set(#echo=FALSE, 
                       warning=FALSE, 
@@ -51,12 +51,15 @@ ipak(load.packages)
 ```
 
 
-
+##Load the data & take a look at it
 ```{r load.data}
 
 my.data <- getURLContent("https://raw.githubusercontent.com/kylegilde/D607-Data-Acquistion/master/data-sets/tournamentinfo.txt")
+str_sub(my.data, 1, 800)
+```
 
-#extract all the attribute values needed
+##Extract the first 7 required attributes
+```{r first7}
 num <- str_trim(unlist(str_extract_all(my.data, " {3,4}\\d{1,2} ")))
 name <- data.frame(str_trim(unlist(str_extract_all(my.data, " [[:alpha:] -]{2,30} {6}"))), stringsAsFactors = F)
 name <- name[2:65,1]
@@ -73,15 +76,24 @@ my.rows <- str_subset(my.rows, " [[:alpha:] -]{2,30} {6}")
 my.rows <- str_extract_all(my.rows, "((W|L|D) {2,3}\\d{1,2})")
 # just the digits
 my.rows <- str_extract_all(my.rows, "\\d{1,2}")
-
 opponents <- data.frame(sapply(my.rows, str_c, collapse=","), stringsAsFactors = F)
 #remove superfluous row
 opponents <- opponents[2:65,1]
+```
 
+##Let's take a look at the DF so far
+```{r df1}
 #create my df so far
 chess.df <- data.frame(num, name, state, total_points,pre_rating, opponents, stringsAsFactors = F)
 
+kable(head(chess.df, 10))
+```
 
+
+
+
+##Calculate the opponents' mean pre-rating
+```{r opp}
 opponent_mean <- function(opp.list, opp.scores){
   #function to calculate the opponent pre-rating means
   list_len <- length(opp.list)
@@ -95,9 +107,34 @@ opponent_mean <- function(opp.list, opp.scores){
   return(mean.vec)
 }
 chess.df$opponent_pre_rating_mean <- round(opponent_mean(chess.df[,6], chess.df[,c(1,5)]))
+```
 
+##Let's take a look at the final data frame & create the CSV
+```{r finaldf}
 final_chess_df <- chess.df[,c(2:5,7)]
-write.table(final_chess_df,file="kgilde_chess_df.csv",sep=",")
+write.table(final_chess_df,file="kgilde_chess_df.csv",sep=",",row.names = F)
+
+kable(head(final_chess_df, 10))
+```
+
+###The CSV file can be found [here](https://github.com/kylegilde/D607-Data-Acquistion/blob/master/kgilde_chess_df.csv)
+
+
+
+##Can we see any correlation between the players' pre-rating and the mean opponents' prerating?
+###There may be a little bit, but it's not too strong.
+```{r plot 1}
+
+plot(final_chess_df$opponent_pre_rating_mean ~ final_chess_df$pre_rating)
+
+```
+
+##Was there any correlation between the players' pre-rating and their total points from the tournament?
+###Yes, the variables appear correlated.
+```{r plot 2}
+
+plot(final_chess_df$total_points ~ final_chess_df$pre_rating)
+
 ```
 
 </div>
