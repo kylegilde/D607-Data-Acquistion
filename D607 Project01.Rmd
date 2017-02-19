@@ -54,6 +54,50 @@ ipak(load.packages)
 
 ```{r load.data}
 
+my.data <- getURLContent("https://raw.githubusercontent.com/kylegilde/D607-Data-Acquistion/master/data-sets/tournamentinfo.txt")
+
+#extract all the attribute values needed
+num <- str_trim(unlist(str_extract_all(my.data, " {3,4}\\d{1,2} ")))
+name <- data.frame(str_trim(unlist(str_extract_all(my.data, " [[:alpha:] -]{2,30} {6}"))), stringsAsFactors = F)
+name <- name[2:65,1]
+state <- str_trim(unlist(str_extract_all(my.data, " {3}[[:alpha:]]{2} ")))
+total_points <- as.numeric(str_trim(unlist(str_extract_all(my.data, "\\d\\.\\d"))))
+pre_rating <- as.numeric(str_trim(unlist(str_extract_all(str_extract_all(my.data, ": {1,2}\\d{3,4}( {3}|P)"),"\\d+"))))
+
+
+#to extract the opponent numbers, create a list seperated by newline characters
+my.rows <- unlist(str_extract_all(my.data, ".+\\n"))
+#subset to the rows that have names in them since these rows have the opponent numbers in them
+my.rows <- str_subset(my.rows, " [[:alpha:] -]{2,30} {6}")
+# extract only the digits of opponent numbers
+my.rows <- str_extract_all(my.rows, "((W|L|D) {2,3}\\d{1,2})")
+# just the digits
+my.rows <- str_extract_all(my.rows, "\\d{1,2}")
+
+opponents <- data.frame(sapply(my.rows, str_c, collapse=","), stringsAsFactors = F)
+#remove superfluous row
+opponents <- opponents[2:65,1]
+
+#create my df so far
+chess.df <- data.frame(num, name, state, total_points,pre_rating, opponents, stringsAsFactors = F)
+
+
+opponent_mean <- function(opp.list, opp.scores){
+  #function to calculate the opponent pre-rating means
+  list_len <- length(opp.list)
+  mean.vec <- rep(NA,list_len)
+  for (i in 1:list_len)
+    {
+    opps <- c(str_split(opp.list,",")[[i]])
+    opp.mean <- mean(subset(opp.scores[,2], opp.scores[,1] %in% opps))
+    mean.vec[i] <- opp.mean
+    }
+  return(mean.vec)
+}
+chess.df$opponent_pre_rating_mean <- round(opponent_mean(chess.df[,6], chess.df[,c(1,5)]))
+
+final_chess_df <- chess.df[,c(2:5,7)]
+write.table(final_chess_df,file="kgilde_chess_df.csv",sep=",")
 ```
 
 </div>
