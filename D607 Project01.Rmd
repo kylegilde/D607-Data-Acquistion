@@ -1,11 +1,11 @@
 ---
-title: "D607 Project #1"
+title: "D607 Project 1 "
 author: "Kyle Gilde"
-date: "Feb. 12, 2017"
+date: "Feb. 19, 2017"
 output: 
-  html_document:
-    toc: true
-    #code_folding: hide
+  prettydoc::html_pretty:
+    theme: hpstr
+    highlight: github
 ---
 
 <style>
@@ -35,9 +35,11 @@ knitr::opts_chunk$set(#echo=FALSE,
                       dev="png", 
                       dev.args=list(type="cairo"))
 
+#https://cran.r-project.org/web/packages/prettydoc/vignettes/architect.html
 #https://www.rstudio.com/wp-content/uploads/2015/03/rmarkdown-reference.pdf
+#html_document: toc: true code_folding: hide
 
-load.packages <- c("RCurl", "knitr","stringr","htmlTable")
+load.packages <- c("RCurl", "knitr","stringr","htmlTable","prettydoc")
 
 
 ipak <- function(pkg){

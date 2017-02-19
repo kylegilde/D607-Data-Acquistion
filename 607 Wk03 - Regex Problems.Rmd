@@ -3,9 +3,9 @@ title: "D607 Week 3 - Regex Problems"
 author: "Kyle Gilde"
 date: "Feb. 12, 2017"
 output: 
-  html_document:
-    toc: true
-    #code_folding: hide
+  prettydoc::html_pretty:
+    theme: cayman
+    highlight: github
 ---
 
 <style>
@@ -30,9 +30,10 @@ knitr::opts_chunk$set(#echo=FALSE,
                       dev="png", 
                       dev.args=list(type="cairo"))
 
+#https://cran.r-project.org/web/packages/prettydoc/vignettes/architect.html
 #https://www.rstudio.com/wp-content/uploads/2015/03/rmarkdown-reference.pdf
 
-load.packages <- c("RCurl", "knitr","stringr","htmlTable", "tesseract")
+load.packages <- c("RCurl", "knitr","stringr","htmlTable", "tesseract","prettydoc")
 
 
 ipak <- function(pkg){
@@ -43,6 +44,8 @@ ipak <- function(pkg){
     sapply(pkg, require, character.only = TRUE)
 }
 ipak(load.packages)
+
+# html_document: toc: true code_folding: hide
 ```
 
 
