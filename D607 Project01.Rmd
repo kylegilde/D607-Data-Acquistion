@@ -131,7 +131,7 @@ kable(head(final_chess_df, 10))
 pre_rating_opp_pre_rating <- lm(final_chess_df$opponent_pre_rating_mean ~ final_chess_df$pre_rating)
 plot(final_chess_df$opponent_pre_rating_mean ~ final_chess_df$pre_rating)
 abline(pre_rating_opp_pre_rating)
-#summary(pre_rating_opp_pre_rating)
+
 ```
 
 ##Was there any correlation between the players' pre-rating and their total points from the tournament?
@@ -141,7 +141,7 @@ abline(pre_rating_opp_pre_rating)
 pre_rating_points <- lm(final_chess_df$total_points ~ final_chess_df$pre_rating)
 plot(final_chess_df$total_points ~ final_chess_df$pre_rating)
 abline(pre_rating_points)
-#summary(pre_rating_points)
+
 
 ```
 
