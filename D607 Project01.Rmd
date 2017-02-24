@@ -1,10 +1,10 @@
 ---
-title: "D607 Project 1 "
+title: "D607 Project 1: Create Table Using Regex "
 author: "Kyle Gilde"
 date: "Feb. 19, 2017"
 output: 
   prettydoc::html_pretty:
-    theme: hpstr
+    theme: architect
     highlight: github
 ---
 
@@ -35,11 +35,10 @@ knitr::opts_chunk$set(#echo=FALSE,
                       dev="png", 
                       dev.args=list(type="cairo"))
 
-#https://cran.r-project.org/web/packages/prettydoc/vignettes/architect.html
+#https://cran.r-project.org/web/packages/prettydoc/vignettes/
 #https://www.rstudio.com/wp-content/uploads/2015/03/rmarkdown-reference.pdf
-#html_document: toc: true code_folding: hide
 
-load.packages <- c("RCurl", "knitr","stringr","htmlTable","prettydoc")
+load.packages <- c("RCurl", "knitr","stringr","prettydoc")
 
 
 ipak <- function(pkg){
@@ -57,8 +56,11 @@ ipak(load.packages)
 ```{r load.data}
 
 my.data <- getURLContent("https://raw.githubusercontent.com/kylegilde/D607-Data-Acquistion/master/data-sets/tournamentinfo.txt")
-str_sub(my.data, 1, 800)
+writeLines(str_sub(my.data, 1, 811))
+
 ```
+####Or click [here](https://raw.githubusercontent.com/kylegilde/D607-Data-Acquistion/master/data-sets/tournamentinfo.txt)
+
 
 ##Extract the first 7 required attributes
 ```{r first7}
@@ -124,18 +126,22 @@ kable(head(final_chess_df, 10))
 
 
 ##Can we see any correlation between the players' pre-rating and the mean opponents' prerating?
-###There may be a little bit, but it's not too strong.
++ There may be a little bit, but it's not too strong.
 ```{r plot 1}
-
+pre_rating_opp_pre_rating <- lm(final_chess_df$opponent_pre_rating_mean ~ final_chess_df$pre_rating)
 plot(final_chess_df$opponent_pre_rating_mean ~ final_chess_df$pre_rating)
-
+abline(pre_rating_opp_pre_rating)
+#summary(pre_rating_opp_pre_rating)
 ```
 
 ##Was there any correlation between the players' pre-rating and their total points from the tournament?
-###Yes, the variables appear correlated.
++ Yes, the variables appear correlated.
 ```{r plot 2}
 
+pre_rating_points <- lm(final_chess_df$total_points ~ final_chess_df$pre_rating)
 plot(final_chess_df$total_points ~ final_chess_df$pre_rating)
+abline(pre_rating_points)
+#summary(pre_rating_points)
 
 ```
 
