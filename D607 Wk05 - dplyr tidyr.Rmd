@@ -1,0 +1,61 @@
+---
+title: "D607 Project 1: Create Table Using Regex "
+author: "Kyle Gilde"
+date: "Feb. 19, 2017"
+output: 
+  prettydoc::html_pretty:
+    theme: architect
+    highlight: github
+---
+
+<style>
+.lightgreen table {
+  background-color:#eff8e5;
+.beige {
+  background-color:beige;  
+}
+</style>
+<div class = "beige">
+
+##The Task
+In this project, you're given a text file with chess tournament results where the information has some structure. Your job is to create an R Markdown file that generates a .CSV file (that could for example be imported into a SQL database) with the following information for all of the players:
+
+Player's Name, Player's State, Total Number of Points, Player's Pre-Rating, and Average Pre Chess Rating of Opponents
+
+For the first player, the information would be:
+Gary Hua, ON, 6.0, 1794, 1605
+
+##Load Packages
+```{r setup, results='hide'} 
+knitr::opts_chunk$set(#echo=FALSE, 
+                      warning=FALSE, 
+                      message=FALSE,
+                      tidy=TRUE,
+                      #comment = "",
+                      dev="png", 
+                      dev.args=list(type="cairo"))
+
+#https://cran.r-project.org/web/packages/prettydoc/vignettes/
+#https://www.rstudio.com/wp-content/uploads/2015/03/rmarkdown-reference.pdf
+
+load.packages <- c("RCurl", "knitr","stringr","prettydoc")
+
+
+ipak <- function(pkg){
+    #FUNCTION SOURCE: https://gist.github.com/stevenworthington/3178163
+    new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
+    if (length(new.pkg)) 
+        install.packages(new.pkg, dependencies = TRUE)
+    sapply(pkg, require, character.only = TRUE)
+}
+ipak(load.packages)
+```
+
+
+##Load the data & take a look at it
+```{r load.data}
+
+my.data <- getURLContent("https://raw.githubusercontent.com/kylegilde/D607-Data-Acquistion/master/data-sets/tournamentinfo.txt")
+writeLines(str_sub(my.data, 1, 811))
+
+```
