@@ -38,7 +38,7 @@ knitr::opts_chunk$set(#echo=FALSE,
 #https://cran.r-project.org/web/packages/prettydoc/vignettes/
 #https://www.rstudio.com/wp-content/uploads/2015/03/rmarkdown-reference.pdf
 
-load.packages <- c("RCurl", "knitr","stringr","prettydoc")
+load.packages <- c("RCurl", "knitr","stringr","prettydoc", "tesseract", "tidyr", "dplyr")
 
 
 ipak <- function(pkg){
@@ -51,6 +51,15 @@ ipak <- function(pkg){
 ipak(load.packages)
 ```
 
+
+```{r ocr}
+text <- ocr("https://raw.githubusercontent.com/kylegilde/D607-Data-Acquistion/master/data-sets/flight_img.PNG")
+writeLines(text)
+my.text <- unlist(str_split(text, "\n"))
+my.text
+writeLines(my.text)
+
+```
 
 ##Load the data & take a look at it
 ```{r load.data}
