@@ -18,12 +18,19 @@ output:
 <div class = "beige">
 
 ##The Task
-In this project, you're given a text file with chess tournament results where the information has some structure. Your job is to create an R Markdown file that generates a .CSV file (that could for example be imported into a SQL database) with the following information for all of the players:
+The chart above describes arrival delays for two airlines across five destinations. Your task is to:
 
-Player's Name, Player's State, Total Number of Points, Player's Pre-Rating, and Average Pre Chess Rating of Opponents
-
-For the first player, the information would be:
-Gary Hua, ON, 6.0, 1794, 1605
+(1) Create a .CSV file (or optionally, a MySQL database!) that includes all of the information above.
+You're encouraged to use a "wide" structure similar to how the information appears above, so
+that you can practice tidying and transformations as described below.
+(2) Read the information from your .CSV file into R, and use tidyr and dplyr as needed to tidy
+and transform your data.
+(3) Perform analysis to compare the arrival delays for the two airlines.
+(4) Your code should be in an R Markdown file, posted to rpubs.com, and should include narrative
+descriptions of your data cleanup work, analysis, and conclusions. Please include in your
+homework submission:
+??? The URL to the .Rmd file in your GitHub repository. and
+??? The URL for your rpubs.com web page.
 
 ##Load Packages
 ```{r setup, results='hide'} 
@@ -56,15 +63,30 @@ ipak(load.packages)
 text <- ocr("https://raw.githubusercontent.com/kylegilde/D607-Data-Acquistion/master/data-sets/flight_img.PNG")
 writeLines(text)
 my.text <- unlist(str_split(text, "\n"))
-my.text
-writeLines(my.text)
+my.text <- data.frame(data=my.text, stringsAsFactors = F)
+# 
+# new.text <- my.text %>% 
+#   filter(nchar(data) > 0) %>% 
+#   sapply(str_replace, "on time", "on_time") #%>% 
+# 
+# new.text <- sapply(new.text, str_replace, "AM WEST", "AM_WEST")
+# new.text <- sapply(new.text, str_replace, " \\I ", " 1")
+# 
+#   
+#   
+# my.text[c(1,3,4,6,7),1]
+# my.text
+# View(my.text)
+# my.text <- str_replace_all(my.text, "\\||I", " 1")
+# 
+# t(t(my.text))
+# writeLines(my.text)
+
 
 ```
 
 ##Load the data & take a look at it
 ```{r load.data}
 
-my.data <- getURLContent("https://raw.githubusercontent.com/kylegilde/D607-Data-Acquistion/master/data-sets/tournamentinfo.txt")
-writeLines(str_sub(my.data, 1, 811))
 
 ```
