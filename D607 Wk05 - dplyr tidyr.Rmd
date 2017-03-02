@@ -45,7 +45,7 @@ knitr::opts_chunk$set(#echo=FALSE,
 #https://cran.r-project.org/web/packages/prettydoc/vignettes/
 #https://www.rstudio.com/wp-content/uploads/2015/03/rmarkdown-reference.pdf
 
-load.packages <- c("RCurl", "knitr","stringr","prettydoc", "tesseract", "tidyr", "dplyr")
+load.packages <- c("stringr","prettydoc", "tidyr", "dplyr")
 
 
 ipak <- function(pkg){
@@ -58,35 +58,29 @@ ipak <- function(pkg){
 ipak(load.packages)
 ```
 
+##Load Data & take a look at it
+```{r data}
+my.data <- read.csv("https://raw.githubusercontent.com/kylegilde/D607-Data-Acquistion/master/data-sets/numbersense_flight_data.csv", stringsAsFactors = F)
 
-```{r ocr}
-text <- ocr("https://raw.githubusercontent.com/kylegilde/D607-Data-Acquistion/master/data-sets/flight_img.PNG")
-writeLines(text)
-my.text <- unlist(str_split(text, "\n"))
-my.text <- data.frame(data=my.text, stringsAsFactors = F)
-# 
-# new.text <- my.text %>% 
-#   filter(nchar(data) > 0) %>% 
-#   sapply(str_replace, "on time", "on_time") #%>% 
-# 
-# new.text <- sapply(new.text, str_replace, "AM WEST", "AM_WEST")
-# new.text <- sapply(new.text, str_replace, " \\I ", " 1")
-# 
-#   
-#   
-# my.text[c(1,3,4,6,7),1]
-# my.text
-# View(my.text)
-# my.text <- str_replace_all(my.text, "\\||I", " 1")
-# 
-# t(t(my.text))
-# writeLines(my.text)
-
+my.data
 
 ```
 
-##Load the data & take a look at it
-```{r load.data}
+##Time to tidy this data up!
+```{r tidy}
+names(my.data)[1:2] <- c("airline", "arrival_type")
+my.data[2,1] <- my.data[1,1]
+my.data[5,1] <- my.data[4,1]
+my.data[,2] <- sapply(my.data[,2], str_replace, " ", "_")
 
+my.data
+tidy.data <- my.data %>% 
+  na.omit() %>% 
+  gather("arrival_city", "n", 3:7) %>% 
+  spread(arrival_type, "n") %>% 
+  mutate(total_flights = delayed + on_time, on_time_rate = on_time / total_flights) %>% 
+  arrange(desc(total_flights))
+tidy.data[,2] <- sapply(tidy.data[,2], str_replace, "\\.", " ")
 
+tidy.data
 ```
