@@ -1,21 +1,12 @@
 ---
-title: "D607 Project 1: Create Table Using Regex "
+title: "D607 Week 5: dplyr & tidyr Practice"
 author: "Kyle Gilde"
-date: "Feb. 19, 2017"
+date: "Mar. 4, 2017"
 output: 
   prettydoc::html_pretty:
     theme: architect
     highlight: github
 ---
-
-<style>
-.lightgreen table {
-  background-color:#eff8e5;
-.beige {
-  background-color:beige;  
-}
-</style>
-<div class = "beige">
 
 ##The Task
 The chart above describes arrival delays for two airlines across five destinations. Your task is to:
@@ -28,59 +19,90 @@ and transform your data.
 (3) Perform analysis to compare the arrival delays for the two airlines.
 (4) Your code should be in an R Markdown file, posted to rpubs.com, and should include narrative
 descriptions of your data cleanup work, analysis, and conclusions. Please include in your
-homework submission:
-??? The URL to the .Rmd file in your GitHub repository. and
-??? The URL for your rpubs.com web page.
+homework submission: The URL to the .Rmd file in your GitHub repository and??? URL for your rpubs.com web page.
 
 ##Load Packages
-```{r setup, results='hide'} 
+```{r setup} 
 knitr::opts_chunk$set(#echo=FALSE, 
                       warning=FALSE, 
                       message=FALSE,
-                      tidy=TRUE,
+                      tidy=F,
                       #comment = "",
                       dev="png", 
                       dev.args=list(type="cairo"))
-
 #https://cran.r-project.org/web/packages/prettydoc/vignettes/
 #https://www.rstudio.com/wp-content/uploads/2015/03/rmarkdown-reference.pdf
 
-load.packages <- c("stringr","prettydoc", "tidyr", "dplyr")
-
+load.packages <- c("stringr","prettydoc", "tidyr", "dplyr", "knitr")
 
 ipak <- function(pkg){
     #FUNCTION SOURCE: https://gist.github.com/stevenworthington/3178163
     new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
     if (length(new.pkg)) 
         install.packages(new.pkg, dependencies = TRUE)
-    sapply(pkg, require, character.only = TRUE)
+    sapply(pkg, require, character.only = TRUE, quietly = TRUE, warn.conflicts = FALSE)
 }
+
 ipak(load.packages)
 ```
 
-##Load Data & take a look at it
+##Load data, fill in missing values & take a look at it
 ```{r data}
-my.data <- read.csv("https://raw.githubusercontent.com/kylegilde/D607-Data-Acquistion/master/data-sets/numbersense_flight_data.csv", stringsAsFactors = F)
+my_data <- read.csv("https://raw.githubusercontent.com/kylegilde/D607-Data-Acquistion/master/data-sets/numbersense_flight_data.csv", stringsAsFactors = F)
 
-my.data
+#Fill in the airline values and insert underscore into "on time"
+my_data[2,1] <- my_data[1,1]
+my_data[5,1] <- my_data[4,1]
+my_data[,2] <- sapply(my_data[,2], str_replace, " ", "_")
+
+kable(my_data)
 
 ```
 
 ##Time to tidy this data up!
 ```{r tidy}
-names(my.data)[1:2] <- c("airline", "arrival_type")
-my.data[2,1] <- my.data[1,1]
-my.data[5,1] <- my.data[4,1]
-my.data[,2] <- sapply(my.data[,2], str_replace, " ", "_")
-
-my.data
-tidy.data <- my.data %>% 
+tidy_data <- my_data %>% 
   na.omit() %>% 
+  rename(airline = X, arrival_type = X.1) %>% 
   gather("arrival_city", "n", 3:7) %>% 
   spread(arrival_type, "n") %>% 
-  mutate(total_flights = delayed + on_time, on_time_rate = on_time / total_flights) %>% 
-  arrange(desc(total_flights))
-tidy.data[,2] <- sapply(tidy.data[,2], str_replace, "\\.", " ")
+  mutate(total_arrivals = delayed + on_time, on_time_rate = on_time / total_arrivals) %>% 
+  arrange(desc(total_arrivals))
 
-tidy.data
+tidy_data[,2] <- sapply(tidy_data[,2], str_replace, "\\.", " ")
 ```
+
+##Let's take a look at the results
+```{r tidied}
+glimpse(tidy_data)
+kable(tidy_data)
+```
+
+#Now let's do some basic analysis with dply
+##Which airline & city had the best on-time arrival rate?
+```{r}
+tidy_data %>% 
+  filter(on_time_rate == max(on_time_rate)) %>% 
+  kable()
+
+```
+
+##Which airline had the better on-time arrival rate?
+```{r analysis, tidy=F}
+tidy_data %>% 
+  group_by(airline) %>% 
+  summarise(airline_on_time_rate = sum(on_time) / sum(total_arrivals)) %>% 
+  filter(airline_on_time_rate == max(airline_on_time_rate)) %>% 
+  kable()
+```
+
+##Let's rank the cities by their overall on-time arrival rates.
+```{r}
+tidy_data %>% 
+  group_by(arrival_city) %>% 
+  summarise(city_on_time_rate = sum(on_time) / sum(total_arrivals)) %>% 
+  mutate(on_time_ranking = min_rank(desc(city_on_time_rate))) %>% 
+  arrange(on_time_ranking) %>% 
+  kable()
+```
+
