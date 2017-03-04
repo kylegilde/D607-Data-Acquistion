@@ -10,7 +10,7 @@
 #file:///C:/Users/kyleg/Downloads/wrangling-webinar.pdf
 library(EDAWR)
 
-####4 tidyr functions####
+####----------4 tidyr functions----------####
 cases
 #gather
 gather(cases, "year", "n", 2:4)
@@ -24,7 +24,7 @@ storms2
 #unite
 storms2 %>% unite("date", year, month, day, sep="-")
 
-####dplyr FUNCTIONS####
+####----------dplyr FUNCTIONS------------####
 library(EDAWR)
 select(storms, storm, pressure)
 select(storms, -storm)
