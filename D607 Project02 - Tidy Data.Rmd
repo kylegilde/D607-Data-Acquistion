@@ -1,0 +1,102 @@
+---
+title: "D607 Project 2 - Tidy Data"
+author: "Kyle Gilde"
+date: "Mar. 4, 2017"
+output: 
+  prettydoc::html_pretty:
+    theme: architect
+    highlight: github
+---
+
+#The Task
+Choose any three of the "wide" datasets identified in the Week 6 Discussion items. (You may use your own dataset; please don't use my Sample Post dataset, since that was used in your Week 6 assignment!) 
+ 
+For each of the three chosen datasets:
+1.  Create a .CSV file (or optionally, a MySQL database!) that includes all of the information included in the dataset. You're encouraged to use a "wide" structure similar to how the information appears in the discussion item, so that you can practice tidying and transformations as described below.
+2.  Read the information from your .CSV file into R, and use tidyr and dplyr as needed to tidy and transform your data. [Most of your grade will be based on this step!]
+3.  Perform the analysis requested in the discussion item.
+
+##Load Packages
+```{r setup} 
+knitr::opts_chunk$set(#echo=FALSE, 
+                      warning=FALSE, 
+                      message=FALSE,
+                      tidy=F,
+                      #comment = "",
+                      dev="png", 
+                      dev.args=list(type="cairo"))
+#https://cran.r-project.org/web/packages/prettydoc/vignettes/
+#https://www.rstudio.com/wp-content/uploads/2015/03/rmarkdown-reference.pdf
+
+load.packages <- c("stringr","prettydoc", "tidyr", "dplyr", "knitr")
+
+ipak <- function(pkg){
+    #FUNCTION SOURCE: https://gist.github.com/stevenworthington/3178163
+    new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
+    if (length(new.pkg)) 
+        install.packages(new.pkg, dependencies = TRUE)
+    sapply(pkg, require, character.only = TRUE, quietly = TRUE, warn.conflicts = FALSE)
+}
+
+ipak(load.packages)
+```
+
+##Load data, fill in missing values & take a look at it
+```{r data}
+my_data <- read.csv("https://raw.githubusercontent.com/kylegilde/D607-Data-Acquistion/master/data-sets/numbersense_flight_data.csv", stringsAsFactors = F)
+
+#Fill in the airline values and insert underscore into "on time"
+my_data[2,1] <- my_data[1,1]
+my_data[5,1] <- my_data[4,1]
+my_data[,2] <- sapply(my_data[,2], str_replace, " ", "_")
+
+kable(my_data)
+```
+
+##Time to tidy this data up!
+```{r tidy}
+tidy_data <- my_data %>% 
+  na.omit() %>% 
+  rename(airline = X, arrival_type = X.1) %>% 
+  gather("arrival_city", "n", 3:7) %>% 
+  spread(arrival_type, "n") %>% 
+  mutate(total_arrivals = delayed + on_time, on_time_rate = on_time / total_arrivals) %>% 
+  arrange(desc(total_arrivals))
+
+tidy_data[,2] <- sapply(tidy_data[,2], str_replace, "\\.", " ")
+```
+
+##Let's take a look at the results
+```{r tidied}
+glimpse(tidy_data)
+kable(tidy_data)
+```
+
+#Now let's do some basic analysis with dply
+##Which airline & city had the best on-time arrival rate?
+```{r}
+tidy_data %>% 
+  filter(on_time_rate == max(on_time_rate)) %>% 
+  kable()
+
+```
+
+##Which airline had the better on-time arrival rate?
+```{r analysis, tidy=F}
+tidy_data %>% 
+  group_by(airline) %>% 
+  summarise(airline_on_time_rate = sum(on_time) / sum(total_arrivals)) %>% 
+  filter(airline_on_time_rate == max(airline_on_time_rate)) %>% 
+  kable()
+```
+
+##Let's rank the cities by their overall on-time arrival rates.
+```{r}
+tidy_data %>% 
+  group_by(arrival_city) %>% 
+  summarise(city_on_time_rate = sum(on_time) / sum(total_arrivals)) %>% 
+  mutate(on_time_ranking = min_rank(desc(city_on_time_rate))) %>% 
+  arrange(on_time_ranking) %>% 
+  kable()
+```
+
