@@ -113,7 +113,14 @@ party_agreement %>%
   kable()
 ```
 
-#Dataset #2: Nkasi's Congressional Voting Records
+#Dataset #2: Joel's GINI Index  
+
+Measuring the wealth distribution between the people in each country has been something economists have been measuring for many years. In the GINI index, a higher GINI coefficient signifies inequality in wealth distribution, with 1 being complete inequality and 0 being complete equality. The World Bank has been maintaining [this data](http://databank.worldbank.org/data/reports.aspx?source=2&series=SI.POV.GINI&country=#).
+
+
+
+A potential analysis that could be performed is the trend in the GINI coefficient for each country (or continent) or the average of the GINI coefficient. 
+
 ##Load data, get headers & take a look at it
 
 ```{r tidy}
