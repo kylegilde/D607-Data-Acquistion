@@ -31,7 +31,7 @@ knitr::opts_chunk$set(#echo=FALSE,
 #https://cran.r-project.org/web/packages/prettydoc/vignettes/
 #https://www.rstudio.com/wp-content/uploads/2015/03/rmarkdown-reference.pdf
 
-load.packages <- c("stringr","prettydoc", "tidyr", "dplyr", "knitr", "janitor")
+load.packages <- c("stringr","prettydoc", "tidyr", "dplyr", "knitr", "janitor", "ggplot2", "data.table")
 
 ipak <- function(pkg){
     #FUNCTION SOURCE: https://gist.github.com/stevenworthington/3178163
@@ -115,34 +115,96 @@ party_agreement %>%
 
 #Dataset #2: Joel's GINI Index  
 
-Measuring the wealth distribution between the people in each country has been something economists have been measuring for many years. In the GINI index, a higher GINI coefficient signifies inequality in wealth distribution, with 1 being complete inequality and 0 being complete equality. The World Bank has been maintaining [this data](http://databank.worldbank.org/data/reports.aspx?source=2&series=SI.POV.GINI&country=#).
+"Measuring the wealth distribution between the people in each country has been something economists have been measuring for many years. In the GINI index, a higher GINI coefficient signifies inequality in wealth distribution, with 1 being complete inequality and 0 being complete equality. The World Bank has been maintaining [this data](http://databank.worldbank.org/data/reports.aspx?source=2&series=SI.POV.GINI&country=#)."
 
+A potential analysis that could be performed is the trend in the GINI coefficient for each country.
 
-
-A potential analysis that could be performed is the trend in the GINI coefficient for each country (or continent) or the average of the GINI coefficient. 
-
-##Load data, get headers & take a look at it
-
+##Load data & take a look at it
 ```{r tidy}
+gini_data <- read.csv("https://raw.githubusercontent.com/kylegilde/D607-Data-Acquistion/master/data-sets/1966f167-824f-4105-8927-8f5a80a92c0f_Data.csv", stringsAsFactors = F)
 
-
-
+glimpse(gini_data)
 ```
-
-#Now let's do some basic analysis with dply
-##Which airline & city had the best on-time arrival rate?
+##Tidy & transform & filter to countries that have at least 8 observations since 2007
 ```{r}
+gini_data1 <- gini_data %>% 
+  clean_names() %>% 
+  gather("year_chr", "gini_chr", 5:16) %>% 
+  mutate(year = as.integer(str_extract(year_chr,"[0-9]{4}"))) %>% 
+  mutate(gini_coefficient = as.numeric(str_replace(gini_chr, "\\.{2}", ""))) %>% 
+  select(country_name, year, gini_coefficient) %>% 
+  filter(gini_coefficient >= 0 & year >= 2007)
 
+country_8obs <- filter(count(gini_data1, country_name),n >= 8)$country_name
+gini_data2 <- filter(gini_data1, country_name %in% country_8obs)
+
+glimpse(gini_data2)
 
 ```
+##"A potential analysis that could be performed is the trend in the GINI coefficient for each country."
++ There are appears to be an slight overall decline in inquality among these 17 countries.
++ Honduras and Paraguay have had more volatility in their coefficients than other countries in this group.
 
-##Which airline had the better on-time arrival rate?
+```{r}
+ggplot(gini_data2, aes(x = year, y = gini_coefficient, color = country_name)) + geom_line(size=2)
+```
+
+
+#Dataset #3: World Bank: both wide and long data set (mine)
+In their [World Development Indicators collection](http://data.worldbank.org/data-catalog/world-development-indicators), [this zip folder](http://databank.worldbank.org/data/download/WDI_csv.zip) contains a file called WDI_Data, which I believe is an example of a table that is both wide and long/narrow. In it, each year is given its own column, which is characteristic of a "wide" format. However, it also has a column that is called "Indicator Name." It contains metric names that would typically be given their own columns instead of rows, and so this is a characteristic of narrow/long table. 
+
+It would be a good exercise to tidy this table by putting all of the years in a one column and the metrics in their own columns. Then you could use scatter plots to look for correlations between variables.
+
+
+##Download & upzip the large file, take a glimpse
+```{r}
+wb_url <- "http://databank.worldbank.org/data/download/WDI_csv.zip"
+
+# Commented out to avoid re-downloading this large file
+temp <- tempfile()
+download.file(wb_url,temp)
+wb_data <- read.csv(unz(temp, "WDI_Data.csv"), stringsAsFactors = F)
+# unlink(temp)
+
+glimpse(wb_data)
+```
+
+##Let's tidy up this massive mess!
 ```{r analysis, tidy=F}
+wb_data1 <- wb_data
 
+#remove the Xs from the year columns
+names(wb_data1)[5:61] <- str_extract(names(wb_data1)[5:61],"[0-9]{4}")
+
+selected_indicators <- c(
+  "NY.GDP.PCAP.KD.ZG",
+  "NY.GDP.PCAP.PP.KD",
+  "SH.MED.BEDS.ZS",
+  "SE.ADT.LITR.FE.ZS"
+)
+
+#tidy & filter
+wb_data2 <- wb_data1 %>%
+  filter(Indicator.Code %in% selected_indicators) %>% 
+  gather("year_chr", "value", 5:61) %>%
+  mutate(year = as.integer(year_chr)) %>% 
+  select(-Country.Code, -Indicator.Code, -year_chr) %>%
+  spread(Indicator.Name, value) %>% 
+  clean_names() 
+
+glimpse(wb_data2)
 ```
 
-##Let's rank the cities by their overall on-time arrival rates.
+###Question 1: Does there appear to be correlation between GDP per capita & the rate of hosital beds per 1000 people?
++ There appears to be small amount of correlation.
 ```{r}
+ggplot(wb_data2, aes(x = gdp_per_capita_ppp_constant_2011_international, y = hospital_beds_per_1_000_people)) + geom_point(size = .5)
 
 ```
 
+###Question 2: Does there appear to be correlation between GDP per capita & the literacy rate of adult females?
++ There appears to be possibly some non-linear correlation between these 2 variables.
+```{r}
+ggplot(wb_data2, aes(x = gdp_per_capita_ppp_constant_2011_international, y = literacy_rate_adult_female_percent_of_females_ages_15_and_above)) + geom_point(size = .5)
+
+```
