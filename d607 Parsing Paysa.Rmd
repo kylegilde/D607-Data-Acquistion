@@ -29,7 +29,7 @@ knitr::opts_chunk$set(#echo=FALSE,
 #https://cran.r-project.org/web/packages/prettydoc/vignettes/
 #https://www.rstudio.com/wp-content/uploads/2015/03/rmarkdown-reference.pdf
 
-load.packages <- c("RCurl","prettydoc", "tidyr", "dplyr", "knitr", "janitor", "XML")
+load.packages <- c("RCurl","prettydoc", "stringr", "dplyr", "knitr", "janitor", "XML")
 
 ipak <- function(pkg){
     #FUNCTION SOURCE: https://gist.github.com/stevenworthington/3178163
@@ -45,10 +45,16 @@ ipak(load.packages)
 #1. HTML Table 
 ##Load data, get headers & take a look at it
 ```{r load}
-url_html <- getURLContent("https://raw.githubusercontent.com/kylegilde/D607-Data-Acquistion/master/data-sets/favorite_books.html")
+paysa_text <- getURLContent("https://raw.githubusercontent.com/kylegilde/D607-Group-Project/master/paysa.txt")
 
-my_html_table <- htmlParse(url_html)
+url <- "https://raw.githubusercontent.com/kylegilde/D607-Group-Project/master/paysa.txt"
 
+length(readLines(url))
+
+paysa_list <- str_split(paysa_text, "\\n")
+
+paysa_list
+str_split(paysa_list, "APPLY NOW")
 
 ```
 ##Tidy & mutate the data, remove non-yea-or-nay votes
