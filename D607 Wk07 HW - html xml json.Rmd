@@ -29,7 +29,7 @@ knitr::opts_chunk$set(warning=FALSE,
 #https://www.rstudio.com/wp-content/uploads/2015/03/rmarkdown-reference.pdf
 
 #create vector with all needed packages
-load_packages <- c("RCurl","prettydoc", "stringr", "dplyr", "knitr", "janitor", "XML", "tidyr")
+load_packages <- c("RCurl","prettydoc", "stringr", "dplyr", "knitr", "janitor", "XML", "tidyr", "RJSONIO")
 
 #see if we need to install any of them
 new.pkg <- load_packages[!(load_packages %in% installed.packages()[, "Package"])]
@@ -62,9 +62,6 @@ kable(my_html_table)
 #2. XML Parsing 
 ##Load data, look at the XML & then its data frame
 ```{r xml}
-
-#url_XML <- getURLContent("https://raw.githubusercontent.com/kylegilde/D607-Data-Acquistion/master/data-sets/books/books2.xml")
-
 url_XML <- getURLContent("https://raw.githubusercontent.com/kylegilde/D607-Data-Acquistion/master/data-sets/books/books2.xml")
 
 writeLines(url_XML)
@@ -88,30 +85,21 @@ kable(my_XML_table2, caption = "And now it looks like the HTML data frame")
 ```
 
 #3. JSON Parsing 
-##Load data, look at the XML & then its data frame
-```{r xml}
+##Load data, look at the JSON & then its data frame
+```{r json}
 
-#url_XML <- getURLContent("https://raw.githubusercontent.com/kylegilde/D607-Data-Acquistion/master/data-sets/books/books2.xml")
+url_json <- getURLContent("https://raw.githubusercontent.com/kylegilde/D607-Data-Acquistion/master/data-sets/books/books.json")
 
-url_XML <- getURLContent("https://raw.githubusercontent.com/kylegilde/D607-Data-Acquistion/master/data-sets/books/books2.xml")
+isValidJSON("https://raw.githubusercontent.com/kylegilde/D607-Data-Acquistion/master/data-sets/books/books.json")
 
-writeLines(url_XML)
+writeLines(url_json)
 
-my_XML_table <- url_XML %>% 
-  xmlParse() %>% 
-  xmlToDataFrame()
+my_json_table <- fromJSON(url_json)
 
-kable(my_XML_table, caption = "This does not look the same as the HTML data frame. For the book with more than one author, the function concatenated all of them into a single cell. Let's do a little bit of surgery to get the same result.")
+my_json_table <- do.call("rbind", lapply(my_json_table$`favorate recent books`, data.frame, stringsAsFactors = F))
 
+my_json_table <- clean_names(my_json_table)
 
-my_XML_table2 <- my_XML_table %>% 
-  mutate(authors = paste(str_replace_all(authors, "([a-z])([A-Z])", "\\1,\\2"))) %>% 
-  separate(authors, c(paste0("author_", 1:4)), sep = ",") %>% 
-  gather(author_num, author, author_1:author_4, na.rm = T) %>% 
-  select(book_title, author, everything(), -author_num) %>% 
-  arrange(book_title) 
-  
-kable(my_XML_table2, caption = "And now it looks like the HTML data frame")
-
+kable(my_json_table)
 ```
 
