@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!--These are some of my recent favorite books-->
-  <cityDetails>
-    <cityName>Belmopa</cityName>
-    <hotelDetails>
-      <hotelName>Bull Frog Inn</hotelName>
-    </hotelDetails>
-    <hotelDetails>
-      <hotelName>Pook's Hill Lodge</hotelName>
-    </hotelDetails>
-  </cityDetails>
-  <cityDetails>
-    <cityName>Kuala Lumpur</cityName>
-    <hotelDetails>
-      <hotelName>Pan Pacific Kuala Lumpur</hotelName>
-    </hotelDetails>
-    <hotelDetails>
-      <hotelName>Mandarin Oriental Kuala Lumpur</hotelName>
-    </hotelDetails>
-  </cityDetails>
+<cityDetails>
+<cityName>Belmopa</cityName>
+<hotelDetails>
+  <hotelName>Bull Frog Inn</hotelName>
+</hotelDetails>
+<hotelDetails>
+  <hotelName>Pook's Hill Lodge</hotelName>
+</hotelDetails>
+</cityDetails>
+<cityDetails>
+<cityName>Kuala Lumpur</cityName>
+<hotelDetails>
+  <hotelName>Pan Pacific Kuala Lumpur</hotelName>
+</hotelDetails>
+<hotelDetails>
+  <hotelName>Mandarin Oriental Kuala Lumpur</hotelName>
+</hotelDetails>
+</cityDetails>
