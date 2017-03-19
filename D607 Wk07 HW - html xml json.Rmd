@@ -45,46 +45,21 @@ t(t(sapply(load_packages, require, character.only = TRUE, quietly = TRUE,  warn.
 ```{r html}
 url_html <- getURLContent("https://raw.githubusercontent.com/kylegilde/D607-Data-Acquistion/master/data-sets/books/books.html")
 
-#my_html_table <- htmlParse(url_html)
+#my_html_df <- htmlParse(url_html)
 
 writeLines(url_html)
 
-my_html_table <- url_html %>% 
+my_html_df <- url_html %>% 
   readHTMLTable(header=TRUE, as.data.frame = TRUE) %>% 
   data.frame() %>% 
   clean_names() 
 
-colnames(my_html_table) <- str_replace(colnames(my_html_table),"null_", "")
+colnames(my_html_df) <- str_replace(colnames(my_html_df),"null_", "")
 
-kable(my_html_table)
+kable(my_html_df)
 ```
 
-#2. XML Parsing 
-##Load data, look at the XML & then its data frame
-```{r xml}
-url_XML <- getURLContent("https://raw.githubusercontent.com/kylegilde/D607-Data-Acquistion/master/data-sets/books/books2.xml")
-
-writeLines(url_XML)
-
-my_XML_table <- url_XML %>% 
-  xmlParse() %>% 
-  xmlToDataFrame()
-
-kable(my_XML_table, caption = "This does not look the same as the HTML data frame. For the book with more than one author, the function concatenated all of them into a single cell. Let's do a little bit of surgery to get the same result.")
-
-
-my_XML_table2 <- my_XML_table %>% 
-  mutate(authors = paste(str_replace_all(authors, "([a-z])([A-Z])", "\\1,\\2"))) %>% 
-  separate(authors, c(paste0("author_", 1:4)), sep = ",") %>% 
-  gather(author_num, author, author_1:author_4, na.rm = T) %>% 
-  select(book_title, author, everything(), -author_num) %>% 
-  arrange(book_title) 
-  
-kable(my_XML_table2, caption = "And now it looks like the HTML data frame")
-
-```
-
-#3. JSON Parsing 
+#2. JSON Parsing 
 ##Load data, look at the JSON & then its data frame
 ```{r json}
 
@@ -95,17 +70,45 @@ isValidJSON("https://raw.githubusercontent.com/kylegilde/D607-Data-Acquistion/ma
 
 writeLines(url_json)
 
-my_json_table <- fromJSON(url_json)
+my_json_df <- fromJSON(url_json)
 
-my_json_table <- do.call("rbind", lapply(my_json_table$`favorite recent books`, data.frame, stringsAsFactors = F))
+my_json_df <- do.call("rbind", lapply(my_json_df$`favorite recent books`, data.frame, stringsAsFactors = F))
 
-my_json_table <- my_json_table %>%  
+my_json_df <- my_json_df %>%  
   clean_names() %>% 
   arrange(book_title)
 
+kable(my_json_df)
 
-kable(my_json_table)
 
-my_json_table == my_html_table
 ```
+
+#3. XML Parsing 
+##Load data, look at the XML & then its data frame
+```{r xml}
+url_XML <- getURLContent("https://raw.githubusercontent.com/kylegilde/D607-Data-Acquistion/master/data-sets/books/books2.xml")
+
+writeLines(url_XML)
+
+my_XML_df <- url_XML %>% 
+  xmlParse() %>% 
+  xmlToDataFrame(stringsAsFactors = FALSE)
+
+kable(my_XML_df, caption = "This does not look the same as the HTML data frame.\\n For the book with more than one author, the function concatenated all of them into a single cell.\\n Let's do a little bit of surgery to get the same result.")
+
+
+my_XML_df2 <- my_XML_df %>% 
+  mutate(authors = paste(str_replace_all(authors, "([a-z])([A-Z])", "\\1,\\2"))) %>% 
+  separate(authors, c(paste0("author_", 1:4)), sep = ",") %>% 
+  gather(author_num, author, author_1:author_4, na.rm = T) %>% 
+  select(book_title, author, everything(), -author_num) %>% 
+  arrange(book_title) 
+  
+kable(my_XML_df2, caption = "And now it looks like the HTML data frame")
+
+my_json_df == my_html_df
+my_html_df == my_XML_df2
+```
+
+
 
