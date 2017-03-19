@@ -1,5 +1,5 @@
 ---
-title: "D607 Project 2 - Tidy Data"
+title: "D607 Wk07 HW - Parsing HTML, XML & JSON"
 author: "Kyle Gilde"
 date: "Mar. 14, 2017"
 output: 
@@ -36,7 +36,7 @@ new.pkg <- load_packages[!(load_packages %in% installed.packages()[, "Package"])
 if (length(new.pkg)) install.packages(new.pkg, dependencies = TRUE, warn.conflicts = FALSE)
 
 #require
-sapply(load_packages, require, character.only = TRUE, quietly = TRUE,  warn.conflicts = FALSE)
+t(t(sapply(load_packages, require, character.only = TRUE, quietly = TRUE,  warn.conflicts = FALSE)))
 #CODE SOURCE DOCUMENTATION: https://gist.github.com/stevenworthington/3178163
 ```
 
@@ -99,8 +99,13 @@ my_json_table <- fromJSON(url_json)
 
 my_json_table <- do.call("rbind", lapply(my_json_table$`favorite recent books`, data.frame, stringsAsFactors = F))
 
-my_json_table <- clean_names(my_json_table)
+my_json_table <- my_json_table %>%  
+  clean_names() %>% 
+  arrange(book_title)
+
 
 kable(my_json_table)
+
+my_json_table == my_html_table
 ```
 

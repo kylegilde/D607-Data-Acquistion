@@ -14,7 +14,7 @@
 
 <meta name="date" content="2017-03-14" />
 
-<title>D607 Project 2 - Tidy Data</title>
+<title>D607 Wk07 HW - Parsing HTML, XML &amp; JSON</title>
 
 
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <header>
 <div class="inner">
-<h1 class="title toc-ignore">D607 Project 2 - Tidy Data</h1>
+<h1 class="title toc-ignore">D607 Wk07 HW - Parsing HTML, XML &amp; JSON</h1>
 <h3 class="author">Kyle Gilde</h3>
 <h3 class="date">Mar. 14, 2017</h3>
 </div>
@@ -107,12 +107,18 @@ new.pkg &lt;-<span class="st"> </span>load_packages[!(load_packages %in%<span cl
 if (<span class="kw">length</span>(new.pkg)) <span class="kw">install.packages</span>(new.pkg, <span class="dt">dependencies =</span> <span class="ot">TRUE</span>, <span class="dt">warn.conflicts =</span> <span class="ot">FALSE</span>)
 
 <span class="co">#require</span>
-<span class="kw">sapply</span>(load_packages, require, <span class="dt">character.only =</span> <span class="ot">TRUE</span>, <span class="dt">quietly =</span> <span class="ot">TRUE</span>,  <span class="dt">warn.conflicts =</span> <span class="ot">FALSE</span>)</code></pre></div>
+<span class="kw">t</span>(<span class="kw">t</span>(<span class="kw">sapply</span>(load_packages, require, <span class="dt">character.only =</span> <span class="ot">TRUE</span>, <span class="dt">quietly =</span> <span class="ot">TRUE</span>,  <span class="dt">warn.conflicts =</span> <span class="ot">FALSE</span>)))</code></pre></div>
 <pre><code>## Warning: package 'janitor' was built under R version 3.3.3</code></pre>
-<pre><code>##     RCurl prettydoc   stringr     dplyr     knitr   janitor       XML 
-##      TRUE      TRUE      TRUE      TRUE      TRUE      TRUE      TRUE 
-##     tidyr   RJSONIO 
-##      TRUE      TRUE</code></pre>
+<pre><code>##           [,1]
+## RCurl     TRUE
+## prettydoc TRUE
+## stringr   TRUE
+## dplyr     TRUE
+## knitr     TRUE
+## janitor   TRUE
+## XML       TRUE
+## tidyr     TRUE
+## RJSONIO   TRUE</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#CODE SOURCE DOCUMENTATION: https://gist.github.com/stevenworthington/3178163</span></code></pre></div>
 </div>
 <div id="html-table-parsing" class="section level1">
@@ -383,7 +389,10 @@ if (<span class="kw">length</span>(new.pkg)) <span class="kw">install.packages</
 
 my_json_table &lt;-<span class="st"> </span><span class="kw">do.call</span>(<span class="st">&quot;rbind&quot;</span>, <span class="kw">lapply</span>(my_json_table$<span class="st">`</span><span class="dt">favorite recent books</span><span class="st">`</span>, data.frame, <span class="dt">stringsAsFactors =</span> F))
 
-my_json_table &lt;-<span class="st"> </span><span class="kw">clean_names</span>(my_json_table)
+my_json_table &lt;-<span class="st"> </span>my_json_table %&gt;%<span class="st">  </span>
+<span class="st">  </span><span class="kw">clean_names</span>() %&gt;%<span class="st"> </span>
+<span class="st">  </span><span class="kw">arrange</span>(book_title)
+
 
 <span class="kw">kable</span>(my_json_table)</code></pre></div>
 <table>
@@ -397,20 +406,6 @@ my_json_table &lt;-<span class="st"> </span><span class="kw">clean_names</span>(
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">Gun, Germs and Steel</td>
-<td align="left">Jared Diamond</td>
-<td align="left">Soft</td>
-<td align="left">History</td>
-<td align="right">498</td>
-</tr>
-<tr class="even">
-<td align="left">The Signal and the Noise</td>
-<td align="left">Nate Silver</td>
-<td align="left">Soft</td>
-<td align="left">Science &amp; Math</td>
-<td align="right">560</td>
-</tr>
 <tr class="odd">
 <td align="left">Automated Data Collection with R</td>
 <td align="left">Simon Munzert</td>
@@ -439,8 +434,30 @@ my_json_table &lt;-<span class="st"> </span><span class="kw">clean_names</span>(
 <td align="left">Computer Science</td>
 <td align="right">452</td>
 </tr>
+<tr class="odd">
+<td align="left">Gun, Germs and Steel</td>
+<td align="left">Jared Diamond</td>
+<td align="left">Soft</td>
+<td align="left">History</td>
+<td align="right">498</td>
+</tr>
+<tr class="even">
+<td align="left">The Signal and the Noise</td>
+<td align="left">Nate Silver</td>
+<td align="left">Soft</td>
+<td align="left">Science &amp; Math</td>
+<td align="right">560</td>
+</tr>
 </tbody>
 </table>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">my_json_table ==<span class="st"> </span>my_html_table</code></pre></div>
+<pre><code>##      book_title authors cover_type subject pages
+## [1,]       TRUE    TRUE       TRUE    TRUE  TRUE
+## [2,]       TRUE    TRUE       TRUE    TRUE  TRUE
+## [3,]       TRUE    TRUE       TRUE    TRUE  TRUE
+## [4,]       TRUE    TRUE       TRUE    TRUE  TRUE
+## [5,]      FALSE    TRUE       TRUE    TRUE  TRUE
+## [6,]       TRUE    TRUE       TRUE    TRUE  TRUE</code></pre>
 </div>
 </div>
     </section>
