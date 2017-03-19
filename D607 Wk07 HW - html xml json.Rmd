@@ -29,45 +29,48 @@ knitr::opts_chunk$set(#echo=FALSE,
 #https://cran.r-project.org/web/packages/prettydoc/vignettes/
 #https://www.rstudio.com/wp-content/uploads/2015/03/rmarkdown-reference.pdf
 
-load.packages <- c("RCurl","prettydoc", "tidyr", "dplyr", "knitr", "janitor", "XML")
+#create vector with all needed packages
+load_packages <- c("RCurl","prettydoc", "tidyr", "dplyr", "knitr", "janitor", "XML")
 
-ipak <- function(pkg){
-    #FUNCTION SOURCE: https://gist.github.com/stevenworthington/3178163
-    new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
-    if (length(new.pkg)) 
-        install.packages(new.pkg, dependencies = TRUE)
-    sapply(pkg, require, character.only = TRUE, quietly = TRUE, warn.conflicts = FALSE)
-}
+#see if we need to install 
+new.pkg <- load_packages[!(load_packages %in% installed.packages()[, "Package"])]
+if (length(new.pkg)) install.packages(new.pkg, dependencies = TRUE, warn.conflicts = FALSE)
 
-ipak(load.packages)
+#require
+sapply(load_packages, require, character.only = TRUE, quietly = TRUE)
+#CODE SOURCE DOCUMENTATION: https://gist.github.com/stevenworthington/3178163
 ```
 
 #1. HTML Table 
-##Load data, get headers & take a look at it
+##Load data & take a look the data frame
 ```{r load}
-url_html <- getURLContent("https://raw.githubusercontent.com/kylegilde/D607-Data-Acquistion/master/data-sets/favorite_books.html")
+url_html <- getURLContent("https://raw.githubusercontent.com/kylegilde/D607-Data-Acquistion/master/data-sets/books/books.html")
 
-my_html_table <- htmlParse(url_html)
+#my_html_table <- htmlParse(url_html)
 
+my_html_table <- url_html %>% 
+  readHTMLTable(header=TRUE, as.data.frame = TRUE) %>% 
+  data.frame() %>% 
+  clean_names() 
 
+colnames(my_html_table) <- str_replace(colnames(my_html_table),"null_", "")  
+
+my_html_table
+kable(my_html_table)
 ```
-##Tidy & mutate the data, remove non-yea-or-nay votes
+
+#2. XML Table 
+##Load data & take a look the data frame
 ```{r tidy_data}
 
-party_agreement <- ds1 %>% 
-  gather("voting_issue", "vote", 2:17) %>%
-  filter(vote %in% c("y", "n")) %>% 
-  group_by(party, voting_issue, vote) %>% 
-  summarise(vote_count = n()) %>% 
-  spread(vote, vote_count) %>% 
-  rename(nay_votes = n, yea_votes = y) %>% 
-  mutate(total_votes = nay_votes + yea_votes, 
-         agreement_rate = pmax(nay_votes, yea_votes) / total_votes, 
-         most_votes = ifelse(yea_votes > nay_votes, "yea", "nay")) %>% 
-  select(party, voting_issue, agreement_rate, most_votes) 
-    #switch("n" = "nay_votes", "y" = "yea_votes")
+url_XML <- getURLContent("https://raw.githubusercontent.com/kylegilde/D607-Data-Acquistion/master/data-sets/favorite_books.XML")
 
-kable(head(party_agreement))
+#my_XML_table <- XMLParse(url_XML)
+xml
+my_XML_table <- data.frame(readXMLTable(url_XML))
+
+kable(my_XML_table)
+
 ```
 
 ##Analysis that can be done:
