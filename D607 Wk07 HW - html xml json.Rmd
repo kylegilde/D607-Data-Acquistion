@@ -51,7 +51,7 @@ writeLines(url_html)
 
 my_html_df <- url_html %>% 
   readHTMLTable(header=TRUE, as.data.frame = TRUE) %>% 
-  data.frame() %>% 
+  data.frame(stringsAsFactors = FALSE) %>% 
   clean_names() 
 
 colnames(my_html_df) <- str_replace(colnames(my_html_df),"null_", "")
@@ -78,9 +78,7 @@ my_json_df <- my_json_df %>%
   clean_names() %>% 
   arrange(book_title)
 
-kable(my_json_df)
-
-
+kable(my_json_df, caption = "This data frame looks the same as the HTML one.")
 ```
 
 #3. XML Parsing 
@@ -92,10 +90,9 @@ writeLines(url_XML)
 
 my_XML_df <- url_XML %>% 
   xmlParse() %>% 
-  xmlToDataFrame(stringsAsFactors = FALSE)
+  xmlToDataFrame(stringsAsFactors = FALSE) 
 
-kable(my_XML_df, caption = "This does not look the same as the HTML data frame.\\n For the book with more than one author, the function concatenated all of them into a single cell.\\n Let's do a little bit of surgery to get the same result.")
-
+kable(my_XML_df, caption = "This does not look the same as the first 2 data frames. For the book with more than one author, the function concatenated all of them into a single cell. Let's do a little bit of surgery to get the same result.")
 
 my_XML_df2 <- my_XML_df %>% 
   mutate(authors = paste(str_replace_all(authors, "([a-z])([A-Z])", "\\1,\\2"))) %>% 
@@ -104,8 +101,11 @@ my_XML_df2 <- my_XML_df %>%
   select(book_title, author, everything(), -author_num) %>% 
   arrange(book_title) 
   
-kable(my_XML_df2, caption = "And now it looks like the HTML data frame")
+kable(my_XML_df2, caption = "And now it looks like the other 2 data frames")
+```
 
+#After reworking the XML DF, all data frames now are the same
+```{r}
 my_json_df == my_html_df
 my_html_df == my_XML_df2
 ```

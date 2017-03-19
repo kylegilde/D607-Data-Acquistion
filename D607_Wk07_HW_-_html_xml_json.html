@@ -127,7 +127,7 @@ if (<span class="kw">length</span>(new.pkg)) <span class="kw">install.packages</
 <h2>Load data, look at the HTML table &amp; then its data frame</h2>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">url_html &lt;-<span class="st"> </span><span class="kw">getURLContent</span>(<span class="st">&quot;https://raw.githubusercontent.com/kylegilde/D607-Data-Acquistion/master/data-sets/books/books.html&quot;</span>)
 
-<span class="co">#my_html_table &lt;- htmlParse(url_html)</span>
+<span class="co">#my_html_df &lt;- htmlParse(url_html)</span>
 
 <span class="kw">writeLines</span>(url_html)</code></pre></div>
 <pre><code>## &lt;table&gt;
@@ -137,164 +137,17 @@ if (<span class="kw">length</span>(new.pkg)) <span class="kw">install.packages</
 ## &lt;tr&gt; &lt;td&gt;Automated Data Collection with R&lt;/td&gt;   &lt;td&gt;Peter Meibner&lt;/td&gt;  &lt;td&gt;Hard&lt;/td&gt;   &lt;td&gt;Computer Science&lt;/td&gt;   &lt;td&gt;452&lt;/td&gt;    &lt;/tr&gt;
 ## &lt;tr&gt; &lt;td&gt;Automated Data Collection with R&lt;/td&gt;   &lt;td&gt;Dominic Nyhuis&lt;/td&gt; &lt;td&gt;Hard&lt;/td&gt;   &lt;td&gt;Computer Science&lt;/td&gt;   &lt;td&gt;452&lt;/td&gt;    &lt;/tr&gt;
 ## &lt;tr&gt; &lt;td&gt;Guns, Germs and Steel&lt;/td&gt;  &lt;td&gt;Jared Diamond&lt;/td&gt;  &lt;td&gt;Soft&lt;/td&gt;   &lt;td&gt;History&lt;/td&gt;    &lt;td&gt;498&lt;/td&gt;    &lt;/tr&gt;
-## &lt;tr&gt; &lt;td&gt;The Signal and the Noise&lt;/td&gt;   &lt;td&gt;Nate Silver&lt;/td&gt;    &lt;td&gt;Soft&lt;/td&gt;   &lt;td&gt;Science &amp; Math&lt;/td&gt; &lt;td&gt;560&lt;/td&gt;    &lt;/tr&gt;
+## &lt;tr&gt; &lt;td&gt;The Signal and the Noise&lt;/td&gt;   &lt;td&gt;Nate Silver&lt;/td&gt;    &lt;td&gt;Soft&lt;/td&gt;   &lt;td&gt;Science and Math&lt;/td&gt;   &lt;td&gt;560&lt;/td&gt;    &lt;/tr&gt;
 ## &lt;/table&gt;</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">my_html_table &lt;-<span class="st"> </span>url_html %&gt;%<span class="st"> </span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">my_html_df &lt;-<span class="st"> </span>url_html %&gt;%<span class="st"> </span>
 <span class="st">  </span><span class="kw">readHTMLTable</span>(<span class="dt">header=</span><span class="ot">TRUE</span>, <span class="dt">as.data.frame =</span> <span class="ot">TRUE</span>) %&gt;%<span class="st"> </span>
-<span class="st">  </span><span class="kw">data.frame</span>() %&gt;%<span class="st"> </span>
+<span class="st">  </span><span class="kw">data.frame</span>(<span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>) %&gt;%<span class="st"> </span>
 <span class="st">  </span><span class="kw">clean_names</span>() 
 
-<span class="kw">colnames</span>(my_html_table) &lt;-<span class="st"> </span><span class="kw">str_replace</span>(<span class="kw">colnames</span>(my_html_table),<span class="st">&quot;null_&quot;</span>, <span class="st">&quot;&quot;</span>)
+<span class="kw">colnames</span>(my_html_df) &lt;-<span class="st"> </span><span class="kw">str_replace</span>(<span class="kw">colnames</span>(my_html_df),<span class="st">&quot;null_&quot;</span>, <span class="st">&quot;&quot;</span>)
 
-<span class="kw">kable</span>(my_html_table)</code></pre></div>
+<span class="kw">kable</span>(my_html_df)</code></pre></div>
 <table>
-<thead>
-<tr class="header">
-<th align="left">book_title</th>
-<th align="left">author</th>
-<th align="left">cover_type</th>
-<th align="left">subject</th>
-<th align="left">pages</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Automated Data Collection with R</td>
-<td align="left">Simon Munzert</td>
-<td align="left">Hard</td>
-<td align="left">Computer Science</td>
-<td align="left">452</td>
-</tr>
-<tr class="even">
-<td align="left">Automated Data Collection with R</td>
-<td align="left">Christian Rubba</td>
-<td align="left">Hard</td>
-<td align="left">Computer Science</td>
-<td align="left">452</td>
-</tr>
-<tr class="odd">
-<td align="left">Automated Data Collection with R</td>
-<td align="left">Peter Meibner</td>
-<td align="left">Hard</td>
-<td align="left">Computer Science</td>
-<td align="left">452</td>
-</tr>
-<tr class="even">
-<td align="left">Automated Data Collection with R</td>
-<td align="left">Dominic Nyhuis</td>
-<td align="left">Hard</td>
-<td align="left">Computer Science</td>
-<td align="left">452</td>
-</tr>
-<tr class="odd">
-<td align="left">Guns, Germs and Steel</td>
-<td align="left">Jared Diamond</td>
-<td align="left">Soft</td>
-<td align="left">History</td>
-<td align="left">498</td>
-</tr>
-<tr class="even">
-<td align="left">The Signal and the Noise</td>
-<td align="left">Nate Silver</td>
-<td align="left">Soft</td>
-<td align="left">Science &amp; Math</td>
-<td align="left">560</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div id="xml-parsing" class="section level1">
-<h1>2. XML Parsing</h1>
-<div id="load-data-look-at-the-xml-then-its-data-frame" class="section level2">
-<h2>Load data, look at the XML &amp; then its data frame</h2>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">url_XML &lt;-<span class="st"> </span><span class="kw">getURLContent</span>(<span class="st">&quot;https://raw.githubusercontent.com/kylegilde/D607-Data-Acquistion/master/data-sets/books/books2.xml&quot;</span>)
-
-<span class="kw">writeLines</span>(url_XML)</code></pre></div>
-<pre><code>## &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;
-## &lt;!--These are some of my recent favorite books--&gt;
-## &lt;books&gt;
-##  &lt;book&gt;
-##      &lt;book_title&gt;Automated Data Collection with R&lt;/book_title&gt;
-##      &lt;authors&gt;
-##          &lt;author ID=&quot;1&quot;&gt;Simon Munzert&lt;/author&gt;
-##          &lt;author ID=&quot;2&quot;&gt;Christian Rubba&lt;/author&gt;
-##          &lt;author ID=&quot;3&quot;&gt;Peter Meibner&lt;/author&gt;
-##          &lt;author ID=&quot;4&quot;&gt;Dominic Nyhuis&lt;/author&gt;
-##      &lt;/authors&gt;
-##      &lt;cover_type&gt;Hard&lt;/cover_type&gt;
-##      &lt;subject&gt;Computer Science&lt;/subject&gt;
-##      &lt;pages&gt;452&lt;/pages&gt;
-##  &lt;/book&gt;
-##  &lt;book&gt;      
-##      &lt;book_title&gt;Guns, Germs and Steel&lt;/book_title&gt;
-##      &lt;authors&gt;
-##          &lt;author ID=&quot;1&quot;&gt;Jared Diamond&lt;/author&gt;
-##      &lt;/authors&gt;
-##      &lt;cover_type&gt;Soft&lt;/cover_type&gt;
-##      &lt;subject&gt;History&lt;/subject&gt;
-##      &lt;pages&gt;498&lt;/pages&gt;
-##  &lt;/book&gt;     
-##  &lt;book&gt;      
-##      &lt;book_title&gt;The Signal and the Noise&lt;/book_title&gt;
-##      &lt;authors&gt;
-##          &lt;author ID=&quot;1&quot;&gt;Nate Silver&lt;/author&gt;
-##      &lt;/authors&gt;
-##      &lt;cover_type&gt;Soft&lt;/cover_type&gt;
-##      &lt;subject&gt;Science and Math&lt;/subject&gt;
-##      &lt;pages&gt;560&lt;/pages&gt;
-##  &lt;/book&gt;     
-## &lt;/books&gt;</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">my_XML_table &lt;-<span class="st"> </span>url_XML %&gt;%<span class="st"> </span>
-<span class="st">  </span><span class="kw">xmlParse</span>() %&gt;%<span class="st"> </span>
-<span class="st">  </span><span class="kw">xmlToDataFrame</span>()
-
-<span class="kw">kable</span>(my_XML_table, <span class="dt">caption =</span> <span class="st">&quot;This does not look the same as the HTML data frame. For the book with more than one author, the function concatenated all of them into a single cell. Let's do a little bit of surgery to get the same result.&quot;</span>)</code></pre></div>
-<table>
-<caption>This does not look the same as the HTML data frame. For the book with more than one author, the function concatenated all of them into a single cell. Let’s do a little bit of surgery to get the same result.</caption>
-<thead>
-<tr class="header">
-<th align="left">book_title</th>
-<th align="left">authors</th>
-<th align="left">cover_type</th>
-<th align="left">subject</th>
-<th align="left">pages</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">Automated Data Collection with R</td>
-<td align="left">Simon MunzertChristian RubbaPeter MeibnerDominic Nyhuis</td>
-<td align="left">Hard</td>
-<td align="left">Computer Science</td>
-<td align="left">452</td>
-</tr>
-<tr class="even">
-<td align="left">Guns, Germs and Steel</td>
-<td align="left">Jared Diamond</td>
-<td align="left">Soft</td>
-<td align="left">History</td>
-<td align="left">498</td>
-</tr>
-<tr class="odd">
-<td align="left">The Signal and the Noise</td>
-<td align="left">Nate Silver</td>
-<td align="left">Soft</td>
-<td align="left">Science and Math</td>
-<td align="left">560</td>
-</tr>
-</tbody>
-</table>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">my_XML_table2 &lt;-<span class="st"> </span>my_XML_table %&gt;%<span class="st"> </span>
-<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">authors =</span> <span class="kw">paste</span>(<span class="kw">str_replace_all</span>(authors, <span class="st">&quot;([a-z])([A-Z])&quot;</span>, <span class="st">&quot;</span><span class="ch">\\</span><span class="st">1,</span><span class="ch">\\</span><span class="st">2&quot;</span>))) %&gt;%<span class="st"> </span>
-<span class="st">  </span><span class="kw">separate</span>(authors, <span class="kw">c</span>(<span class="kw">paste0</span>(<span class="st">&quot;author_&quot;</span>, <span class="dv">1</span>:<span class="dv">4</span>)), <span class="dt">sep =</span> <span class="st">&quot;,&quot;</span>) %&gt;%<span class="st"> </span>
-<span class="st">  </span><span class="kw">gather</span>(author_num, author, author_1:author_4, <span class="dt">na.rm =</span> T) %&gt;%<span class="st"> </span>
-<span class="st">  </span><span class="kw">select</span>(book_title, author, <span class="kw">everything</span>(), -author_num) %&gt;%<span class="st"> </span>
-<span class="st">  </span><span class="kw">arrange</span>(book_title) 
-  
-<span class="kw">kable</span>(my_XML_table2, <span class="dt">caption =</span> <span class="st">&quot;And now it looks like the HTML data frame&quot;</span>)</code></pre></div>
-<table>
-<caption>And now it looks like the HTML data frame</caption>
 <thead>
 <tr class="header">
 <th align="left">book_title</th>
@@ -352,7 +205,7 @@ if (<span class="kw">length</span>(new.pkg)) <span class="kw">install.packages</
 </div>
 </div>
 <div id="json-parsing" class="section level1">
-<h1>3. JSON Parsing</h1>
+<h1>2. JSON Parsing</h1>
 <div id="load-data-look-at-the-json-then-its-data-frame" class="section level2">
 <h2>Load data, look at the JSON &amp; then its data frame</h2>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">url_json &lt;-<span class="st"> </span><span class="kw">getURLContent</span>(<span class="st">&quot;https://raw.githubusercontent.com/kylegilde/D607-Data-Acquistion/master/data-sets/books/books.json&quot;</span>)
@@ -364,7 +217,7 @@ if (<span class="kw">length</span>(new.pkg)) <span class="kw">install.packages</
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">writeLines</span>(url_json)</code></pre></div>
 <pre><code>## {&quot;favorite recent books&quot;:[
 ##  {
-##  &quot;Book Title&quot;: &quot;Gun, Germs and Steel&quot;,
+##  &quot;Book Title&quot;: &quot;Guns, Germs and Steel&quot;,
 ##  &quot;Authors&quot;: &quot;Jared Diamond&quot;,
 ##  &quot;Cover Type&quot;: &quot;Soft&quot;,
 ##  &quot;Subject&quot;: &quot;History&quot;,
@@ -374,7 +227,7 @@ if (<span class="kw">length</span>(new.pkg)) <span class="kw">install.packages</
 ##  &quot;Book Title&quot;: &quot;The Signal and the Noise&quot;,
 ##  &quot;Authors&quot;: &quot;Nate Silver&quot;,
 ##  &quot;Cover Type&quot;: &quot;Soft&quot;,
-##  &quot;Subject&quot;: &quot;Science &amp; Math&quot;,
+##  &quot;Subject&quot;: &quot;Science and Math&quot;,
 ##  &quot;Pages&quot;: 560
 ##  },
 ##      {
@@ -385,16 +238,15 @@ if (<span class="kw">length</span>(new.pkg)) <span class="kw">install.packages</
 ##  &quot;Pages&quot;: 452
 ##  }]
 ## }</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">my_json_table &lt;-<span class="st"> </span><span class="kw">fromJSON</span>(url_json)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">my_json_df &lt;-<span class="st"> </span><span class="kw">fromJSON</span>(url_json)
 
-my_json_table &lt;-<span class="st"> </span><span class="kw">do.call</span>(<span class="st">&quot;rbind&quot;</span>, <span class="kw">lapply</span>(my_json_table$<span class="st">`</span><span class="dt">favorite recent books</span><span class="st">`</span>, data.frame, <span class="dt">stringsAsFactors =</span> F))
+my_json_df &lt;-<span class="st"> </span><span class="kw">do.call</span>(<span class="st">&quot;rbind&quot;</span>, <span class="kw">lapply</span>(my_json_df$<span class="st">`</span><span class="dt">favorite recent books</span><span class="st">`</span>, data.frame, <span class="dt">stringsAsFactors =</span> F))
 
-my_json_table &lt;-<span class="st"> </span>my_json_table %&gt;%<span class="st">  </span>
+my_json_df &lt;-<span class="st"> </span>my_json_df %&gt;%<span class="st">  </span>
 <span class="st">  </span><span class="kw">clean_names</span>() %&gt;%<span class="st"> </span>
 <span class="st">  </span><span class="kw">arrange</span>(book_title)
 
-
-<span class="kw">kable</span>(my_json_table)</code></pre></div>
+<span class="kw">kable</span>(my_json_df)</code></pre></div>
 <table>
 <thead>
 <tr class="header">
@@ -435,7 +287,7 @@ my_json_table &lt;-<span class="st"> </span>my_json_table %&gt;%<span class="st"
 <td align="right">452</td>
 </tr>
 <tr class="odd">
-<td align="left">Gun, Germs and Steel</td>
+<td align="left">Guns, Germs and Steel</td>
 <td align="left">Jared Diamond</td>
 <td align="left">Soft</td>
 <td align="left">History</td>
@@ -445,20 +297,178 @@ my_json_table &lt;-<span class="st"> </span>my_json_table %&gt;%<span class="st"
 <td align="left">The Signal and the Noise</td>
 <td align="left">Nate Silver</td>
 <td align="left">Soft</td>
-<td align="left">Science &amp; Math</td>
+<td align="left">Science and Math</td>
 <td align="right">560</td>
 </tr>
 </tbody>
 </table>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">my_json_table ==<span class="st"> </span>my_html_table</code></pre></div>
+</div>
+</div>
+<div id="xml-parsing" class="section level1">
+<h1>3. XML Parsing</h1>
+<div id="load-data-look-at-the-xml-then-its-data-frame" class="section level2">
+<h2>Load data, look at the XML &amp; then its data frame</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">url_XML &lt;-<span class="st"> </span><span class="kw">getURLContent</span>(<span class="st">&quot;https://raw.githubusercontent.com/kylegilde/D607-Data-Acquistion/master/data-sets/books/books2.xml&quot;</span>)
+
+<span class="kw">writeLines</span>(url_XML)</code></pre></div>
+<pre><code>## &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;
+## &lt;!--These are some of my recent favorite books--&gt;
+## &lt;books&gt;
+##  &lt;book&gt;
+##      &lt;book_title&gt;Automated Data Collection with R&lt;/book_title&gt;
+##      &lt;authors&gt;
+##          &lt;author ID=&quot;1&quot;&gt;Simon Munzert&lt;/author&gt;
+##          &lt;author ID=&quot;2&quot;&gt;Christian Rubba&lt;/author&gt;
+##          &lt;author ID=&quot;3&quot;&gt;Peter Meibner&lt;/author&gt;
+##          &lt;author ID=&quot;4&quot;&gt;Dominic Nyhuis&lt;/author&gt;
+##      &lt;/authors&gt;
+##      &lt;cover_type&gt;Hard&lt;/cover_type&gt;
+##      &lt;subject&gt;Computer Science&lt;/subject&gt;
+##      &lt;pages&gt;452&lt;/pages&gt;
+##  &lt;/book&gt;
+##  &lt;book&gt;      
+##      &lt;book_title&gt;Guns, Germs and Steel&lt;/book_title&gt;
+##      &lt;authors&gt;
+##          &lt;author ID=&quot;1&quot;&gt;Jared Diamond&lt;/author&gt;
+##      &lt;/authors&gt;
+##      &lt;cover_type&gt;Soft&lt;/cover_type&gt;
+##      &lt;subject&gt;History&lt;/subject&gt;
+##      &lt;pages&gt;498&lt;/pages&gt;
+##  &lt;/book&gt;     
+##  &lt;book&gt;      
+##      &lt;book_title&gt;The Signal and the Noise&lt;/book_title&gt;
+##      &lt;authors&gt;
+##          &lt;author ID=&quot;1&quot;&gt;Nate Silver&lt;/author&gt;
+##      &lt;/authors&gt;
+##      &lt;cover_type&gt;Soft&lt;/cover_type&gt;
+##      &lt;subject&gt;Science and Math&lt;/subject&gt;
+##      &lt;pages&gt;560&lt;/pages&gt;
+##  &lt;/book&gt;     
+## &lt;/books&gt;</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">my_XML_df &lt;-<span class="st"> </span>url_XML %&gt;%<span class="st"> </span>
+<span class="st">  </span><span class="kw">xmlParse</span>() %&gt;%<span class="st"> </span>
+<span class="st">  </span><span class="kw">xmlToDataFrame</span>(<span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>) 
+
+<span class="kw">kable</span>(my_XML_df, <span class="dt">caption =</span> <span class="st">&quot;This does not look the same as the first 2 data frames. For the book with more than one author, the function concatenated all of them into a single cell. Let's do a little bit of surgery to get the same result.&quot;</span>)</code></pre></div>
+<table>
+<caption>This does not look the same as the first 2 data frames. For the book with more than one author, the function concatenated all of them into a single cell. Let’s do a little bit of surgery to get the same result.</caption>
+<thead>
+<tr class="header">
+<th align="left">book_title</th>
+<th align="left">authors</th>
+<th align="left">cover_type</th>
+<th align="left">subject</th>
+<th align="left">pages</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Automated Data Collection with R</td>
+<td align="left">Simon MunzertChristian RubbaPeter MeibnerDominic Nyhuis</td>
+<td align="left">Hard</td>
+<td align="left">Computer Science</td>
+<td align="left">452</td>
+</tr>
+<tr class="even">
+<td align="left">Guns, Germs and Steel</td>
+<td align="left">Jared Diamond</td>
+<td align="left">Soft</td>
+<td align="left">History</td>
+<td align="left">498</td>
+</tr>
+<tr class="odd">
+<td align="left">The Signal and the Noise</td>
+<td align="left">Nate Silver</td>
+<td align="left">Soft</td>
+<td align="left">Science and Math</td>
+<td align="left">560</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">my_XML_df2 &lt;-<span class="st"> </span>my_XML_df %&gt;%<span class="st"> </span>
+<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">authors =</span> <span class="kw">paste</span>(<span class="kw">str_replace_all</span>(authors, <span class="st">&quot;([a-z])([A-Z])&quot;</span>, <span class="st">&quot;</span><span class="ch">\\</span><span class="st">1,</span><span class="ch">\\</span><span class="st">2&quot;</span>))) %&gt;%<span class="st"> </span>
+<span class="st">  </span><span class="kw">separate</span>(authors, <span class="kw">c</span>(<span class="kw">paste0</span>(<span class="st">&quot;author_&quot;</span>, <span class="dv">1</span>:<span class="dv">4</span>)), <span class="dt">sep =</span> <span class="st">&quot;,&quot;</span>) %&gt;%<span class="st"> </span>
+<span class="st">  </span><span class="kw">gather</span>(author_num, author, author_1:author_4, <span class="dt">na.rm =</span> T) %&gt;%<span class="st"> </span>
+<span class="st">  </span><span class="kw">select</span>(book_title, author, <span class="kw">everything</span>(), -author_num) %&gt;%<span class="st"> </span>
+<span class="st">  </span><span class="kw">arrange</span>(book_title) 
+  
+<span class="kw">kable</span>(my_XML_df2, <span class="dt">caption =</span> <span class="st">&quot;And now it looks like the other 2 data frames&quot;</span>)</code></pre></div>
+<table>
+<caption>And now it looks like the other 2 data frames</caption>
+<thead>
+<tr class="header">
+<th align="left">book_title</th>
+<th align="left">author</th>
+<th align="left">cover_type</th>
+<th align="left">subject</th>
+<th align="left">pages</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Automated Data Collection with R</td>
+<td align="left">Simon Munzert</td>
+<td align="left">Hard</td>
+<td align="left">Computer Science</td>
+<td align="left">452</td>
+</tr>
+<tr class="even">
+<td align="left">Automated Data Collection with R</td>
+<td align="left">Christian Rubba</td>
+<td align="left">Hard</td>
+<td align="left">Computer Science</td>
+<td align="left">452</td>
+</tr>
+<tr class="odd">
+<td align="left">Automated Data Collection with R</td>
+<td align="left">Peter Meibner</td>
+<td align="left">Hard</td>
+<td align="left">Computer Science</td>
+<td align="left">452</td>
+</tr>
+<tr class="even">
+<td align="left">Automated Data Collection with R</td>
+<td align="left">Dominic Nyhuis</td>
+<td align="left">Hard</td>
+<td align="left">Computer Science</td>
+<td align="left">452</td>
+</tr>
+<tr class="odd">
+<td align="left">Guns, Germs and Steel</td>
+<td align="left">Jared Diamond</td>
+<td align="left">Soft</td>
+<td align="left">History</td>
+<td align="left">498</td>
+</tr>
+<tr class="even">
+<td align="left">The Signal and the Noise</td>
+<td align="left">Nate Silver</td>
+<td align="left">Soft</td>
+<td align="left">Science and Math</td>
+<td align="left">560</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="after-reworking-the-xmf-df-all-data-frames-now-are-the-same" class="section level1">
+<h1>After reworking the XMF DF, all data frames now are the same</h1>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">my_json_df ==<span class="st"> </span>my_html_df</code></pre></div>
 <pre><code>##      book_title authors cover_type subject pages
 ## [1,]       TRUE    TRUE       TRUE    TRUE  TRUE
 ## [2,]       TRUE    TRUE       TRUE    TRUE  TRUE
 ## [3,]       TRUE    TRUE       TRUE    TRUE  TRUE
 ## [4,]       TRUE    TRUE       TRUE    TRUE  TRUE
-## [5,]      FALSE    TRUE       TRUE    TRUE  TRUE
+## [5,]       TRUE    TRUE       TRUE    TRUE  TRUE
 ## [6,]       TRUE    TRUE       TRUE    TRUE  TRUE</code></pre>
-</div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">my_html_df ==<span class="st"> </span>my_XML_df2</code></pre></div>
+<pre><code>##      book_title author cover_type subject pages
+## [1,]       TRUE   TRUE       TRUE    TRUE  TRUE
+## [2,]       TRUE   TRUE       TRUE    TRUE  TRUE
+## [3,]       TRUE   TRUE       TRUE    TRUE  TRUE
+## [4,]       TRUE   TRUE       TRUE    TRUE  TRUE
+## [5,]       TRUE   TRUE       TRUE    TRUE  TRUE
+## [6,]       TRUE   TRUE       TRUE    TRUE  TRUE</code></pre>
 </div>
     </section>
   </div>

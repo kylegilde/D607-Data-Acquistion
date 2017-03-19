@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--These are some of my recent favorite books-->
+<books>
+	<book>
+		<book_title>Automated Data Collection with R</book_title>
+		<authors>
+			<author>Simon Munzert</author>
+			<author>Christian Rubba</author>
+			<author>Peter Meibner</author>
+			<author>Dominic Nyhuis</author>
+		</authors>
+		<cover_type>Hard</cover_type>
+		<subject>Computer Science</subject>
+		<pages>452</pages>
+	</book>
+	<book>		
+		<book_title>Guns, Germs and Steel</book_title>
+		<authors>
+			<author ID="1">Jared Diamond</author>
+		</authors>
+		<cover_type>Soft</cover_type>
+		<subject>History</subject>
+		<pages>498</pages>
+	</book>		
+	<book>		
+		<book_title>The Signal and the Noise</book_title>
+		<authors>
+			<author ID="1">Nate Silver</author>
+		</authors>
+		<cover_type>Soft</cover_type>
+		<subject>Science and Math</subject>
+		<pages>560</pages>
+	</book>		
+</books>
