@@ -42,8 +42,8 @@ sapply(load_packages, require, character.only = TRUE, quietly = TRUE)
 ```
 
 #1. HTML Table 
-##Load data, look at the HTML Table & its data frame
-```{r load}
+##Load data, look at the HTML table & then its data frame
+```{r html}
 url_html <- getURLContent("https://raw.githubusercontent.com/kylegilde/D607-Data-Acquistion/master/data-sets/books/books.html")
 
 #my_html_table <- htmlParse(url_html)
@@ -61,12 +61,12 @@ kable(my_html_table)
 ```
 
 #2. XML Table 
-##Load data, look at the XML & its data frame
-```{r tidy_data}
+##Load data, look at the XML & then its data frame
+```{r xml}
 
-url_XML <- getURLContent("https://raw.githubusercontent.com/kylegilde/D607-Data-Acquistion/master/data-sets/books/books.xml")
+url_XML <- getURLContent("https://raw.githubusercontent.com/kylegilde/D607-Data-Acquistion/master/data-sets/books/books2.xml")
 
-writeLines(str_sub(url_XML, 1, 501))
+writeLines(url_XML)
 
 my_XML_table <- url_XML %>% 
   xmlParse() %>% 

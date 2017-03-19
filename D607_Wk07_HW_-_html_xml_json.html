@@ -124,8 +124,8 @@ if (<span class="kw">length</span>(new.pkg)) <span class="kw">install.packages</
 </div>
 <div id="html-table" class="section level1">
 <h1>1. HTML Table</h1>
-<div id="load-data-look-at-the-html-table-its-data-frame" class="section level2">
-<h2>Load data, look at the HTML Table &amp; its data frame</h2>
+<div id="load-data-look-at-the-html-table-then-its-data-frame" class="section level2">
+<h2>Load data, look at the HTML table &amp; then its data frame</h2>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">url_html &lt;-<span class="st"> </span><span class="kw">getURLContent</span>(<span class="st">&quot;https://raw.githubusercontent.com/kylegilde/D607-Data-Acquistion/master/data-sets/books/books.html&quot;</span>)
 
 <span class="co">#my_html_table &lt;- htmlParse(url_html)</span>
@@ -207,28 +207,45 @@ if (<span class="kw">length</span>(new.pkg)) <span class="kw">install.packages</
 </div>
 <div id="xml-table" class="section level1">
 <h1>2. XML Table</h1>
-<div id="load-data-look-at-the-xml-its-data-frame" class="section level2">
-<h2>Load data, look at the XML &amp; its data frame</h2>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">url_XML &lt;-<span class="st"> </span><span class="kw">getURLContent</span>(<span class="st">&quot;https://raw.githubusercontent.com/kylegilde/D607-Data-Acquistion/master/data-sets/books/books.xml&quot;</span>)
+<div id="load-data-look-at-the-xml-then-its-data-frame" class="section level2">
+<h2>Load data, look at the XML &amp; then its data frame</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">url_XML &lt;-<span class="st"> </span><span class="kw">getURLContent</span>(<span class="st">&quot;https://raw.githubusercontent.com/kylegilde/D607-Data-Acquistion/master/data-sets/books/books2.xml&quot;</span>)
 
-<span class="kw">writeLines</span>(<span class="kw">str_sub</span>(url_XML, <span class="dv">1</span>, <span class="dv">501</span>))</code></pre></div>
+<span class="kw">writeLines</span>(url_XML)</code></pre></div>
 <pre><code>## &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;
 ## &lt;!--These are some of my recent favorite books--&gt;
 ## &lt;books&gt;
 ##  &lt;book&gt;
 ##      &lt;book_title&gt;Automated Data Collection with R&lt;/book_title&gt;
-##      &lt;author&gt;Simon Munzert&lt;/author&gt;
+##      &lt;authors&gt;
+##          &lt;author ID=&quot;1&quot;&gt;Simon Munzert&lt;/author&gt;
+##          &lt;author ID=&quot;2&quot;&gt;Christian Rubba&lt;/author&gt;
+##          &lt;author ID=&quot;3&quot;&gt;Peter Meibner&lt;/author&gt;
+##          &lt;author ID=&quot;4&quot;&gt;Dominic Nyhuis&lt;/author&gt;
+##      &lt;/authors&gt;
 ##      &lt;cover_type&gt;Hard&lt;/cover_type&gt;
 ##      &lt;subject&gt;Computer Science&lt;/subject&gt;
 ##      &lt;pages&gt;452&lt;/pages&gt;
 ##  &lt;/book&gt;
-##  &lt;book&gt;
-##      &lt;book_title&gt;Automated Data Collection with R&lt;/book_title&gt;
-##      &lt;author&gt;Christian Rubba&lt;/author&gt;
-##      &lt;cover_type&gt;Hard&lt;/cover_type&gt;
-##      &lt;subject&gt;Computer Science&lt;/subject&gt;
-##      &lt;pages&gt;452&lt;/pages&gt;
-##  &lt;/book&gt;</code></pre>
+##  &lt;book&gt;      
+##      &lt;book_title&gt;Guns, Germs and Steel&lt;/book_title&gt;
+##      &lt;authors&gt;
+##          &lt;author ID=&quot;1&quot;&gt;Jared Diamond&lt;/author&gt;
+##      &lt;/authors&gt;
+##      &lt;cover_type&gt;Soft&lt;/cover_type&gt;
+##      &lt;subject&gt;History&lt;/subject&gt;
+##      &lt;pages&gt;498&lt;/pages&gt;
+##  &lt;/book&gt;     
+##  &lt;book&gt;      
+##      &lt;book_title&gt;The Signal and the Noise&lt;/book_title&gt;
+##      &lt;authors&gt;
+##          &lt;author ID=&quot;1&quot;&gt;Nate Silver&lt;/author&gt;
+##      &lt;/authors&gt;
+##      &lt;cover_type&gt;Soft&lt;/cover_type&gt;
+##      &lt;subject&gt;Science and Math&lt;/subject&gt;
+##      &lt;pages&gt;560&lt;/pages&gt;
+##  &lt;/book&gt;     
+## &lt;/books&gt;</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">my_XML_table &lt;-<span class="st"> </span>url_XML %&gt;%<span class="st"> </span>
 <span class="st">  </span><span class="kw">xmlParse</span>() %&gt;%<span class="st"> </span>
 <span class="st">  </span><span class="kw">xmlToDataFrame</span>()
@@ -238,7 +255,7 @@ if (<span class="kw">length</span>(new.pkg)) <span class="kw">install.packages</
 <thead>
 <tr class="header">
 <th align="left">book_title</th>
-<th align="left">author</th>
+<th align="left">authors</th>
 <th align="left">cover_type</th>
 <th align="left">subject</th>
 <th align="left">pages</th>
@@ -247,40 +264,19 @@ if (<span class="kw">length</span>(new.pkg)) <span class="kw">install.packages</
 <tbody>
 <tr class="odd">
 <td align="left">Automated Data Collection with R</td>
-<td align="left">Simon Munzert</td>
+<td align="left">Simon MunzertChristian RubbaPeter MeibnerDominic Nyhuis</td>
 <td align="left">Hard</td>
 <td align="left">Computer Science</td>
 <td align="left">452</td>
 </tr>
 <tr class="even">
-<td align="left">Automated Data Collection with R</td>
-<td align="left">Christian Rubba</td>
-<td align="left">Hard</td>
-<td align="left">Computer Science</td>
-<td align="left">452</td>
-</tr>
-<tr class="odd">
-<td align="left">Automated Data Collection with R</td>
-<td align="left">Peter Meibner</td>
-<td align="left">Hard</td>
-<td align="left">Computer Science</td>
-<td align="left">452</td>
-</tr>
-<tr class="even">
-<td align="left">Automated Data Collection with R</td>
-<td align="left">Dominic Nyhuis</td>
-<td align="left">Hard</td>
-<td align="left">Computer Science</td>
-<td align="left">452</td>
-</tr>
-<tr class="odd">
 <td align="left">Guns, Germs and Steel</td>
 <td align="left">Jared Diamond</td>
 <td align="left">Soft</td>
 <td align="left">History</td>
 <td align="left">498</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">The Signal and the Noise</td>
 <td align="left">Nate Silver</td>
 <td align="left">Soft</td>
