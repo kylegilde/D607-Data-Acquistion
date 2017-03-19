@@ -351,10 +351,12 @@ if (<span class="kw">length</span>(new.pkg)) <span class="kw">install.packages</
 <h2>Load data, look at the JSON &amp; then its data frame</h2>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">url_json &lt;-<span class="st"> </span><span class="kw">getURLContent</span>(<span class="st">&quot;https://raw.githubusercontent.com/kylegilde/D607-Data-Acquistion/master/data-sets/books/books.json&quot;</span>)
 
-<span class="kw">isValidJSON</span>(<span class="st">&quot;https://raw.githubusercontent.com/kylegilde/D607-Data-Acquistion/master/data-sets/books/books.json&quot;</span>)</code></pre></div>
+<span class="kw">print</span>(<span class="st">&quot;Is my JSON valid?&quot;</span>)</code></pre></div>
+<pre><code>## [1] &quot;Is my JSON valid?&quot;</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">isValidJSON</span>(<span class="st">&quot;https://raw.githubusercontent.com/kylegilde/D607-Data-Acquistion/master/data-sets/books/books.json&quot;</span>)</code></pre></div>
 <pre><code>## [1] TRUE</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">writeLines</span>(url_json)</code></pre></div>
-<pre><code>## {&quot;favorate recent books&quot;:[
+<pre><code>## {&quot;favorite recent books&quot;:[
 ##  {
 ##  &quot;Book Title&quot;: &quot;Gun, Germs and Steel&quot;,
 ##  &quot;Authors&quot;: &quot;Jared Diamond&quot;,
@@ -379,69 +381,37 @@ if (<span class="kw">length</span>(new.pkg)) <span class="kw">install.packages</
 ## }</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">my_json_table &lt;-<span class="st"> </span><span class="kw">fromJSON</span>(url_json)
 
-my_json_table &lt;-<span class="st"> </span><span class="kw">do.call</span>(<span class="st">&quot;rbind&quot;</span>, <span class="kw">lapply</span>(my_json_table, data.frame, <span class="dt">stringsAsFactors =</span> F))
+my_json_table &lt;-<span class="st"> </span><span class="kw">do.call</span>(<span class="st">&quot;rbind&quot;</span>, <span class="kw">lapply</span>(my_json_table$<span class="st">`</span><span class="dt">favorite recent books</span><span class="st">`</span>, data.frame, <span class="dt">stringsAsFactors =</span> F))
 
-my_json_table</code></pre></div>
-<pre><code>##                                   Book.Title       Authors Cover.Type
-## favorate recent books.1 Gun, Germs and Steel Jared Diamond       Soft
-## favorate recent books.2 Gun, Germs and Steel Jared Diamond       Soft
-## favorate recent books.3 Gun, Germs and Steel Jared Diamond       Soft
-## favorate recent books.4 Gun, Germs and Steel Jared Diamond       Soft
-##                         Subject Pages             Book.Title.1   Authors.1
-## favorate recent books.1 History   498 The Signal and the Noise Nate Silver
-## favorate recent books.2 History   498 The Signal and the Noise Nate Silver
-## favorate recent books.3 History   498 The Signal and the Noise Nate Silver
-## favorate recent books.4 History   498 The Signal and the Noise Nate Silver
-##                         Cover.Type.1      Subject.1 Pages.1
-## favorate recent books.1         Soft Science &amp; Math     560
-## favorate recent books.2         Soft Science &amp; Math     560
-## favorate recent books.3         Soft Science &amp; Math     560
-## favorate recent books.4         Soft Science &amp; Math     560
-##                                             Book.Title.2       Authors.2
-## favorate recent books.1 Automated Data Collection with R   Simon Munzert
-## favorate recent books.2 Automated Data Collection with R Christian Rubba
-## favorate recent books.3 Automated Data Collection with R   Peter Meibner
-## favorate recent books.4 Automated Data Collection with R  Dominic Nyhuis
-##                         Cover.Type.2        Subject.2 Pages.2
-## favorate recent books.1         Hard Computer Science     452
-## favorate recent books.2         Hard Computer Science     452
-## favorate recent books.3         Hard Computer Science     452
-## favorate recent books.4         Hard Computer Science     452</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">kable</span>(my_json_table)</code></pre></div>
+my_json_table &lt;-<span class="st"> </span><span class="kw">clean_names</span>(my_json_table)
+
+<span class="kw">kable</span>(my_json_table)</code></pre></div>
 <table>
 <thead>
 <tr class="header">
-<th></th>
-<th align="left">Book.Title</th>
-<th align="left">Authors</th>
-<th align="left">Cover.Type</th>
-<th align="left">Subject</th>
-<th align="right">Pages</th>
-<th align="left">Book.Title.1</th>
-<th align="left">Authors.1</th>
-<th align="left">Cover.Type.1</th>
-<th align="left">Subject.1</th>
-<th align="right">Pages.1</th>
-<th align="left">Book.Title.2</th>
-<th align="left">Authors.2</th>
-<th align="left">Cover.Type.2</th>
-<th align="left">Subject.2</th>
-<th align="right">Pages.2</th>
+<th align="left">book_title</th>
+<th align="left">authors</th>
+<th align="left">cover_type</th>
+<th align="left">subject</th>
+<th align="right">pages</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td>favorate recent books.1</td>
 <td align="left">Gun, Germs and Steel</td>
 <td align="left">Jared Diamond</td>
 <td align="left">Soft</td>
 <td align="left">History</td>
 <td align="right">498</td>
+</tr>
+<tr class="even">
 <td align="left">The Signal and the Noise</td>
 <td align="left">Nate Silver</td>
 <td align="left">Soft</td>
 <td align="left">Science &amp; Math</td>
 <td align="right">560</td>
+</tr>
+<tr class="odd">
 <td align="left">Automated Data Collection with R</td>
 <td align="left">Simon Munzert</td>
 <td align="left">Hard</td>
@@ -449,17 +419,6 @@ my_json_table</code></pre></div>
 <td align="right">452</td>
 </tr>
 <tr class="even">
-<td>favorate recent books.2</td>
-<td align="left">Gun, Germs and Steel</td>
-<td align="left">Jared Diamond</td>
-<td align="left">Soft</td>
-<td align="left">History</td>
-<td align="right">498</td>
-<td align="left">The Signal and the Noise</td>
-<td align="left">Nate Silver</td>
-<td align="left">Soft</td>
-<td align="left">Science &amp; Math</td>
-<td align="right">560</td>
 <td align="left">Automated Data Collection with R</td>
 <td align="left">Christian Rubba</td>
 <td align="left">Hard</td>
@@ -467,17 +426,6 @@ my_json_table</code></pre></div>
 <td align="right">452</td>
 </tr>
 <tr class="odd">
-<td>favorate recent books.3</td>
-<td align="left">Gun, Germs and Steel</td>
-<td align="left">Jared Diamond</td>
-<td align="left">Soft</td>
-<td align="left">History</td>
-<td align="right">498</td>
-<td align="left">The Signal and the Noise</td>
-<td align="left">Nate Silver</td>
-<td align="left">Soft</td>
-<td align="left">Science &amp; Math</td>
-<td align="right">560</td>
 <td align="left">Automated Data Collection with R</td>
 <td align="left">Peter Meibner</td>
 <td align="left">Hard</td>
@@ -485,17 +433,6 @@ my_json_table</code></pre></div>
 <td align="right">452</td>
 </tr>
 <tr class="even">
-<td>favorate recent books.4</td>
-<td align="left">Gun, Germs and Steel</td>
-<td align="left">Jared Diamond</td>
-<td align="left">Soft</td>
-<td align="left">History</td>
-<td align="right">498</td>
-<td align="left">The Signal and the Noise</td>
-<td align="left">Nate Silver</td>
-<td align="left">Soft</td>
-<td align="left">Science &amp; Math</td>
-<td align="right">560</td>
 <td align="left">Automated Data Collection with R</td>
 <td align="left">Dominic Nyhuis</td>
 <td align="left">Hard</td>

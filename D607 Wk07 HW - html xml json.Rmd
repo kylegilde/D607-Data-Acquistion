@@ -90,13 +90,14 @@ kable(my_XML_table2, caption = "And now it looks like the HTML data frame")
 
 url_json <- getURLContent("https://raw.githubusercontent.com/kylegilde/D607-Data-Acquistion/master/data-sets/books/books.json")
 
+print("Is my JSON valid?")
 isValidJSON("https://raw.githubusercontent.com/kylegilde/D607-Data-Acquistion/master/data-sets/books/books.json")
 
 writeLines(url_json)
 
 my_json_table <- fromJSON(url_json)
 
-my_json_table <- do.call("rbind", lapply(my_json_table$`favorate recent books`, data.frame, stringsAsFactors = F))
+my_json_table <- do.call("rbind", lapply(my_json_table$`favorite recent books`, data.frame, stringsAsFactors = F))
 
 my_json_table <- clean_names(my_json_table)
 
