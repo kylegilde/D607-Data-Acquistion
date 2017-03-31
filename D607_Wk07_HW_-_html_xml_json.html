@@ -246,8 +246,9 @@ my_json_df &lt;-<span class="st"> </span>my_json_df %&gt;%<span class="st">  </s
 <span class="st">  </span><span class="kw">clean_names</span>() %&gt;%<span class="st"> </span>
 <span class="st">  </span><span class="kw">arrange</span>(book_title)
 
-<span class="kw">kable</span>(my_json_df)</code></pre></div>
+<span class="kw">kable</span>(my_json_df, <span class="dt">caption =</span> <span class="st">&quot;This data frame looks the same as the HTML one.&quot;</span>)</code></pre></div>
 <table>
+<caption>This data frame looks the same as the HTML one.</caption>
 <thead>
 <tr class="header">
 <th align="left">book_title</th>
@@ -451,8 +452,8 @@ my_json_df &lt;-<span class="st"> </span>my_json_df %&gt;%<span class="st">  </s
 </table>
 </div>
 </div>
-<div id="after-reworking-the-xmf-df-all-data-frames-now-are-the-same" class="section level1">
-<h1>After reworking the XMF DF, all data frames now are the same</h1>
+<div id="after-reworking-the-xml-df-all-data-frames-now-are-the-same" class="section level1">
+<h1>After reworking the XML DF, all data frames now are the same</h1>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">my_json_df ==<span class="st"> </span>my_html_df</code></pre></div>
 <pre><code>##      book_title authors cover_type subject pages
 ## [1,]       TRUE    TRUE       TRUE    TRUE  TRUE

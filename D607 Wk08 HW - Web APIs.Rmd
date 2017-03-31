@@ -1,0 +1,78 @@
+---
+title: "D607 Wk07 HW - Web APIs"
+author: "Kyle Gilde"
+date: "Mar. 14, 2017"
+output: 
+  prettydoc::html_pretty:
+    theme: architect
+    highlight: github
+---
+
+#The Task
+The New York Times web site provides a rich set of APIs, as described here: http://developer.nytimes.com/docs
+
+You'll need to start by signing up for an API key.
+
+Your task is to choose one of the New York Times APIs, construct an interface in R to read in the JSON data, and transform it to an R dataframe
+
+Here's your API Key for the Most Popular API: 016f630b0da546b796d27ee0f9bc3255
+
+#Load Packages
+```{r setup} 
+knitr::opts_chunk$set(warning=FALSE, 
+                      message=FALSE,
+                      tidy=TRUE,
+                      #comment = "",
+                      dev="png", 
+                      dev.args=list(type="cairo"))
+#https://cran.r-project.org/web/packages/prettydoc/vignettes/
+#https://www.rstudio.com/wp-content/uploads/2015/03/rmarkdown-reference.pdf
+
+#create vector with all needed packages
+load_packages <- c("httr","prettydoc", "jsonlite", "dplyr", "knitr", "janitor", "XML", "tidyr")
+
+#see if we need to install any of them
+install_load <- function(pkg){
+  new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
+  if (length(new.pkg)) 
+    install.packages(new.pkg, dependencies = TRUE)
+  sapply(pkg, require, character.only = TRUE)
+}
+
+install_load(load_packages)
+#CODE SOURCE DOCUMENTATION: https://gist.github.com/stevenworthington/3178163
+```
+
+#1. HTML Table Parsing
+##Load data, look at the HTML table & then its data frame
+```{r html}
+url <- "http://developer.nytimes.com/most_popular_api_v2.json"
+url <- "http://developer.nytimes.com/most_popular_api_v2.json#/Console/GET/mostshared/%7Bsection%7D/%7Btime-period%7D.json"
+#/Console/GET/mostviewed/%7Bsection%7D/%7Btime-period%7D.json
+
+api_key <- "016f630b0da546b796d27ee0f9bc3255"
+
+url <- paste0("http://developer.nytimes.com/most_popular_api_v2.json/mostshared/%7Bsection%7D/%7Btime-period%7D.json?api-key=",api_key)
+url
+
+
+my_content <- GET(url, add_headers(`api-key` = "016f630b0da546b796d27ee0f9bc3255", `time-period` = 7))
+my_content
+
+
+fromJSON(url)
+
+
+class(my_content)
+#content(my_content)
+http_status(my_content)$category
+headers(my_content)
+my_xml <- content(my_content, "parse")
+class(my_xml)
+print(my_xml)
+
+
+class(dat)
+paste0("http://api.nytimes.com/svc/search/v2/articlesearch.json?q=", q, "&page=", i, "&fl=pub_date&api-key=", api) d <- getURL(uri) res <- fromJSON(d,simplify = FALSE) dat <- append(dat, unlist(res$response$docs)) 
+```
+
