@@ -36,9 +36,10 @@ install_load(load_packages)
 #CODE SOURCE DOCUMENTATION: https://gist.github.com/stevenworthington/3178163
 ```
 
-#Download files
+#Download Email Files
 ```{r}
-url <- "https://spamassassin.apache.org/publiccorpus/"
+url <- "http://spamassassin.apache.org/old/publiccorpus/"
+
 files <- url %>% 
   getURL() %>% 
   read_html() %>% 
@@ -53,16 +54,21 @@ for (i in 1:length(my_files))
   if (!my_files[i] %in% list.files(getwd()))
     download.file(file_paths[i], destfile = my_files[i])
 }
+
+
 ```
 
-#Load Files into Corpora
+#Create Corpus
 ```{r}
+ham_file <- untar(bzfile(my_files[1], "rb"))
+
+class(ham_file)
 
 #concat function
 '%&%' <- function(x, y) paste0(x,y)
 
 #Create the 2 corpora
-data_dir <- "data-sets/spamham/"
+data_dir <- "/Users/kyleg/Documents/spamham/"
 
 spam_corpus <- VCorpus(DirSource(data_dir %&% "spam"), readerControl = list(language = "lat"))
 
@@ -88,44 +94,95 @@ for (i in 1:length(ham_corpus))
   meta(ham_corpus[[i]], group_attr) <- sample(attr_value_vec, size = 1, prob = c(.5, .5), replace = T)
 }
 my_corpus <- c(ham_corpus, spam_corpus)
-sort
 
-meta(my_corpus)
 
-lapply(my_corpus, meta)[1:10]
-inspect(my_corpus[1:10])
-meta(my_corpus[[2501]])
-#Create DTM
 
-dtm <- DocumentTermMatrix(release_corpus)
-dtm <- removeSparseTerms(dtm, 1-(10/length(release_corpus)))
-dtm
+# 
+# meta(my_corpus)
+# 
+# lapply(my_corpus, meta)[1:10]
+# inspect(my_corpus[1:10])
+meta(my_corpus[[2502]])
+
+# spam_corpus
+# ham_corpus[[1000]]$content
+# 
+# 
+# spam_corpus[[101]]$content
+# inspect(spam_corpus[1:10])
+# content(spam_corpus[1:10][1])
+# stopwords("en")[1:100]
+```
+#Create Document-Term Matrix
+```{r}
+
+#Create Document-Term Matrix
+dtm <- DocumentTermMatrix(my_corpus)
+dtm <- removeSparseTerms(dtm, 1-(10/length(my_corpus)))
+
+inspect(dtm)
+
+
+```
+
+#Create container
+```{r}
 
 email_types <- unlist(meta(my_corpus, type = "local", tag = "email_type"))
 group_list <- unlist(meta(my_corpus, type = "local", tag = "group"))
 table(group_list)
 
+training_indices <- which(group_list == "train")
+test_indices <- which(group_list == "test")
 
-N <- length(org_labels)
 container <- create_container(
     dtm,
-    labels = org_labels,
-    trainSize = 1:400,
-    testSize = 401:N,
+    labels = email_types,
+    trainSize = training_indices,
+    testSize = test_indices,
     virgin = F
 )
 
 slotNames(container)
+# Train models
+svm_model <- train_model(container, "SVM")
+tree_model <- train_model(container, "TREE")
+maxent_model <- train_model(container, "MAXENT")
+
+# Classify models
+svm_out <- classify_model(container, svm_model)
+tree_out <- classify_model(container, tree_model)
+maxent_out <- classify_model(container, maxent_model)
+
+head(svm_out)
+head(tree_out)
+head(maxent_out)
 
 
-spam_corpus
-ham_corpus[[1000]]$content
+
+```
 
 
-spam_corpus[[101]]$content
-inspect(spam_corpus[1:10])
-content(spam_corpus[1:10][1])
-stopwords("en")[1:100]
+#Results from the 3 Models
+```{r}
+# Construct data frame with correct labels
+results <- data.frame(
+    correct_label = email_types[test_indices],
+    svm = as.character(svm_out[,1]),
+    tree = as.character(tree_out[,1]),
+    maxent = as.character(maxent_out[,1]),
+    stringsAsFactors = F
+)
 
+View(results)
+
+## SVM performance
+table(results[,1] == results[,2])
+## Random forest performance
+table(results[,1] == results[,3])
+## Maximum entropy performance
+table(results[,1] == results[,4])
+
+prop.table(table(results[,1] == results[,4]))
 ```
 

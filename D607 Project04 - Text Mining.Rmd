@@ -1,0 +1,199 @@
+---
+title: "D607 Wk11 HW - Text Mining"
+author: "Kyle Gilde"
+date: "April 7, 2017"
+output: 
+  prettydoc::html_pretty:
+    theme: architect
+    highlight: github
+---
+
+#The Task
+It can be useful to be able to classify new "test" documents using already classified "training" documents.  A common example is using a corpus of labeled spam and ham (non-spam) e-mails to predict whether or not a new document is spam.  
+
+For this project, you can start with a spam/ham dataset, then predict the class of new documents (either withheld from the training dataset or from another source such as your own spam folder).  
+
+#Load Packages
+```{r setup, echo = FALSE} 
+knitr::opts_chunk$set(warning=FALSE, 
+                      message=FALSE,
+                      tidy=TRUE
+                      )
+
+#create vector with all needed packages
+load_packages <- c("prettydoc", "SnowballC", "knitr", "RCurl", "rvest", "stringr", "tm", "RTextTools", "caret")
+
+#see if we need to install any of them
+install_load <- function(pkg){
+  new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
+  if (length(new.pkg)) 
+    install.packages(new.pkg, dependencies = TRUE)
+  sapply(pkg, require, character.only = TRUE, quietly = TRUE)
+}
+
+install_load(load_packages)
+#CODE SOURCE DOCUMENTATION: https://gist.github.com/stevenworthington/3178163
+```
+
+#Download & Extract Email Files
+```{r}
+url <- "http://spamassassin.apache.org/old/publiccorpus/"
+
+files <- url %>% 
+  getURL() %>% 
+  read_html() %>% 
+  html_nodes("a") %>% 
+  html_attr("href")
+
+#concat function
+'%&%' <- function(x, y) paste0(x,y)
+
+my_files <- files[c(9, 14)]
+file_urls <- url %&% my_files
+data_dir <- "data-sets/spamham"
+
+dir.create(data_dir)
+
+#getwd()
+for (i in 1:length(my_files))
+{
+  if (!my_files[i] %in% list.files(data_dir))
+  {
+      my_dest <- file.path(data_dir, my_files[i])
+      download.file(file_urls[i], destfile = my_dest) 
+      untar(bzfile(my_dest, "rb"), exdir = data_dir)
+  }
+    
+}
+```
+
+#Create Corpus & Add Metadata
+```{r}
+#Create the 2 corpora
+spam_corpus <- VCorpus(DirSource(data_dir %&% "/" %&%  "spam_2"), readerControl = list(language = "lat"))
+
+ham_corpus <- VCorpus(DirSource(data_dir %&% "/" %&%  "easy_ham"), readerControl = list(language = "lat"))
+
+#add 2 metadata attributes to each & combine into one corpus
+email_attr <- "email_type" 
+attr_value1 <- "spam"
+attr_value2 <- "ham"
+
+group_attr <- "group"
+attr_value_vec <- c("test", "train")
+
+for (i in 1:length(spam_corpus))
+{
+  meta(spam_corpus[[i]], email_attr) <- attr_value1
+  meta(spam_corpus[[i]], group_attr) <- sample(attr_value_vec, size = 1, prob = c(.5, .5), replace = T)
+}
+
+for (i in 1:length(ham_corpus))
+{
+  meta(ham_corpus[[i]], email_attr) <- attr_value2
+  meta(ham_corpus[[i]], group_attr) <- sample(attr_value_vec, size = 1, prob = c(.5, .5), replace = T)
+}
+my_corpus <- c(ham_corpus, spam_corpus)
+
+meta(my_corpus[[1]])
+
+# 
+# meta(my_corpus)
+# 
+# lapply(my_corpus, meta)[1:10]
+# inspect(my_corpus[1:10])
+
+
+# spam_corpus
+# ham_corpus[[1000]]$content
+# 
+# 
+# spam_corpus[[101]]$content
+# inspect(spam_corpus[1:10])
+# content(spam_corpus[1:10][1])
+# stopwords("en")[1:100]
+```
+
+
+
+#Create my Corpus & Create Document-Term Matrix
+```{r}
+cleaned_corpus <- my_corpus %>% 
+  tm_map(removeNumbers) %>% 
+  tm_map(content_transformer(tolower)) %>% 
+  tm_map(PlainTextDocument) %>% 
+  tm_map(removeWords, words = stopwords("en")) %>%
+  tm_map(stemDocument) %>%
+  tm_map(str_replace_all, pattern = "[[:punct:]]", replacement = " ")
+
+#Create Document-Term Matrix
+dtm <- DocumentTermMatrix(cleaned_corpus)
+dtm <- removeSparseTerms(dtm, 1-(10/length(cleaned_corpus)))
+inspect(dtm) 
+
+
+```
+
+#Create container
+```{r}
+
+email_types <- unlist(meta(my_corpus, type = "local", tag = "email_type"))
+group_list <- unlist(meta(my_corpus, type = "local", tag = "group"))
+table(group_list)
+
+training_indices <- which(group_list == "train")
+test_indices <- which(group_list == "test")
+
+container <- create_container(
+    dtm,
+    labels = email_types,
+    trainSize = training_indices,
+    testSize = test_indices,
+    virgin = F
+)
+
+#slotNames(container)
+
+# Train models
+svm_model <- train_model(container, "SVM")
+tree_model <- train_model(container, "TREE")
+maxent_model <- train_model(container, "MAXENT")
+
+# Classify models
+svm_out <- classify_model(container, svm_model)
+tree_out <- classify_model(container, tree_model)
+maxent_out <- classify_model(container, maxent_model)
+
+```
+
+
+#Results from the 3 Models
+```{r}
+# Construct data frame with correct labels
+results <- data.frame(
+    actuals = email_types[test_indices],
+    svm = as.character(svm_out[,1]),
+    tree = as.character(tree_out[,1]),
+    maxent = as.character(maxent_out[,1]),
+    stringsAsFactors = F
+)
+
+svm_cm <- confusionMatrix(results$svm, results$actuals)
+tree_cm <- confusionMatrix(results$tree, results$actuals)
+maxent_cm <- confusionMatrix(results$maxent, results$actuals)
+
+options(scipen = 999)
+
+values <- data.frame(svm_cm = svm_cm$overall, 
+          tree_cm = tree_cm$overall,
+          maxent_cm = maxent_cm$overall)
+
+kable(values)
+```
+
+```{r close}
+#Close connections & delete local data
+closeAllConnections()
+unlink(data_dir, recursive = T)
+```
+
