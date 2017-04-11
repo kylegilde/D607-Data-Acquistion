@@ -201,5 +201,6 @@ kable(values)
 #Close connections & delete local data
 closeAllConnections()
 unlink(data_dir, recursive = T)
+
 ```
 
