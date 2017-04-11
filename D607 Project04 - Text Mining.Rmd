@@ -13,34 +13,43 @@ It can be useful to be able to classify new "test" documents using already class
 
 For this project, you can start with a spam/ham dataset, then predict the class of new documents (either withheld from the training dataset or from another source such as your own spam folder).  
 
-#Load Packages
-```{r setup, echo = FALSE} 
-knitr::opts_chunk$set(warning=FALSE, 
-                      message=FALSE,
-                      tidy=TRUE
-                      )
+```{r knitr_options, echo=FALSE}
+knitr::opts_chunk$set(warning = FALSE, 
+                      error = FALSE,
+                      message = FALSE,
+                      tidy = TRUE,
+                      cache = TRUE)
+```
+
+
+#Loaded Packages
+```{r load_packages, echo = FALSE, comment = ""} 
 
 #create vector with all needed packages
-load_packages <- c("prettydoc", "SnowballC", "knitr", "RCurl", "rvest", "stringr", "tm", "RTextTools", "caret")
+load_packages <- c("prettydoc", "SnowballC", "knitr", "rvest", "stringr", "tm", "RTextTools", "caret")
 
 #see if we need to install any of them
 install_load <- function(pkg){
+  #CODE SOURCE: https://gist.github.com/stevenworthington/3178163
   new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
   if (length(new.pkg)) 
     install.packages(new.pkg, dependencies = TRUE)
-  sapply(pkg, require, character.only = TRUE, quietly = TRUE)
+  sapply(pkg, require, character.only = TRUE, quietly = TRUE, warn.conflicts = FALSE)
 }
 
-install_load(load_packages)
-#CODE SOURCE DOCUMENTATION: https://gist.github.com/stevenworthington/3178163
+#excute function and display the loaded packages
+install_load(load_packages) %>% 
+  t() %>% 
+  t() %>% 
+  data.frame()
 ```
 
 #Download & Extract Email Files
-```{r}
+```{r download}
 url <- "http://spamassassin.apache.org/old/publiccorpus/"
 
+#parse the HTML
 files <- url %>% 
-  getURL() %>% 
   read_html() %>% 
   html_nodes("a") %>% 
   html_attr("href")
@@ -48,13 +57,15 @@ files <- url %>%
 #concat function
 '%&%' <- function(x, y) paste0(x,y)
 
+#select the 2 files needed
 my_files <- files[c(9, 14)]
 file_urls <- url %&% my_files
-data_dir <- "data-sets/spamham"
 
+#create temporary directory
+data_dir <- "data-sets/spamham"
 dir.create(data_dir)
 
-#getwd()
+#Download and unzip the doubly zipped files
 for (i in 1:length(my_files))
 {
   if (!my_files[i] %in% list.files(data_dir))
@@ -65,10 +76,14 @@ for (i in 1:length(my_files))
   }
     
 }
+
+#Let's take a look at the downloaded files & created directories
+(afile <- list.files(data_dir))
+head(list.files(data_dir %&% "/" %&% afile[3]))
 ```
 
 #Create Corpus & Add Metadata
-```{r}
+```{r create_corpora_metadata}
 #Create the 2 corpora
 spam_corpus <- VCorpus(DirSource(data_dir %&% "/" %&%  "spam_2"), readerControl = list(language = "lat"))
 
@@ -79,15 +94,18 @@ email_attr <- "email_type"
 attr_value1 <- "spam"
 attr_value2 <- "ham"
 
+#randomly assign test and training groups
 group_attr <- "group"
 attr_value_vec <- c("test", "train")
 
+#loop through spam corpus and create metadata
 for (i in 1:length(spam_corpus))
 {
   meta(spam_corpus[[i]], email_attr) <- attr_value1
   meta(spam_corpus[[i]], group_attr) <- sample(attr_value_vec, size = 1, prob = c(.5, .5), replace = T)
 }
 
+#loop through ham corpus and create metadata
 for (i in 1:length(ham_corpus))
 {
   meta(ham_corpus[[i]], email_attr) <- attr_value2
@@ -95,51 +113,34 @@ for (i in 1:length(ham_corpus))
 }
 my_corpus <- c(ham_corpus, spam_corpus)
 
+#let's look at the new metadata
 meta(my_corpus[[1]])
-
-# 
-# meta(my_corpus)
-# 
-# lapply(my_corpus, meta)[1:10]
-# inspect(my_corpus[1:10])
-
-
-# spam_corpus
-# ham_corpus[[1000]]$content
-# 
-# 
-# spam_corpus[[101]]$content
-# inspect(spam_corpus[1:10])
-# content(spam_corpus[1:10][1])
-# stopwords("en")[1:100]
 ```
 
 
 
-#Create my Corpus & Create Document-Term Matrix
-```{r}
-cleaned_corpus <- my_corpus %>% 
-  tm_map(removeNumbers) %>% 
-  tm_map(content_transformer(tolower)) %>% 
-  tm_map(PlainTextDocument) %>% 
-  tm_map(removeWords, words = stopwords("en")) %>%
-  tm_map(stemDocument) %>%
-  tm_map(str_replace_all, pattern = "[[:punct:]]", replacement = " ")
+#Clean my Corpus & Create a Document-Term Matrix with the Sparse Words Removed
+```{r clean_corpus}
+cleaned_corpus <- tm_map(my_corpus, removeNumbers)  
+cleaned_corpus <- tm_map(cleaned_corpus, content_transformer(tolower)) 
+cleaned_corpus <- tm_map(cleaned_corpus, removeWords, words = stopwords("en")) 
+cleaned_corpus <- tm_map(cleaned_corpus, stemDocument) 
+cleaned_corpus <- tm_map(cleaned_corpus, removePunctuation, preserve_intra_word_dashes = TRUE)
+cleaned_corpus <- tm_map(cleaned_corpus, stripWhitespace)
+
 
 #Create Document-Term Matrix
 dtm <- DocumentTermMatrix(cleaned_corpus)
+#remove sparse terms
 dtm <- removeSparseTerms(dtm, 1-(10/length(cleaned_corpus)))
+
 inspect(dtm) 
-
-
 ```
 
-#Create container
-```{r}
-
+#Create Container, Train & Classify Models
+```{r container_and_models}
 email_types <- unlist(meta(my_corpus, type = "local", tag = "email_type"))
 group_list <- unlist(meta(my_corpus, type = "local", tag = "group"))
-table(group_list)
 
 training_indices <- which(group_list == "train")
 test_indices <- which(group_list == "test")
@@ -168,7 +169,7 @@ maxent_out <- classify_model(container, maxent_model)
 
 
 #Results from the 3 Models
-```{r}
+```{r myresults comments = FALSE}
 # Construct data frame with correct labels
 results <- data.frame(
     actuals = email_types[test_indices],
@@ -182,8 +183,13 @@ svm_cm <- confusionMatrix(results$svm, results$actuals)
 tree_cm <- confusionMatrix(results$tree, results$actuals)
 maxent_cm <- confusionMatrix(results$maxent, results$actuals)
 
-options(scipen = 999)
+#par( mfrow = c( 2, 2))
 
+svm_cm$table
+tree_cm$table
+maxent_cm$table
+
+options(scipen = 999)
 values <- data.frame(svm_cm = svm_cm$overall, 
           tree_cm = tree_cm$overall,
           maxent_cm = maxent_cm$overall)
@@ -191,7 +197,7 @@ values <- data.frame(svm_cm = svm_cm$overall,
 kable(values)
 ```
 
-```{r close}
+```{r close_and_delete_data}
 #Close connections & delete local data
 closeAllConnections()
 unlink(data_dir, recursive = T)

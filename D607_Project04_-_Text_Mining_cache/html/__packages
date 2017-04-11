@@ -1,0 +1,17 @@
+base
+prettydoc
+SnowballC
+knitr
+bitops
+RCurl
+xml2
+rvest
+stringr
+NLP
+tm
+SparseM
+RTextTools
+lattice
+ggplot2
+caret
+htmlTable
