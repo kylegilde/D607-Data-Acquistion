@@ -7,7 +7,6 @@ output:
     theme: architect
     highlight: github
 ---
-
 #The Task
 It can be useful to be able to classify new "test" documents using already classified "training" documents.  A common example is using a corpus of labeled spam and ham (non-spam) e-mails to predict whether or not a new document is spam.  
 
@@ -24,9 +23,8 @@ knitr::opts_chunk$set(warning = FALSE,
 
 #Loaded Packages
 ```{r load_packages, echo = FALSE, comment = ""} 
-
 #create vector with all needed packages
-load_packages <- c("prettydoc", "SnowballC", "knitr", "rvest", "stringr", "tm", "RTextTools", "caret")
+load_packages <- c("prettydoc", "SnowballC", "knitr", "rvest", "stringr", "tm", "RTextTools", "caret", "dplyr")
 
 #see if we need to install any of them
 install_load <- function(pkg){
@@ -38,10 +36,7 @@ install_load <- function(pkg){
 }
 
 #excute function and display the loaded packages
-install_load(load_packages) %>% 
-  t() %>% 
-  t() %>% 
-  data.frame()
+data.frame(t(t(install_load(load_packages))))
 ```
 
 #Download & Extract Email Files
@@ -76,8 +71,10 @@ for (i in 1:length(my_files))
   }
     
 }
+```
 
-#Let's take a look at the downloaded files & created directories
+##Let's take a look at the downloaded files & created directories
+```{r files}
 (afile <- list.files(data_dir))
 head(list.files(data_dir %&% "/" %&% afile[3]))
 ```
@@ -89,12 +86,13 @@ spam_corpus <- VCorpus(DirSource(data_dir %&% "/" %&%  "spam_2"), readerControl 
 
 ham_corpus <- VCorpus(DirSource(data_dir %&% "/" %&%  "easy_ham"), readerControl = list(language = "lat"))
 
-#add 2 metadata attributes to each & combine into one corpus
+#add 2 metadata attributes
+#email group attribute
 email_attr <- "email_type" 
 attr_value1 <- "spam"
 attr_value2 <- "ham"
 
-#randomly assign test and training groups
+#randomly assign test and training group attribute values
 group_attr <- "group"
 attr_value_vec <- c("test", "train")
 
@@ -111,10 +109,23 @@ for (i in 1:length(ham_corpus))
   meta(ham_corpus[[i]], email_attr) <- attr_value2
   meta(ham_corpus[[i]], group_attr) <- sample(attr_value_vec, size = 1, prob = c(.5, .5), replace = T)
 }
+
+#combine corpora
 my_corpus <- c(ham_corpus, spam_corpus)
 
-#let's look at the new metadata
-meta(my_corpus[[1]])
+email_types <- unlist(meta(my_corpus, type = "local", tag = "email_type"))
+group_list <- unlist(meta(my_corpus, type = "local", tag = "group"))
+
+table(email_types, group_list)
+```
+
+#Let's see how many ham & spam emails were assigned to the Test and Train groups.
+
+```{r preview_metadata}
+email_types <- unlist(meta(my_corpus, type = "local", tag = "email_type"))
+group_list <- unlist(meta(my_corpus, type = "local", tag = "group"))
+
+table(email_types, group_list)
 ```
 
 
@@ -139,9 +150,6 @@ inspect(dtm)
 
 #Create Container, Train & Classify Models
 ```{r container_and_models}
-email_types <- unlist(meta(my_corpus, type = "local", tag = "email_type"))
-group_list <- unlist(meta(my_corpus, type = "local", tag = "group"))
-
 training_indices <- which(group_list == "train")
 test_indices <- which(group_list == "test")
 
@@ -168,8 +176,8 @@ maxent_out <- classify_model(container, maxent_model)
 ```
 
 
-#Results from the 3 Models
-```{r myresults comments = FALSE}
+#Aggregate the Results of the 3 Models with the Actuals
+```{r myresults}
 # Construct data frame with correct labels
 results <- data.frame(
     actuals = email_types[test_indices],
@@ -178,29 +186,43 @@ results <- data.frame(
     maxent = as.character(maxent_out[,1]),
     stringsAsFactors = F
 )
+```
 
+#Create Confusion Matrices
+
+##Support Vector Machine Results
+```{r svm_cm, comment = "", echo=FALSE}
 svm_cm <- confusionMatrix(results$svm, results$actuals)
 tree_cm <- confusionMatrix(results$tree, results$actuals)
 maxent_cm <- confusionMatrix(results$maxent, results$actuals)
 
-#par( mfrow = c( 2, 2))
-
-svm_cm$table
-tree_cm$table
-maxent_cm$table
-
-options(scipen = 999)
-values <- data.frame(svm_cm = svm_cm$overall, 
-          tree_cm = tree_cm$overall,
-          maxent_cm = maxent_cm$overall)
-
-kable(values)
+svm_cm
 ```
+
+
+##Random Forest Results
+```{r tree_cm, comment = "", echo=FALSE}
+tree_cm
+```
+
+
+##Maximum Entropy Results
+```{r maxent_cm, comment = "", echo=FALSE}
+maxent_cm
+
+n <- sum(group_list == "test")
+n
+```
+
+
+#Conclusion
++ In this iteration, the test group had `r n` emails
+
 
 ```{r close_and_delete_data}
 #Close connections & delete local data
-closeAllConnections()
-unlink(data_dir, recursive = T)
+# closeAllConnections()
+# unlink(data_dir, recursive = T)
 
 ```
 
