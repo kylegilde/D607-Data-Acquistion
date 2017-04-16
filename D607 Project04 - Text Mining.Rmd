@@ -1,5 +1,5 @@
 ---
-title: "D607 Wk11 HW - Text Mining"
+title: "D607 Project 4 - Text Mining"
 author: "Kyle Gilde"
 date: "April 7, 2017"
 output: 
@@ -17,7 +17,8 @@ knitr::opts_chunk$set(warning = FALSE,
                       error = FALSE,
                       message = FALSE,
                       tidy = TRUE,
-                      cache = TRUE)
+                      cache = TRUE
+                      )
 ```
 
 
@@ -36,7 +37,7 @@ install_load <- function(pkg){
 }
 
 #excute function and display the loaded packages
-data.frame(t(t(install_load(load_packages))))
+data.frame(t(t(install_load(load_packages))), fix.empty.names = FALSE)
 ```
 
 #Download & Extract Email Files
@@ -79,56 +80,57 @@ for (i in 1:length(my_files))
 head(list.files(data_dir %&% "/" %&% afile[3]))
 ```
 
-#Create Corpus & Add Metadata
-```{r create_corpora_metadata}
+#Now let's create 2 corpora
+```{r create_corpora}
 #Create the 2 corpora
 spam_corpus <- VCorpus(DirSource(data_dir %&% "/" %&%  "spam_2"), readerControl = list(language = "lat"))
 
 ham_corpus <- VCorpus(DirSource(data_dir %&% "/" %&%  "easy_ham"), readerControl = list(language = "lat"))
+```
 
+
+#Add 2 metadata attributes: email type and group
+##For the "group" attribute, we will alternate between assigning the attibute values of "test" and "train" to each document
+```{r metadata}
 #add 2 metadata attributes
 #email group attribute
 email_attr <- "email_type" 
 attr_value1 <- "spam"
 attr_value2 <- "ham"
 
-#randomly assign test and training group attribute values
+#group attribute
 group_attr <- "group"
-attr_value_vec <- c("test", "train")
 
 #loop through spam corpus and create metadata
 for (i in 1:length(spam_corpus))
 {
   meta(spam_corpus[[i]], email_attr) <- attr_value1
-  meta(spam_corpus[[i]], group_attr) <- sample(attr_value_vec, size = 1, prob = c(.5, .5), replace = T)
+  meta(spam_corpus[[i]], group_attr) <- 
+    ifelse(i %% 2 == 0, "test", "train")
 }
 
 #loop through ham corpus and create metadata
 for (i in 1:length(ham_corpus))
 {
   meta(ham_corpus[[i]], email_attr) <- attr_value2
-  meta(ham_corpus[[i]], group_attr) <- sample(attr_value_vec, size = 1, prob = c(.5, .5), replace = T)
+  meta(ham_corpus[[i]], group_attr) <- 
+    ifelse(i %% 2 == 0, "test", "train")
 }
+```
 
+
+#Let's combine the corpora & see how many documents were assigned to the Test and Train groups.
+
+```{r preview_metadata}
 #combine corpora
 my_corpus <- c(ham_corpus, spam_corpus)
 
 email_types <- unlist(meta(my_corpus, type = "local", tag = "email_type"))
 group_list <- unlist(meta(my_corpus, type = "local", tag = "group"))
 
-table(email_types, group_list)
+
+addmargins(table(email_types, group_list))
 ```
-
-#Let's see how many ham & spam emails were assigned to the Test and Train groups.
-
-```{r preview_metadata}
-email_types <- unlist(meta(my_corpus, type = "local", tag = "email_type"))
-group_list <- unlist(meta(my_corpus, type = "local", tag = "group"))
-
-table(email_types, group_list)
-```
-
-
 
 #Clean my Corpus & Create a Document-Term Matrix with the Sparse Words Removed
 ```{r clean_corpus}
@@ -188,13 +190,13 @@ results <- data.frame(
 )
 ```
 
-#Create Confusion Matrices
+#Create Confusion Matrices using the caret package
 
 ##Support Vector Machine Results
 ```{r svm_cm, comment = "", echo=FALSE}
-svm_cm <- confusionMatrix(results$svm, results$actuals)
-tree_cm <- confusionMatrix(results$tree, results$actuals)
-maxent_cm <- confusionMatrix(results$maxent, results$actuals)
+svm_cm <- confusionMatrix(results$svm, results$actuals, positive = "spam")
+tree_cm <- confusionMatrix(results$tree, results$actuals, positive = "spam")
+maxent_cm <- confusionMatrix(results$maxent, results$actuals, positive = "spam")
 
 svm_cm
 ```
@@ -210,19 +212,18 @@ tree_cm
 ```{r maxent_cm, comment = "", echo=FALSE}
 maxent_cm
 
-n <- sum(group_list == "test")
-n
 ```
 
 
-#Conclusion
-+ In this iteration, the test group had `r n` emails
+#Conclusions
++ **Overall, all 3 supervised classifer models came close to correctly classifying nearly all of the documents into spam and ham. Their balanced accuracies ranged from .9801 to .9954.**
+
++ **Out of the 3 models, the Support Vector Machine supervised classifier was the most accurate, followed Maximum Entropy and then Random Forest.**
 
 
 ```{r close_and_delete_data}
-#Close connections & delete local data
-# closeAllConnections()
-# unlink(data_dir, recursive = T)
-
+# Close connections & delete local data
+closeAllConnections()
+unlink(data_dir, recursive = T)
 ```
 

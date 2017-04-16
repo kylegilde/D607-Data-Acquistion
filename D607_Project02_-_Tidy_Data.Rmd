@@ -1,0 +1,210 @@
+---
+title: "D607 Project 2 - Tidy Data"
+author: "Kyle Gilde"
+date: "Mar. 4, 2017"
+output: 
+  prettydoc::html_pretty:
+    theme: architect
+    highlight: github
+---
+
+#The Task
+Choose any three of the "wide" datasets identified in the Week 5 Discussion items. (You may use your own dataset; please don't use my Sample Post dataset, since that was used in your Week 6 assignment!) 
+ 
+For each of the three chosen datasets:
+
+1.  Create a .CSV file (or optionally, a MySQL database!) that includes all of the information included in the dataset. You're encouraged to use a "wide" structure similar to how the information appears in the discussion item, so that you can practice tidying and transformations as described below.
+
+2.  Read the information from your .CSV file into R, and use tidyr and dplyr as needed to tidy and transform your data. [Most of your grade will be based on this step!]
+
+3.  Perform the analysis requested in the discussion item.
+
+#Load Packages
+```{r setup} 
+knitr::opts_chunk$set(#echo=FALSE, 
+                      warning=FALSE, 
+                      message=FALSE,
+                      tidy=F,
+                      #comment = "",
+                      dev="png", 
+                      dev.args=list(type="cairo"))
+#https://cran.r-project.org/web/packages/prettydoc/vignettes/
+#https://www.rstudio.com/wp-content/uploads/2015/03/rmarkdown-reference.pdf
+
+load.packages <- c("stringr","prettydoc", "tidyr", "dplyr", "knitr", "janitor", "ggplot2", "data.table")
+
+ipak <- function(pkg){
+    #FUNCTION SOURCE: https://gist.github.com/stevenworthington/3178163
+    new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
+    if (length(new.pkg)) 
+        install.packages(new.pkg, dependencies = TRUE)
+    sapply(pkg, require, character.only = TRUE, quietly = TRUE, warn.conflicts = FALSE)
+}
+
+ipak(load.packages)
+```
+
+#Dataset #1: Nkasi's Congressional Voting Records
+##Load data, get headers & take a look at it
+```{r load}
+ds1 <- read.csv("https://archive.ics.uci.edu/ml/machine-learning-databases/voting-records/house-votes-84.data", header = F, stringsAsFactors = F)
+
+#get the header names
+ds1_names <- readLines("https://archive.ics.uci.edu/ml/machine-learning-databases/voting-records/house-votes-84.names")[33:49]
+ds1_names <- str_extract(ds1_names,"[[:alpha:]-]{2,40}")
+ds1_names[1] <- "party"
+names(ds1) <- ds1_names
+
+kable(head(ds1))
+glimpse(ds1)
+```
+##Tidy & mutate the data, remove non-yea-or-nay votes
+```{r tidy_data}
+
+party_agreement <- ds1 %>% 
+  gather("voting_issue", "vote", 2:17) %>%
+  filter(vote %in% c("y", "n")) %>% 
+  group_by(party, voting_issue, vote) %>% 
+  summarise(vote_count = n()) %>% 
+  spread(vote, vote_count) %>% 
+  rename(nay_votes = n, yea_votes = y) %>% 
+  mutate(total_votes = nay_votes + yea_votes, 
+         agreement_rate = pmax(nay_votes, yea_votes) / total_votes, 
+         most_votes = ifelse(yea_votes > nay_votes, "yea", "nay")) %>% 
+  select(party, voting_issue, agreement_rate, most_votes) 
+    #switch("n" = "nay_votes", "y" = "yea_votes")
+
+kable(head(party_agreement))
+```
+
+##Analysis that can be done:
+1. Which issue attracted the most difference (in voting pattern) between members of congress according to affiliation?
+
+*My interpretation of the question: On which issue was each party the most divided?*
+```{r ds1q1}
+party_agreement %>% 
+  filter(party == "democrat") %>% 
+  arrange(agreement_rate) %>% 
+  head(1) %>% 
+  kable()
+
+party_agreement %>% 
+  filter(party == "republican") %>% 
+  arrange(agreement_rate) %>% 
+  head(1) %>% 
+  kable()
+```
+
+
+2. Which issue showed the most common ground (in voting pattern) between members of congress according to affiliation?
+
+*My interpretation of the question: On which issue was each party the most unified?*
+```{r ds1q2}
+party_agreement %>% 
+  filter(party == "democrat") %>% 
+  arrange(desc(agreement_rate)) %>% 
+  head(1) %>% 
+  kable()
+
+party_agreement %>% 
+  filter(party == "republican") %>% 
+  arrange(desc(agreement_rate)) %>% 
+  head(1) %>% 
+  kable()
+```
+
+#Dataset #2: Joel's GINI Index  
+
+"Measuring the wealth distribution between the people in each country has been something economists have been measuring for many years. In the GINI index, a higher GINI coefficient signifies inequality in wealth distribution, with 1 being complete inequality and 0 being complete equality. The World Bank has been maintaining [this data](http://databank.worldbank.org/data/reports.aspx?source=2&series=SI.POV.GINI&country=#)."
+
+A potential analysis that could be performed is the trend in the GINI coefficient for each country.
+
+##Load data & take a look at it
+```{r tidy}
+gini_data <- read.csv("https://raw.githubusercontent.com/kylegilde/D607-Data-Acquistion/master/data-sets/1966f167-824f-4105-8927-8f5a80a92c0f_Data.csv", stringsAsFactors = F)
+
+glimpse(gini_data)
+```
+##Tidy & transform & filter to countries that have at least 8 observations since 2007
+```{r}
+gini_data1 <- gini_data %>% 
+  clean_names() %>% 
+  gather("year_chr", "gini_chr", 5:16) %>% 
+  mutate(year = as.integer(str_extract(year_chr,"[0-9]{4}"))) %>% 
+  mutate(gini_coefficient = as.numeric(str_replace(gini_chr, "\\.{2}", ""))) %>% 
+  select(country_name, year, gini_coefficient) %>% 
+  filter(gini_coefficient >= 0 & year >= 2007)
+
+country_8obs <- filter(count(gini_data1, country_name),n >= 8)$country_name
+gini_data2 <- filter(gini_data1, country_name %in% country_8obs)
+
+glimpse(gini_data2)
+
+```
+##"A potential analysis that could be performed is the trend in the GINI coefficient for each country."
++ There are appears to be an slight overall decline in inquality among these 17 countries.
++ Honduras and Paraguay have had more volatility in their coefficients than other countries in this group.
+
+```{r}
+ggplot(gini_data2, aes(x = year, y = gini_coefficient, color = country_name)) + geom_line(size=2)
+```
+
+
+#Dataset #3: World Bank: both wide and long data set (mine)
+In their [World Development Indicators collection](http://data.worldbank.org/data-catalog/world-development-indicators), [this zip folder](http://databank.worldbank.org/data/download/WDI_csv.zip) contains a file called WDI_Data, which I believe is an example of a table that is both wide and long/narrow. In it, each year is given its own column, which is characteristic of a "wide" format. However, it also has a column that is called "Indicator Name." It contains metric names that would typically be given their own columns instead of rows, and so this is a characteristic of narrow/long table. 
+
+It would be a good exercise to tidy this table by putting all of the years in a one column and the metrics in their own columns. Then you could use scatter plots to look for correlations between variables.
+
+
+##Download & upzip the large file, take a glimpse
+```{r}
+wb_url <- "http://databank.worldbank.org/data/download/WDI_csv.zip"
+
+# Commented out to avoid re-downloading this large file
+temp <- tempfile()
+download.file(wb_url,temp)
+wb_data <- read.csv(unz(temp, "WDI_Data.csv"), stringsAsFactors = F)
+# unlink(temp)
+
+glimpse(wb_data)
+```
+
+##Let's tidy up this massive mess!
+```{r analysis, tidy=F}
+wb_data1 <- wb_data
+
+#remove the Xs from the year columns
+names(wb_data1)[5:61] <- str_extract(names(wb_data1)[5:61],"[0-9]{4}")
+
+selected_indicators <- c(
+  "NY.GDP.PCAP.KD.ZG",
+  "NY.GDP.PCAP.PP.KD",
+  "SH.MED.BEDS.ZS",
+  "SE.ADT.LITR.FE.ZS"
+)
+
+#tidy & filter
+wb_data2 <- wb_data1 %>%
+  filter(Indicator.Code %in% selected_indicators) %>% 
+  gather("year_chr", "value", 5:61) %>%
+  mutate(year = as.integer(year_chr)) %>% 
+  select(-Country.Code, -Indicator.Code, -year_chr) %>%
+  spread(Indicator.Name, value) %>% 
+  clean_names() 
+
+glimpse(wb_data2)
+```
+
+###Question 1: Does there appear to be correlation between GDP per capita & the rate of hosital beds per 1000 people?
++ There appears to be small amount of correlation.
+```{r}
+ggplot(wb_data2, aes(x = gdp_per_capita_ppp_constant_2011_international, y = hospital_beds_per_1_000_people)) + geom_point(size = .5)
+
+```
+
+###Question 2: Does there appear to be correlation between GDP per capita & the literacy rate of adult females?
++ There appears to be possibly some non-linear correlation between these 2 variables.
+```{r}
+ggplot(wb_data2, aes(x = gdp_per_capita_ppp_constant_2011_international, y = literacy_rate_adult_female_percent_of_females_ages_15_and_above)) + geom_point(size = .5)
+
+```
