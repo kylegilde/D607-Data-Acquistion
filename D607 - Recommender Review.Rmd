@@ -1,0 +1,39 @@
+---
+title: "D607 - Recommender Review"
+author: "Kyle Gilde"
+date: "April 20, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Instructions
+
+1. Perform a Scenario Design analysis as described below.  Consider whether it makes sense for your selected recommender system to perform scenario design twice, once for the organization (e.g. Amazon.com) and once for the organization's customers.
+2. Attempt to reverse engineer what you can about the site, from the site interface and any available information that you can find on the Internet or elsewhere.
+3. Include specific recommendations about how to improve the site's recommendation capabilities going forward. 
+4. Create your report using an R Markdown file, and create a discussion thread with a link to the GitHub repo where your Markdown file notebook resides.  You are not expected to need to write code for this discussion assignment.
+
+##Facebook's News Feed
+
+In the wake of the 2016, Facebook's news feed recommendation system took some heat for promoting the spread of fake news.  Subsequently, they released some new functionality in December to allow users to flag fake news articles. This flagging then provides disclaimers to other users. 
+
+[News Feed FYI: Addressing Hoaxes and Fake News](https://newsroom.fb.com/news/2016/12/news-feed-fyi-addressing-hoaxes-and-fake-news/)
+
+Consequently, I decided to do a design analysis of the news feed and their new fake-news-flagging functionality.
+
+####Scenario Design Analysis
+1. Who are your target users?
+
+Facebook users, all 1.86 billion monthly active users!
+[Source](https://zephoria.com/top-15-valuable-facebook-statistics/)
+
+2. What are their key goals?
+
+In general, FB's goals are to keep their users on the site for as long as possible, so that they can give their advertisers as many impressions as possible. With this specific initiative, FB wants to decrease the unregulated flow of fake news in their feed. Presumably, they want to avoid the bad press they received after the election. 
+
+3. How can you help them accomplish their goals?
+
+Speaking personally and from hearing the accounts of the viral velocity of fake news, their recommender system works pretty well already. However, I did have a difficult time locating the fake-news flagger even though I was specifically looking for it. Consequently, I would recommend that they reduce the number of clicks required to flag a story. It takes 4 clicks to do so on the website, but it would be more effective if it took only 2 or 3 clicks.
