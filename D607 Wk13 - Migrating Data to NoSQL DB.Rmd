@@ -1,0 +1,87 @@
+---
+title: "D607 Wk13 - Migrating Data to NoSQL DB"
+author: "Kyle Gilde"
+date: "April 29, 2017"
+output: 
+  prettydoc::html_pretty:
+    theme: architect
+    highlight: github
+---
+#The Task
+For this assignment, you should take information from a relational database and migrate it to a NoSQL database of your own choosing. 
+
+For the NoSQL database, you may use MongoDB (which we introduced in week 7), Neo4j, or another NoSQL database of your choosing.
+
+Your migration process needs to be reproducible.  R code is encouraged, but not required.  You should also briefly describe the advantages and disadvantages of storing the data in a relational database vs. your NoSQL database.
+
+
+```{r knitr_options, echo=FALSE}
+knitr::opts_chunk$set(
+                      warning = FALSE
+                      ,error = FALSE
+                      ,message = FALSE
+                      ,tidy = TRUE
+                      ,cache = TRUE
+                      )
+```
+
+
+#Loaded Packages
+```{r load_packages, echo = FALSE, comment = ""} 
+#create vector with all needed packages
+load_packages <- c("prettydoc", "devtools", "rmongodb", "RMySQL", "stringr", "knitr")
+
+#see if we need to install any of them
+install_load <- function(pkg){
+  #CODE SOURCE: https://gist.github.com/stevenworthington/3178163
+  new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
+  if (length(new.pkg)) 
+    install.packages(new.pkg, dependencies = TRUE)
+  sapply(pkg, require, character.only = TRUE, quietly = TRUE, warn.conflicts = FALSE)
+}
+
+#excute function and display the loaded packages
+data.frame(t(t(install_load(load_packages))), fix.empty.names = FALSE)
+
+
+#install_github(repo = "mongosoup/rmongodb")
+```
+
+#Create the Relational Database from CSVs
+```{r rdbms}
+
+my.db <- dbConnect(MySQL(), user="root", password="kmgkmg", dbname="movie_ratings", host="localhost", port=3306)
+
+
+my.files <- c(
+  "friends"
+  ,"movies"
+  ,"movies_ratings_friends"
+  ,"ratings")
+
+root <- "https://raw.githubusercontent.com/kylegilde/D607-Data-Acquistion/master/data-sets/movie_ratings/"
+
+#Load my files as DFs and then create tables
+
+create_tables <- function(file_names, root, filetype, database){
+  for (i in 1:length(file_names)) {
+    my.url <- paste0(root, file_names[i], ".", filetype)
+    x <- read.csv(my.url)
+    dbWriteTable(database, file_names[i], x, overwrite = T, row.names = F)
+  }
+}
+
+create_tables(my.files, root, "csv", my.db)
+
+my.tables <- dbGetQuery(my.db, "show tables")
+kable(my.tables, caption ="Tables")
+```
+
+
+
+```{r download}
+mongo = mongo.create(host = "localhost")
+mongo.is.connected(mongo)
+
+mongo.get.databases(mongo)
+```

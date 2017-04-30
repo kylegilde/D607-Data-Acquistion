@@ -1,0 +1,9 @@
+base
+prettydoc
+devtools
+rmongodb
+DBI
+RMySQL
+stringr
+knitr
+jsonlite
