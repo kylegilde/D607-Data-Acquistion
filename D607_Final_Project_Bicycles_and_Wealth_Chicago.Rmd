@@ -1,5 +1,5 @@
 ---
-title: "DATA 607 Final Project: Bicycles and Wealth "
+title: "DATA 607 Final Project: Bicycles and Wealth in Chicago"
 author: "Kyle Gilde"
 date: "May 6, 2017"
 output: 
@@ -18,9 +18,6 @@ knitr::opts_chunk$set(
                       )
 ```
 
-
-
-
 # Research Question
 **Are the Divvy bike-share stations disproportionately located in Chicago's wealthier neighborhoods/zip codes?**
 Motivation...
@@ -33,10 +30,14 @@ $H_0: B_1 = 0$ **There is no correlation between the number of Divvy station doc
 
 $H_A: B_1 > 0$ **There is a positive correlation between the number of Divvy station docks and the median cost of homes in a neighborhood.**
 
-#Loaded Packages
+
+
+#The Variables & Sources of Data
+
+**Loaded Packages**
 ```{r load_packages, echo = FALSE, comment = ""} 
 #create vector with all needed packages
-load_packages <- c("prettydoc", "knitr", "jsonlite", "ggmap", "tidyverse")
+load_packages <- c("prettydoc", "knitr", "jsonlite", "ggmap", "tidyverse", "stringr", "rvest")
 
 #see if we need to install any of them
 install_load <- function(pkg){
@@ -50,15 +51,72 @@ install_load <- function(pkg){
 #excute function and display the loaded packages
 data.frame(t(t(install_load(load_packages))), fix.empty.names = FALSE)
 
+#(.packages())
 ```
 
-#The Variables & Sources of Data
 **The explanatory variable from Trulia.com **
-The median cost of homes for sale on Trulia.com for each neighborhood/zip code will be used as a proxy to determine the wealth of the neighborhood/zip code. The data will be scraped off of the 300 browse pages and is contained in some JSON on each page. The site appears to have more than 16K homes for sale in Chicago.
+
+The median cost of single-family homes for sale on Trulia.com for each neighborhood/zip code will be used as a proxy to determine the wealth of the neighborhood/zip code. The data will be scraped off of the 300 browse pages and is contained in some JSON on each page. The site appears to have more than 16K homes for sale in Chicago.
+
+The properties that were bank-owned or in default were not included in this study because their sell prices were not publically listed on the site.
+
 
 ```{r trulia}
 
+base_url <- "https://www.trulia.com/for_sale/Chicago,IL/SINGLE-FAMILY_HOME_type/"
+pages <- 3
+trulia_file <- "Trulia_file.csv"
+glimpse(trulia_df)
 
+
+trulia_scraper <- function(base_url, pages, file_name){
+  for (i in 1:pages){
+    current_url <- ifelse(i == 1,
+                          base_url,
+                          paste0(base_url, i, "_p/")
+                          )
+    my_df <- data.frame(
+      urls = character(),
+      stringsAsFactors = F
+    )
+    df2 <- data.frame(urls = current_url, stringsAsFactors = F)
+    my_df <- rbind(my_df, df2)
+    print(current_url)
+    
+
+    # trulia_html <- base_url %>%
+    #   read_html() %>%
+    #   html_nodes("script") %>%
+    #   html_text()
+    # 
+    # reg_ex <- "var appState = "
+    # reg_ex2 <- ";\\n  var googleMapURL ="
+    # 
+    # json_text <- trulia_html[str_detect(trulia_html, reg_ex)]
+    # begin <- as.integer(str_locate(json_text, reg_ex)[1, 2])
+    # ending <- as.integer(str_locate(json_text, reg_ex2)[1, 1]) - 1
+    # 
+    # json <- json_text %>%
+    #   str_sub(begin, ending) %>%
+    #   str_trim() %>%
+    #   fromJSON()
+    # 
+    # trulia_df <- json$page$cards
+    # 
+    # 
+    # 
+    # my_samp <- seq(1, 6, by = .01)
+    # rand_delay <- sample(my_samp, 1, replace = T)
+    # Sys.sleep(rand_delay)
+  }
+  return(my_df)
+  #write.csv(trulia_df, file = file_name)
+}
+
+if (!trulia_file %in% list.files(getwd()))
+  trulia_scraper(base_url, pages, trulia_file)
+
+View(trulia_df)
 
 ```
 
@@ -70,7 +128,8 @@ The Divvy API has 20 variables and 581 observations. Each observation is a Divvy
 ```{r api}
 
 feed <- "https://feeds.divvybikes.com/stations/stations.json"
-divvy_data <- fromJSON(feed)$stationBeanList
+if (!exists("divvy_data"))
+  divvy_data <- fromJSON(feed)$stationBeanList
 glimpse(divvy_data)
 
 # unique(divvy_data$postalCode)
@@ -78,34 +137,42 @@ glimpse(divvy_data)
 ```
 
 
-The 2 variables needed are the `totalDocks` and `postalCode`. However, `postalCode` variable is mostly NULL.
-```{r nozips}
+The 2 variables needed are the `totalDocks` and `postalCode`. However, the `postalCode` values are mostly missing.
+```{r nozips, comment="", collapse=T}
 table(divvy_data$postalCode == "")
 ```
 
 Fortunately, the data set includes the longitude/latitude coordinates, and we can use ggmap to obtain the addresses from the Google Maps API.
 ```{r ggmap}
 coordinates <- cbind(divvy_data$longitude, divvy_data$latitude)  
+divvy_file <- "DivvyAddresses.csv"
 
-if (!(exists("address")))
+if (!divvy_file %in% list.files(getwd()))
+{  
+  ##Code citation: http://stackoverflow.com/a/22919546
   address <- do.call(rbind,
                     lapply(1:nrow(coordinates),
                     function(i)revgeocode(coordinates[i, ])))
+  write.csv(data.frame(address = address), file = divvy_file)
+  }
 
-##Code citation: http://stackoverflow.com/a/22919546
+
+divvy <- read.csv(divvy_file)
+
+#unlink(divvy_file)
 ```
 
 
 Next, let's transform the data so that we have the # of bicycle docks in each zip code. Note that I'm removing one station that is not in service.
 ```{r tidyup, tidy=F}
 divvy_df <- divvy_data %>% 
-  mutate(zip_code = str_trim(str_extract(address, " [\\d]{5}"))) %>% 
+  mutate(zip_code = str_trim(str_extract(divvy$address, " [\\d]{5}"))) %>% 
   filter(status == "IN_SERVICE") %>% 
   select(zip_code, totalDocks) %>% 
   group_by(zip_code) %>% 
   summarise(docks = sum(totalDocks))
 
-#View(divvy_df)
+kable(head(divvy_df))
 ```
 
 

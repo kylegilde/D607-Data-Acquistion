@@ -1,5 +1,5 @@
 ---
-title: "DATA 607 Final Project: Bicycles and Wealth "
+title: "DATA 607 Final Project: Bicycles and Wealth in Chicago"
 author: "Kyle Gilde"
 date: "May 6, 2017"
 output: 

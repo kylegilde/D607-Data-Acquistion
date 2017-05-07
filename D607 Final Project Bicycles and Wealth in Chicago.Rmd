@@ -1,5 +1,5 @@
 ---
-title: "DATA 607 Final Project: Bicycles and Wealth "
+title: "DATA 607 Final Project: Bicycles and Wealth in Chicago"
 author: "Kyle Gilde"
 date: "May 6, 2017"
 output: 
@@ -36,7 +36,7 @@ $H_A: B_1 > 0$ **There is a positive correlation between the number of Divvy sta
 #Loaded Packages
 ```{r load_packages, echo = FALSE, comment = ""} 
 #create vector with all needed packages
-load_packages <- c("prettydoc", "knitr", "jsonlite", "ggmap", "tidyverse")
+load_packages <- c("prettydoc", "knitr", "jsonlite", "ggmap", "tidyverse", "stringr")
 
 #see if we need to install any of them
 install_load <- function(pkg){
@@ -50,6 +50,7 @@ install_load <- function(pkg){
 #excute function and display the loaded packages
 data.frame(t(t(install_load(load_packages))), fix.empty.names = FALSE)
 
+#(.packages())
 ```
 
 #The Variables & Sources of Data
@@ -86,20 +87,28 @@ table(divvy_data$postalCode == "")
 Fortunately, the data set includes the longitude/latitude coordinates, and we can use ggmap to obtain the addresses from the Google Maps API.
 ```{r ggmap}
 coordinates <- cbind(divvy_data$longitude, divvy_data$latitude)  
+divvy_file <- "DivvyAddresses.csv"
 
-if (!(exists("address")))
+if (!divvy_file %in% list.files(getwd()))
+{  
+  ##Code citation: http://stackoverflow.com/a/22919546
   address <- do.call(rbind,
                     lapply(1:nrow(coordinates),
                     function(i)revgeocode(coordinates[i, ])))
+  write.csv(data.frame(address = address), file = divvy_file)
+  }
 
-##Code citation: http://stackoverflow.com/a/22919546
+
+divvy <- read.csv(divvy_file)
+
+#unlink(divvy_file)
 ```
 
 
 Next, let's transform the data so that we have the # of bicycle docks in each zip code. Note that I'm removing one station that is not in service.
 ```{r tidyup, tidy=F}
 divvy_df <- divvy_data %>% 
-  mutate(zip_code = str_trim(str_extract(address, " [\\d]{5}"))) %>% 
+  mutate(zip_code = str_trim(str_extract(divvy$address, " [\\d]{5}"))) %>% 
   filter(status == "IN_SERVICE") %>% 
   select(zip_code, totalDocks) %>% 
   group_by(zip_code) %>% 
