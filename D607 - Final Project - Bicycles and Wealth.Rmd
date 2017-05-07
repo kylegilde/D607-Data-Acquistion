@@ -1,0 +1,119 @@
+---
+title: "DATA 607 Final Project: Bicycles & Wealth"
+author: "Kyle Gilde"
+date: "May 6, 2017"
+output: 
+  prettydoc::html_pretty:
+    toc: true
+    theme: architect
+    highlight: github
+---
+```{r knitr_options, echo=FALSE}
+knitr::opts_chunk$set(
+                      warning = FALSE
+                      ,error = FALSE
+                      ,message = FALSE
+                      ,tidy = TRUE
+                      ,cache = TRUE
+                      )
+```
+
+
+
+
+# Research Question
+**Are the Divvy bike-share stations disproportionately located in Chicago's wealthier neighborhoods/zip codes?**
+Motivation...
+http://chi.streetsblog.org/2015/09/10/divvy-membership-skews-white-and-wealthy-but-hopefully-not-for-long/
+
+#Introduction
+
+#Hypotheses
+$H_0: B_1 = 0$ **There is no correlation between the number of Divvy station docks and median cost of homes in a neighborhood.**
+
+$H_A: B_1 > 0$ **There is a positive correlation between the number of Divvy station docks and the median cost of homes in a neighborhood.**
+
+#Loaded Packages
+```{r load_packages, echo = FALSE, comment = ""} 
+#create vector with all needed packages
+load_packages <- c("prettydoc", "knitr", "jsonlite", "dplyr", "ggmap")
+
+#see if we need to install any of them
+install_load <- function(pkg){
+  #CODE SOURCE: https://gist.github.com/stevenworthington/3178163
+  new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
+  if (length(new.pkg)) 
+    install.packages(new.pkg, dependencies = TRUE)
+  sapply(pkg, require, character.only = TRUE, quietly = TRUE, warn.conflicts = FALSE)
+}
+
+#excute function and display the loaded packages
+data.frame(t(t(install_load(load_packages))), fix.empty.names = FALSE)
+
+```
+
+#The Variables & Sources of Data
+**The explanatory variable from Trulia.com **
+The median cost of homes for sale on Trulia.com for each neighborhood/zip code will be used as a proxy to determine the wealth of the neighborhood/zip code. The data will be scraped off of the 300 browse pages and is contained in some JSON on each page. The site appears to have more than 16K homes for sale in Chicago.
+
+```{r trulia}
+
+
+
+```
+
+**The response variable from City of Chicago API**
+
+The number of Divvy station docks in each neighborhood/zip code. The source of these data will be the [City of Chicago's Divvy Bicycle Stations API](https://data.cityofchicago.org/Transportation/Divvy-Bicycle-Stations/bbyy-e7gq).
+
+The Divvy API has 20 variables and 581 observations. Each observation is a Divvy station, and each station has a certain number of docks for bikes.
+```{r api}
+
+feed <- "https://feeds.divvybikes.com/stations/stations.json"
+divvy_data <- fromJSON(feed)$stationBeanList
+glimpse(divvy_data)
+
+divvy_data <- divvy_data %>% 
+  filter(status == "IN_SERVICE")
+
+
+table(divvy_data$stAddress1 == "")
+# unique(divvy_data$postalCode)
+# t(t(table(divvy_data$testStation)))
+```
+
+
+The 2 variables needed are the `totalDocks` and `postalCode`. However, `postalCode` variable is mostly NULL.
+```{r}
+table(divvy_data$postalCode == "")
+```
+
+Fortunately, the data set includes the longitude/latitude coordinates, and we can use ggmap to obtain the addresses from the Google Maps API.
+```{r}
+
+address <- do.call(rbind,
+                  sapply(1:2, #nrow(coordinates)
+                         function(i)revgeocode(coordinates[i, ])))
+
+
+
+divvy_df <- divvy_data %>% 
+  filter(status == "IN_SERVICE") %>% 
+  transmute(totalDocks = totalDocks, coordinates = cbind(longitude, latitude))
+  
+coordinates <- cbind(divvy_data$longitude, divvy_data$latitude)  
+length(coordinates)
+results
+
+data <- cbind(data,result)
+
+
+a <- lapply(coordinates, revgeocode, output = c("address"))
+```
+
+
+
+Statistical analysis: linear regression between the number of Divvy docks and the median sell price. There are 50 zip codes and about 90 neighborhoods in Chicago.
+
+
+
