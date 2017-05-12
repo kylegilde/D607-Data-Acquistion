@@ -64,25 +64,25 @@ The properties that were bank-owned or in default were not included in this stud
 ```{r trulia}
 
 base_url <- "https://www.trulia.com/for_sale/Chicago,IL/SINGLE-FAMILY_HOME_type/"
-pages <- 3
+pages <- 5
 trulia_file <- "Trulia_file.csv"
-glimpse(trulia_df)
 
+#trulia_scraper <- function(base_url, pages, file_name){
+for (i in 1:pages){
+  current_url <- ifelse(i == 1,
+                        base_url,
+                        paste0(base_url, i, "_p/")
+                        )
 
-trulia_scraper <- function(base_url, pages, file_name){
-  for (i in 1:pages){
-    current_url <- ifelse(i == 1,
-                          base_url,
-                          paste0(base_url, i, "_p/")
-                          )
-    my_df <- data.frame(
-      urls = character(),
-      stringsAsFactors = F
-    )
-    df2 <- data.frame(urls = current_url, stringsAsFactors = F)
-    my_df <- rbind(my_df, df2)
-    print(current_url)
-    
+  my_df <- data.frame(
+    urls = character(),
+
+    stringsAsFactors = F
+  )
+  df2 <- data.frame(urls = current_url, stringsAsFactors = F)
+  my_df <- rbind(my_df, df2)
+  print(current_url)
+}
 
     # trulia_html <- base_url %>%
     #   read_html() %>%
@@ -108,15 +108,17 @@ trulia_scraper <- function(base_url, pages, file_name){
     # my_samp <- seq(1, 6, by = .01)
     # rand_delay <- sample(my_samp, 1, replace = T)
     # Sys.sleep(rand_delay)
-  }
-  return(my_df)
-  #write.csv(trulia_df, file = file_name)
-}
+#   }
+#   return(my_df)
+#   #write.csv(trulia_df, file = file_name)
+# }
 
-if (!trulia_file %in% list.files(getwd()))
-  trulia_scraper(base_url, pages, trulia_file)
-
-View(trulia_df)
+# if (!trulia_file %in% list.files(getwd()))
+#   x <- trulia_scraper(base_url, pages, trulia_file)
+# 
+# 
+# View(x)
+View(my_df)
 
 ```
 
@@ -157,19 +159,24 @@ if (!divvy_file %in% list.files(getwd()))
   }
 
 
-divvy <- read.csv(divvy_file)
-
+divvy <- cbind(divvy_data, read.csv(divvy_file))
+View(divvy)
 #unlink(divvy_file)
 ```
 
 
 Next, let's transform the data so that we have the # of bicycle docks in each zip code. Note that I'm removing one station that is not in service.
 ```{r tidyup, tidy=F}
-divvy_df <- divvy_data %>% 
+
+##one of the address values returned by ggmap is missing the zip code
+missing_zip <- "730-798 W 28th St, Chicago, IL, USA"
+
+divvy_df <- divvy %>% 
   mutate(zip_code = str_trim(str_extract(divvy$address, " [\\d]{5}"))) %>% 
-  filter(status == "IN_SERVICE") %>% 
-  select(zip_code, totalDocks) %>% 
-  group_by(zip_code) %>% 
+  mutate(zip_code = ifelse(address == missing_zip, "60616", zip_code)) %>% 
+  filter(status == "IN_SERVICE") %>%
+  select(zip_code, totalDocks) %>%
+  group_by(zip_code) %>%
   summarise(docks = sum(totalDocks))
 
 kable(head(divvy_df))

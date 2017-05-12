@@ -109,8 +109,32 @@ knitr     TRUE
 jsonlite  TRUE
 ggmap     TRUE
 tidyverse TRUE
-stringr   TRUE</code></pre>
-<p><strong>The explanatory variable from Trulia.com </strong> The median cost of homes for sale on Trulia.com for each neighborhood/zip code will be used as a proxy to determine the wealth of the neighborhood/zip code. The data will be scraped off of the 300 browse pages and is contained in some JSON on each page. The site appears to have more than 16K homes for sale in Chicago.</p>
+stringr   TRUE
+rvest     TRUE</code></pre>
+<p><strong>The explanatory variable from Trulia.com </strong></p>
+<p>The median cost of single-family homes for sale on Trulia.com for each neighborhood/zip code will be used as a proxy to determine the wealth of the neighborhood/zip code. The data will be scraped off of the 300 browse pages and is contained in some JSON on each page. The site appears to have more than 16K homes for sale in Chicago.</p>
+<p>The properties that were bank-owned or in default were not included in this study because their sell prices were not publically listed on the site.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">base_url &lt;-<span class="st"> &quot;https://www.trulia.com/for_sale/Chicago,IL/SINGLE-FAMILY_HOME_type/&quot;</span>
+pages &lt;-<span class="st"> </span><span class="dv">5</span>
+<span class="co"># trulia_file &lt;- 'Trulia_file.csv' glimpse(trulia_df) #trulia_scraper &lt;-</span>
+<span class="co"># function(base_url, pages, file_name){ for (i in 1:pages){ current_url &lt;-</span>
+<span class="co"># ifelse(i == 1, base_url, paste0(base_url, i, '_p/') ) my_df &lt;- data.frame(</span>
+<span class="co"># urls = character(), stringsAsFactors = F ) df2 &lt;- data.frame(urls =</span>
+<span class="co"># current_url, stringsAsFactors = F) my_df &lt;- rbind(my_df, df2)</span>
+<span class="co"># print(current_url) }</span>
+
+<span class="co"># trulia_html &lt;- base_url %&gt;% read_html() %&gt;% html_nodes('script') %&gt;%</span>
+<span class="co"># html_text() reg_ex &lt;- 'var appState = ' reg_ex2 &lt;- ';\\n var</span>
+<span class="co"># googleMapURL =' json_text &lt;- trulia_html[str_detect(trulia_html, reg_ex)]</span>
+<span class="co"># begin &lt;- as.integer(str_locate(json_text, reg_ex)[1, 2]) ending &lt;-</span>
+<span class="co"># as.integer(str_locate(json_text, reg_ex2)[1, 1]) - 1 json &lt;- json_text %&gt;%</span>
+<span class="co"># str_sub(begin, ending) %&gt;% str_trim() %&gt;% fromJSON() trulia_df &lt;-</span>
+<span class="co"># json$page$cards my_samp &lt;- seq(1, 6, by = .01) rand_delay &lt;-</span>
+<span class="co"># sample(my_samp, 1, replace = T) Sys.sleep(rand_delay) } return(my_df)</span>
+<span class="co"># #write.csv(trulia_df, file = file_name) }</span>
+
+<span class="co"># if (!trulia_file %in% list.files(getwd())) x &lt;- trulia_scraper(base_url,</span>
+<span class="co"># pages, trulia_file) View(x) View(my_df)</span></code></pre></div>
 <p><strong>The response variable from City of Chicago API</strong></p>
 <p>The number of Divvy station docks in each neighborhood/zip code. The source of these data will be the <a href="https://data.cityofchicago.org/Transportation/Divvy-Bicycle-Stations/bbyy-e7gq">City of Chicago’s Divvy Bicycle Stations API</a>.</p>
 <p>The Divvy API has 20 variables and 581 observations. Each observation is a Divvy station, and each station has a certain number of docks for bikes.</p>

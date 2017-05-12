@@ -11,3 +11,5 @@ readr
 purrr
 dplyr
 stringr
+xml2
+rvest
