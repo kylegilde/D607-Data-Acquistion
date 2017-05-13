@@ -81,7 +81,17 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li><a href="#research-question">Research Question</a></li>
 <li><a href="#introduction">Introduction</a></li>
 <li><a href="#hypotheses">Hypotheses</a></li>
-<li><a href="#the-variables-sources-of-data">The Variables &amp; Sources of Data</a></li>
+<li><a href="#the-variables-sources-of-data">The Variables &amp; Sources of Data</a><ul>
+<li><a href="#the-explanatory-variable-sell-prices-from-trulia.com">The Explanatory Variable: Sell Prices from Trulia.com</a></li>
+<li><a href="#the-response-variable-divvy-station-docks-from-city-of-chicago-api">The Response Variable: Divvy Station Docks from City of Chicago API</a></li>
+<li><a href="#combine-the-data-sets">Combine the Data Sets</a></li>
+</ul></li>
+<li><a href="#inference">Inference</a><ul>
+<li><a href="#linear-regression-model">Linear Regression Model</a></li>
+<li><a href="#scatter-plot-using-ggplot2">Scatter Plot using ggplot2</a></li>
+<li><a href="#model-diagnostics">Model Diagnostics</a></li>
+</ul></li>
+<li><a href="#conclusion">Conclusion</a></li>
 </ul>
 </div>
 
@@ -110,49 +120,109 @@ jsonlite  TRUE
 ggmap     TRUE
 tidyverse TRUE
 stringr   TRUE
-rvest     TRUE</code></pre>
-<p><strong>The explanatory variable from Trulia.com </strong></p>
-<p>The median cost of single-family homes for sale on Trulia.com for each neighborhood/zip code will be used as a proxy to determine the wealth of the neighborhood/zip code. The data will be scraped off of the 300 browse pages and is contained in some JSON on each page. The site appears to have more than 16K homes for sale in Chicago.</p>
+rvest     TRUE
+psych     TRUE</code></pre>
+<div id="the-explanatory-variable-sell-prices-from-trulia.com" class="section level2">
+<h2>The Explanatory Variable: Sell Prices from Trulia.com</h2>
+<p>The median cost of single-family homes for sale on Trulia.com for each neighborhood/zip code will be used as a proxy for the wealth of the neighborhood/zip code. This was the first publicly available data I found on the web.</p>
+<p>as a proxy to determine the wealth of the neighborhood/zip code. The data will be scraped off of the 300 browse pages and is contained in some JSON on each page. The site appears to have more than 16K homes for sale in Chicago.</p>
 <p>The properties that were bank-owned or in default were not included in this study because their sell prices were not publically listed on the site.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">base_url &lt;-<span class="st"> &quot;https://www.trulia.com/for_sale/Chicago,IL/SINGLE-FAMILY_HOME_type/&quot;</span>
-pages &lt;-<span class="st"> </span><span class="dv">5</span>
-<span class="co"># trulia_file &lt;- 'Trulia_file.csv' glimpse(trulia_df) #trulia_scraper &lt;-</span>
-<span class="co"># function(base_url, pages, file_name){ for (i in 1:pages){ current_url &lt;-</span>
-<span class="co"># ifelse(i == 1, base_url, paste0(base_url, i, '_p/') ) my_df &lt;- data.frame(</span>
-<span class="co"># urls = character(), stringsAsFactors = F ) df2 &lt;- data.frame(urls =</span>
-<span class="co"># current_url, stringsAsFactors = F) my_df &lt;- rbind(my_df, df2)</span>
-<span class="co"># print(current_url) }</span>
+<div id="web-scraping" class="section level3">
+<h3>Web Scraping</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Inputs to loop</span>
+base_url &lt;-<span class="st"> &quot;https://www.trulia.com/for_sale/Chicago,IL/SINGLE-FAMILY_HOME_type/&quot;</span>
+pages &lt;-<span class="st"> </span><span class="dv">150</span>
+trulia_file &lt;-<span class="st"> &quot;Trulia_file.csv&quot;</span>
+aggregate_df &lt;-<span class="st"> </span><span class="kw">data.frame</span>()
+reg_ex1 &lt;-<span class="st"> &quot;var appState = &quot;</span>
+reg_ex2 &lt;-<span class="st"> &quot;;</span><span class="ch">\\</span><span class="st">n  var googleMapURL =&quot;</span>
+my_samp &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">1</span>, <span class="dv">3</span>, <span class="dt">by =</span> <span class="fl">0.01</span>)
 
-<span class="co"># trulia_html &lt;- base_url %&gt;% read_html() %&gt;% html_nodes('script') %&gt;%</span>
-<span class="co"># html_text() reg_ex &lt;- 'var appState = ' reg_ex2 &lt;- ';\\n var</span>
-<span class="co"># googleMapURL =' json_text &lt;- trulia_html[str_detect(trulia_html, reg_ex)]</span>
-<span class="co"># begin &lt;- as.integer(str_locate(json_text, reg_ex)[1, 2]) ending &lt;-</span>
-<span class="co"># as.integer(str_locate(json_text, reg_ex2)[1, 1]) - 1 json &lt;- json_text %&gt;%</span>
-<span class="co"># str_sub(begin, ending) %&gt;% str_trim() %&gt;% fromJSON() trulia_df &lt;-</span>
-<span class="co"># json$page$cards my_samp &lt;- seq(1, 6, by = .01) rand_delay &lt;-</span>
-<span class="co"># sample(my_samp, 1, replace = T) Sys.sleep(rand_delay) } return(my_df)</span>
-<span class="co"># #write.csv(trulia_df, file = file_name) }</span>
+<span class="co"># Loop to scrape pages</span>
+if (!trulia_file %in%<span class="st"> </span><span class="kw">list.files</span>(<span class="kw">getwd</span>())) {
+    for (i in <span class="dv">1</span>:pages) {
+        <span class="co"># pagination</span>
+        current_url &lt;-<span class="st"> </span><span class="kw">ifelse</span>(i ==<span class="st"> </span><span class="dv">1</span>, base_url, <span class="kw">paste0</span>(base_url, i, <span class="st">&quot;_p/&quot;</span>))
+        <span class="co"># get html</span>
+        trulia_html &lt;-<span class="st"> </span>current_url %&gt;%<span class="st"> </span><span class="kw">read_html</span>() %&gt;%<span class="st"> </span><span class="kw">html_nodes</span>(<span class="st">&quot;script&quot;</span>) %&gt;%<span class="st"> </span>
+<span class="st">            </span><span class="kw">html_text</span>()
+        
+        <span class="co"># get json from html</span>
+        json_text &lt;-<span class="st"> </span>trulia_html[<span class="kw">str_detect</span>(trulia_html, reg_ex1)]
+        begin &lt;-<span class="st"> </span><span class="kw">as.integer</span>(<span class="kw">str_locate</span>(json_text, reg_ex1)[<span class="dv">1</span>, <span class="dv">2</span>])
+        ending &lt;-<span class="st"> </span><span class="kw">as.integer</span>(<span class="kw">str_locate</span>(json_text, reg_ex2)[<span class="dv">1</span>, <span class="dv">1</span>]) -<span class="st"> </span><span class="dv">1</span>
+        
+        <span class="co"># parse the JSON</span>
+        json &lt;-<span class="st"> </span>json_text %&gt;%<span class="st"> </span><span class="kw">str_sub</span>(begin, ending) %&gt;%<span class="st"> </span><span class="kw">str_trim</span>() %&gt;%<span class="st"> </span><span class="kw">fromJSON</span>()
+        
+        <span class="co"># store data in DF</span>
+        current_df &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">iteration =</span> i, <span class="dt">id =</span> json$page$cards$id, <span class="dt">price =</span> json$page$cards$price, 
+            <span class="dt">zip_code =</span> json$page$cards$zip, <span class="dt">location =</span> json$page$cards$footer$location)
+        
+        aggregate_df &lt;-<span class="st"> </span><span class="kw">rbind</span>(aggregate_df, current_df)
+        
+        <span class="co"># delay</span>
+        rand_delay &lt;-<span class="st"> </span><span class="kw">sample</span>(my_samp, <span class="dv">1</span>, <span class="dt">replace =</span> T)
+        <span class="kw">Sys.sleep</span>(rand_delay)
+    }
+    <span class="kw">write.csv</span>(aggregate_df, <span class="dt">file =</span> trulia_file)
+}</code></pre></div>
+</div>
+<div id="clean-and-summarize-the-scraped-data" class="section level3">
+<h3>Clean and summarize the scraped data</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">trulia_data &lt;-<span class="st"> </span><span class="kw">read.csv</span>(trulia_file, <span class="dt">stringsAsFactors =</span> F)
+<span class="kw">View</span>(trulia_data)
+trulia_df &lt;-<span class="st"> </span>trulia_data %&gt;%<span class="st"> </span>
+<span class="st">  </span><span class="kw">transmute</span>(<span class="dt">sell_price =</span> <span class="kw">as.integer</span>(<span class="kw">str_replace_all</span>(price, <span class="st">&quot;</span><span class="ch">\\</span><span class="st">$|</span><span class="ch">\\</span><span class="st">+|,&quot;</span>, <span class="st">&quot;&quot;</span>)),
+         <span class="dt">zip_code =</span> <span class="kw">as.character</span>(zip_code)
+         <span class="co">#neighborhood = str_replace(location, &quot;, Chicago, IL&quot;, &quot;&quot;)</span>
+         ) %&gt;%<span class="st"> </span>
+<span class="st">  </span><span class="kw">na.omit</span>() %&gt;%<span class="st"> </span>
+<span class="st">  </span><span class="kw">group_by</span>(zip_code) %&gt;%<span class="st"> </span>
+<span class="st">  </span><span class="kw">summarise</span>(<span class="dt">median_sell_price =</span> <span class="kw">median</span>(sell_price),
+            <span class="dt">n =</span> <span class="kw">n</span>())
 
-<span class="co"># if (!trulia_file %in% list.files(getwd())) x &lt;- trulia_scraper(base_url,</span>
-<span class="co"># pages, trulia_file) View(x) View(my_df)</span></code></pre></div>
-<p><strong>The response variable from City of Chicago API</strong></p>
-<p>The number of Divvy station docks in each neighborhood/zip code. The source of these data will be the <a href="https://data.cityofchicago.org/Transportation/Divvy-Bicycle-Stations/bbyy-e7gq">City of Chicago’s Divvy Bicycle Stations API</a>.</p>
-<p>The Divvy API has 20 variables and 581 observations. Each observation is a Divvy station, and each station has a certain number of docks for bikes.</p>
+<span class="kw">glimpse</span>(trulia_df)</code></pre></div>
+<pre><code>## Observations: 57
+## Variables: 3
+## $ zip_code          &lt;chr&gt; &quot;60601&quot;, &quot;60604&quot;, &quot;60605&quot;, &quot;60607&quot;, &quot;60608&quot;,...
+## $ median_sell_price &lt;dbl&gt; 23500, 699000, 428000, 625000, 267000, 15690...
+## $ n                 &lt;int&gt; 1, 1, 6, 12, 32, 56, 43, 11, 35, 60, 185, 42...</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">hist</span>(trulia_df$median_sell_price, <span class="dt">breaks =</span> <span class="dv">10</span>)</code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#Data inspection functions</span>
+<span class="co"># options(scipen = 9)</span>
+<span class="co"># View(describe(trulia_df))</span>
+<span class="co"># #count NAs</span>
+<span class="co"># sapply(trulia_df, function(x) sum(is.na(x)))</span>
+<span class="co"># #count unique values</span>
+<span class="co"># sapply(trulia_df,  function(x) length(unique(x)))</span>
+<span class="co"># #value frequencies</span>
+<span class="co"># sapply(trulia_df[, 2:3], function(x) table(x))</span></code></pre></div>
+</div>
+</div>
+<div id="the-response-variable-divvy-station-docks-from-city-of-chicago-api" class="section level2">
+<h2>The Response Variable: Divvy Station Docks from City of Chicago API</h2>
+<p>Since stations can have differing numbers of docks, the number of Divvy station docks in each neighborhood/zip code. The source of these data will be the <a href="https://data.cityofchicago.org/Transportation/Divvy-Bicycle-Stations/bbyy-e7gq">City of Chicago’s Divvy Bicycle Stations API</a>.</p>
+<div id="the-divvy-api-has-20-variables-and-581-observations.-each-observation-is-a-divvy-station-and-each-station-has-a-certain-number-of-docks-for-bikes." class="section level3">
+<h3>The Divvy API has 20 variables and 581 observations. Each observation is a Divvy station, and each station has a certain number of docks for bikes.</h3>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">feed &lt;-<span class="st"> &quot;https://feeds.divvybikes.com/stations/stations.json&quot;</span>
-if (!<span class="kw">exists</span>(<span class="st">&quot;divvy_data&quot;</span>)) divvy_data &lt;-<span class="st"> </span><span class="kw">fromJSON</span>(feed)$stationBeanList
+if (!<span class="kw">exists</span>(<span class="st">&quot;divvy_data&quot;</span>)) {
+    divvy_data &lt;-<span class="st"> </span><span class="kw">fromJSON</span>(feed)$stationBeanList
+}
 <span class="kw">glimpse</span>(divvy_data)</code></pre></div>
 <pre><code>## Observations: 581
 ## Variables: 20
 ## $ id                    &lt;int&gt; 2, 3, 4, 5, 6, 7, 9, 11, 12, 13, 14, 15,...
 ## $ stationName           &lt;chr&gt; &quot;Michigan Ave &amp; Balbo Ave&quot;, &quot;Shedd Aquar...
-## $ availableDocks        &lt;int&gt; 35, 13, 4, 9, 22, 17, 11, 3, 9, 18, 1, 0...
+## $ availableDocks        &lt;int&gt; 31, 29, 6, 14, 18, 18, 8, 6, 8, 15, 13, ...
 ## $ totalDocks            &lt;int&gt; 35, 31, 23, 23, 31, 19, 19, 11, 15, 27, ...
 ## $ latitude              &lt;dbl&gt; 41.87264, 41.86723, 41.85627, 41.87405, ...
 ## $ longitude             &lt;dbl&gt; -87.62398, -87.61536, -87.61335, -87.627...
 ## $ statusValue           &lt;chr&gt; &quot;In Service&quot;, &quot;In Service&quot;, &quot;In Service&quot;...
 ## $ statusKey             &lt;int&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1...
 ## $ status                &lt;chr&gt; &quot;IN_SERVICE&quot;, &quot;IN_SERVICE&quot;, &quot;IN_SERVICE&quot;...
-## $ availableBikes        &lt;int&gt; 0, 17, 19, 13, 6, 0, 8, 8, 6, 8, 14, 13,...
+## $ availableBikes        &lt;int&gt; 3, 2, 17, 8, 13, 1, 10, 5, 7, 12, 2, 2, ...
 ## $ stAddress1            &lt;chr&gt; &quot;Michigan Ave &amp; Balbo Ave&quot;, &quot;Shedd Aquar...
 ## $ stAddress2            &lt;chr&gt; &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, ...
 ## $ city                  &lt;chr&gt; &quot;Chicago&quot;, &quot;Chicago&quot;, &quot;Chicago&quot;, &quot;Chicag...
@@ -160,16 +230,19 @@ if (!<span class="kw">exists</span>(<span class="st">&quot;divvy_data&quot;</spa
 ## $ location              &lt;chr&gt; &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;620 S. State St.&quot;, &quot;&quot;, &quot;&quot;, ...
 ## $ altitude              &lt;chr&gt; &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, ...
 ## $ testStation           &lt;lgl&gt; FALSE, FALSE, FALSE, FALSE, FALSE, FALSE...
-## $ lastCommunicationTime &lt;chr&gt; &quot;2017-05-07 14:56:41&quot;, &quot;2017-05-07 14:55...
+## $ lastCommunicationTime &lt;chr&gt; &quot;2017-05-12 15:31:09&quot;, &quot;2017-05-12 15:29...
 ## $ landMark              &lt;chr&gt; &quot;541&quot;, &quot;544&quot;, &quot;545&quot;, &quot;030&quot;, &quot;548&quot;, &quot;534&quot;...
 ## $ is_renting            &lt;lgl&gt; TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE...</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># unique(divvy_data$postalCode) t(t(table(divvy_data$testStation)))</span></code></pre></div>
-<p>The 2 variables needed are the <code>totalDocks</code> and <code>postalCode</code>. However, the <code>postalCode</code> values are mostly missing.</p>
+</div>
+<div id="the-2-variables-needed-are-the-totaldocks-and-postalcode.-however-the-postalcode-values-are-mostly-missing." class="section level3">
+<h3>The 2 variables needed are the <code>totalDocks</code> and <code>postalCode</code>. However, the <code>postalCode</code> values are mostly missing.</h3>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(divvy_data$postalCode ==<span class="st"> &quot;&quot;</span>)
 
 <span class="ot">FALSE</span>  <span class="ot">TRUE</span> 
   <span class="dv">111</span>   <span class="dv">470</span> </code></pre></div>
-<p>Fortunately, the data set includes the longitude/latitude coordinates, and we can use ggmap to obtain the addresses from the Google Maps API.</p>
+</div>
+<div id="fortunately-the-data-set-includes-the-longitudelatitude-coordinates-and-we-can-use-ggmap-to-obtain-the-addresses-from-the-google-maps-api." class="section level3">
+<h3>Fortunately, the data set includes the longitude/latitude coordinates, and we can use ggmap to obtain the addresses from the Google Maps API.</h3>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">coordinates &lt;-<span class="st"> </span><span class="kw">cbind</span>(divvy_data$longitude, divvy_data$latitude)
 divvy_file &lt;-<span class="st"> &quot;DivvyAddresses.csv&quot;</span>
 
@@ -181,15 +254,19 @@ if (!divvy_file %in%<span class="st"> </span><span class="kw">list.files</span>(
 }
 
 
-divvy &lt;-<span class="st"> </span><span class="kw">read.csv</span>(divvy_file)
+divvy &lt;-<span class="st"> </span><span class="kw">cbind</span>(divvy_data, <span class="kw">read.csv</span>(divvy_file))</code></pre></div>
+</div>
+<div id="next-lets-transform-the-data-so-that-we-have-the-number-of-bicycle-docks-in-each-zip-code.-one-station-not-in-service-was-removed." class="section level3">
+<h3>Next, let’s transform the data so that we have the number of bicycle docks in each zip code. One station not in service was removed.</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">##one of the address values returned by ggmap is missing the zip code
+missing_zip &lt;-<span class="st"> &quot;730-798 W 28th St, Chicago, IL, USA&quot;</span>
 
-<span class="co"># unlink(divvy_file)</span></code></pre></div>
-<p>Next, let’s transform the data so that we have the # of bicycle docks in each zip code. Note that I’m removing one station that is not in service.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">divvy_df &lt;-<span class="st"> </span>divvy_data %&gt;%<span class="st"> </span>
+divvy_df &lt;-<span class="st"> </span>divvy %&gt;%<span class="st"> </span>
 <span class="st">  </span><span class="kw">mutate</span>(<span class="dt">zip_code =</span> <span class="kw">str_trim</span>(<span class="kw">str_extract</span>(divvy$address, <span class="st">&quot; [</span><span class="ch">\\</span><span class="st">d]{5}&quot;</span>))) %&gt;%<span class="st"> </span>
-<span class="st">  </span><span class="kw">filter</span>(status ==<span class="st"> &quot;IN_SERVICE&quot;</span>) %&gt;%<span class="st"> </span>
-<span class="st">  </span><span class="kw">select</span>(zip_code, totalDocks) %&gt;%<span class="st"> </span>
-<span class="st">  </span><span class="kw">group_by</span>(zip_code) %&gt;%<span class="st"> </span>
+<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">zip_code =</span> <span class="kw">ifelse</span>(address ==<span class="st"> </span>missing_zip, <span class="st">&quot;60616&quot;</span>, zip_code)) %&gt;%<span class="st"> </span>
+<span class="st">  </span><span class="kw">filter</span>(status ==<span class="st"> &quot;IN_SERVICE&quot;</span>) %&gt;%
+<span class="st">  </span><span class="kw">select</span>(zip_code, totalDocks) %&gt;%
+<span class="st">  </span><span class="kw">group_by</span>(zip_code) %&gt;%
 <span class="st">  </span><span class="kw">summarise</span>(<span class="dt">docks =</span> <span class="kw">sum</span>(totalDocks))
 
 <span class="kw">kable</span>(<span class="kw">head</span>(divvy_df))</code></pre></div>
@@ -202,12 +279,128 @@ divvy &lt;-<span class="st"> </span><span class="kw">read.csv</span>(divvy_file)
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">NA</td>
-<td align="right">9986</td>
+<td align="left">60201</td>
+<td align="right">75</td>
+</tr>
+<tr class="even">
+<td align="left">60202</td>
+<td align="right">45</td>
+</tr>
+<tr class="odd">
+<td align="left">60208</td>
+<td align="right">30</td>
+</tr>
+<tr class="even">
+<td align="left">60301</td>
+<td align="right">15</td>
+</tr>
+<tr class="odd">
+<td align="left">60302</td>
+<td align="right">120</td>
+</tr>
+<tr class="even">
+<td align="left">60304</td>
+<td align="right">72</td>
 </tr>
 </tbody>
 </table>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glimpse</span>(divvy_df)</code></pre></div>
+<pre><code>## Observations: 50
+## Variables: 2
+## $ zip_code &lt;chr&gt; &quot;60201&quot;, &quot;60202&quot;, &quot;60208&quot;, &quot;60301&quot;, &quot;60302&quot;, &quot;60304&quot;,...
+## $ docks    &lt;int&gt; 75, 45, 30, 15, 120, 72, 364, 34, 84, 124, 405, 150, ...</code></pre>
+</div>
+</div>
+<div id="combine-the-data-sets" class="section level2">
+<h2>Combine the Data Sets</h2>
+<ul>
+<li>The response variable is left joined to the explanatory variable by zip code.</li>
+<li>Note that zip codes not starting with “606” are not in the city of Chicago proper and were removed.</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">divvy_trulia &lt;-<span class="st"> </span><span class="kw">left_join</span>(trulia_df, divvy_df, <span class="dt">by =</span> <span class="st">&quot;zip_code&quot;</span>) %&gt;%<span class="st"> </span><span class="kw">filter</span>(<span class="kw">str_detect</span>(zip_code, 
+    <span class="st">&quot;606&quot;</span>)) %&gt;%<span class="st"> </span><span class="kw">transmute</span>(<span class="dt">docks =</span> <span class="kw">ifelse</span>(<span class="kw">is.na</span>(docks), <span class="dv">0</span>, docks), <span class="dt">median_sell_price_1000s =</span> median_sell_price/<span class="dv">1000</span>, 
+    <span class="dt">zip_code =</span> zip_code)
+
+<span class="kw">glimpse</span>(divvy_trulia)</code></pre></div>
+<pre><code>## Observations: 53
+## Variables: 3
+## $ docks                   &lt;dbl&gt; 364, 124, 405, 457, 376, 330, 356, 317...
+## $ median_sell_price_1000s &lt;dbl&gt; 23.500, 699.000, 428.000, 625.000, 267...
+## $ zip_code                &lt;chr&gt; &quot;60601&quot;, &quot;60604&quot;, &quot;60605&quot;, &quot;60607&quot;, &quot;6...</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">View</span>(divvy_trulia)
+divvy_trulia$zip_code</code></pre></div>
+<pre><code>##  [1] &quot;60601&quot; &quot;60604&quot; &quot;60605&quot; &quot;60607&quot; &quot;60608&quot; &quot;60609&quot; &quot;60610&quot; &quot;60611&quot;
+##  [9] &quot;60612&quot; &quot;60613&quot; &quot;60614&quot; &quot;60615&quot; &quot;60616&quot; &quot;60617&quot; &quot;60618&quot; &quot;60619&quot;
+## [17] &quot;60620&quot; &quot;60621&quot; &quot;60622&quot; &quot;60623&quot; &quot;60624&quot; &quot;60625&quot; &quot;60626&quot; &quot;60628&quot;
+## [25] &quot;60629&quot; &quot;60630&quot; &quot;60631&quot; &quot;60632&quot; &quot;60633&quot; &quot;60634&quot; &quot;60636&quot; &quot;60637&quot;
+## [33] &quot;60638&quot; &quot;60639&quot; &quot;60640&quot; &quot;60641&quot; &quot;60642&quot; &quot;60643&quot; &quot;60644&quot; &quot;60645&quot;
+## [41] &quot;60646&quot; &quot;60647&quot; &quot;60649&quot; &quot;60651&quot; &quot;60652&quot; &quot;60653&quot; &quot;60654&quot; &quot;60655&quot;
+## [49] &quot;60656&quot; &quot;60657&quot; &quot;60659&quot; &quot;60660&quot; &quot;60661&quot;</code></pre>
+</div>
+</div>
+<div id="inference" class="section level1">
+<h1>Inference</h1>
+<div id="linear-regression-model" class="section level2">
+<h2>Linear Regression Model</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">bicycle_model &lt;-<span class="st"> </span><span class="kw">lm</span>(docks ~<span class="st"> </span>median_sell_price_1000s, divvy_trulia)
+<span class="kw">summary</span>(bicycle_model)</code></pre></div>
+<pre><code>## 
+## Call:
+## lm(formula = docks ~ median_sell_price_1000s, data = divvy_trulia)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -176.55 -103.61  -23.36   78.85  283.33 
+## 
+## Coefficients:
+##                         Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)             76.31171   24.62724   3.099  0.00316 ** 
+## median_sell_price_1000s  0.18562    0.03295   5.633 7.65e-07 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 124.2 on 51 degrees of freedom
+## Multiple R-squared:  0.3836, Adjusted R-squared:  0.3715 
+## F-statistic: 31.74 on 1 and 51 DF,  p-value: 7.651e-07</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lm_coef &lt;-<span class="st"> </span><span class="kw">coef</span>(bicycle_model)</code></pre></div>
+</div>
+<div id="scatter-plot-using-ggplot2" class="section level2">
+<h2>Scatter Plot using ggplot2</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">a &lt;-<span class="st"> </span><span class="kw">ggplot</span>(divvy_trulia, <span class="kw">aes</span>(median_sell_price_1000s, docks))
+
+a +<span class="st"> </span><span class="kw">geom_point</span>() +<span class="st"> </span><span class="kw">geom_abline</span>(<span class="kw">aes</span>(<span class="dt">intercept =</span> lm_coef[<span class="dv">1</span>], <span class="dt">slope =</span> lm_coef[<span class="dv">2</span>]))</code></pre></div>
+<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAqAAAAHgCAMAAABNUi8GAAAAw1BMVEUAAAAAADoAAGYAOpAAZrYzMzM6AAA6ADo6AGY6kNtNTU1NTW5NTY5NbqtNjshmAABmADpmtv9uTU1uTW5uTY5ubo5ubqtuq+SOTU2OTW6OTY6Obk2ObquOyP+QOgCQOmaQkDqQkGaQkNuQtpCQ27aQ2/+rbk2rbm6rbo6rjk2ryKur5OSr5P+2ZgC225C2///Ijk3I///bkDrb///kq27k///r6+v/tmb/yI7/25D/29v/5Kv//7b//8j//9v//+T///+bSBDPAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAVmklEQVR4nO2dDXfbthVAkdRJa3eJl7SL02zO1nV19+EssWvH8WTH/P+/aiRFyqIEkgDx9UDed07MHIlXeISuQJAin1RBEIJDpU6AIIZCpU6AIIZCpU6AIIZCpU6AIIZCpU6AIIZCpU6AIIZCTcM+a6PnYbMABt5eDUGBJcMICiwaRlBg0TCCAouGERRYNIygwKJhBAUWDSMosGgYQYFFwwgKLBpGUGDRMIICi4YRFFg0jKDAomEEBRYNIyiwaBhBgSPASqmJMIICh4eV2jcUQYHFwAgKLBpGUGDZMHNQ4JnCCAosGkZQYNEwggKLhhEUWDSMoMCiYQQFFg0jKLBoGEGBRcMICiwaRlBg0TCCAouGERRYNIygwKJhBAUWDSMosGgYQYFFwwgKLBo2EfTh7Oj786K4f3v04nqzQFBgKYJ+Oi2+vLh+ODstrl4WzQJBgaUIev/uol2sfrxoFggKLEXQ1Zt/Vbv41Zvr4v6n82ZRPv6sjIFxlyA8hup/avX6tLKz3MtXZjaL5rl0nyzgZcAmgnaGzscRFEGBw8MGgt7/pVaSOShwAthA0Ooovhw3H85O1kfxJxzFA0eDTQS9f3v0hwvOgwKngE0EHYh0iQMvA0ZQYNEwggKLhhEUWDSMoMCiYQQFFg0jKLBoGEGBRcMICiwaRlBg0TCCAouGERRYNIygwKJhBAUWDSMosGgYQYFFwwgKLBpGUGDRMIICi4YRFFg0jKDAomEEBRYNIyiwaBhBgUXDCAosGkZQYNEwggKLhhEUWDSMoMCiYQQFFg0jKLBoGEGBRcMICiwaRlBg0TCCAouGERRYNIygwKJhBAUWDSMosGgYQYFFwwgKLBneeImgwPJgpRhBgcXCpZ7s4oGlwrWeCAosE270RFBgifBGTwQFFgerLT0RFFgY3LHzM4ICi4J39URQYEHwvp4ICiwG1umJoMBCYL2eCAosAVZ9eiIocHq4387PCAqcGh7U01lQgnAKpUxXnPb6AT9ZwPOHR0bPejUEBU4EG+iJoMCJ4IED924bCAocH64ulTdsA0GBY8PrS+UN20BQ4Lhwe6m8YRsIChwTfrxU3rANBAWOB29fKm/YBoICx4K7l8obtoGgwFHg3fNKCAosCNZcKm/YBoICB4e1l8obtoGgwIHhnkvlDdtAUOCgcO+l8oZtIChwQHjgUnnDNhAUOBQ8eEEIggKnhcculTdsA0GBQ8CjV9MhKHA62ORSecM2EBTYN2x2qbxhGwgK7Bc2vVTesA0EBfYIm97JgaDACWBjO81bXpKgY59uoWlnA9voiaD7odSIoTLTzgW20xNB9wNBA8K2eiLofiBoMNheTwTVBHPQILD5gfuUlpckKHAAeJqd5i0jKLADPFlPBAUODzvoiaDAoWGlYrSMoMCToho9ERRYJtwcuCMosETYtrySU8sICmwX9uWVnFpGUGCbmFJeyallBAU2j2nllZxaRlBg09g77YmgwGJg3TfuCAosBHYqr+TUMoICj4ZjeSUnGEGBR8K5vJITjKDAg+GhvJITjKDAA5H+FgQEBe6L0UvlERQ4HeyvvJITjKDAuvBZXskJRlDg/fBbXskJRlDg3fBdXskJRlDgbljcaISgwJFhu3vcERQ4KhyovJITjKDATQQrr+QE5yyoZn8k4p3OEg5YXskJzlhQXTEwAe90lnDQ8kpOsJmgD2enRXH/9ujF9WaBoPOBp1YIkSPo1dFpLenVy3aBoLOBpxewESPo6k9/Pi3u310Uqx8vmoUAQZmDeoAn1k700LJHQR9++085bK7eXBf3P503i/LhZ2UMjruho+zcpO3nHxl1oBp47uqk2q9/eVGb2Syap9J9stjFO8Oxyis5wQaClmPmg24ERdCs4XjllZxgA0Gvjqo4ETcHRVAHuO058Wmb7OLXp5kezk7WR/EnQo7iOUiaDD92nPi0zQUVdx4UeBrc+VyLT9tM0N5IlzjwNDhBeSUnGEEXBec3aUfQBcGJyis5wQi6GFj7nZH4tBF0IXDPV5rS00bQRcD937iLTrteDUFnD6cur+QEixR0+iU24vs7CDzYX+nLKznBEgUd/d3sIdip5Tzhof6SUF7JCUbQ/OH+/hrvRvHbjKD5w339ZdKJ4rdZoqDMQS1hXX8Z9qH4bRYpKLArLKq8khOMoDOEhZVXcoKDCco0MhUsrrySExxK0OkHOuK7TDZs2etS0u5fDUHnBFv3uYy0h1ZD0NnAU3pcQNojqwUSlDlobFhueSUnOJigoRMH7sA5DweDYxmCzgGWXV5pBB6eDSJo/rD08kojMILOG3bRU8Q2I+iM4eqtzTDtLmw/B707fnV3rJ5+RFDZcCbllZxgraAfDorLpx8vDxBUMpxNeSUnWCdoOYB+fX9Q3BgMoekSXzqcUXklJ7hH0LvjQwQVDGdVXskJ1gn69f3hzZNfqx09goqEuwcV2aQ9CdYJWtw+VwfFh29+R1CB8N4xbx5pT4W1gppHusQXCudYXskJRtCc4DzLKznBOkHv/l4vvv6VgyRRcK7llZxgraDlIXxRfDA5U58u8cXB+ZZXcoJ1gpYHSYeXqjyOH490ic8V7vneb+jbak8ty4S1gpZjqHploKeToH3fwIrvsqCw9sqJ4Yu/JaQdDtYLWhpqcBLUSdDea1jEd1lQWNMt2ZdXcoL3BC0HzzaCzkERVAvvdcuIntXPQfppWSjcM4KaxvS2EVQPd3tlbPR0KGO117JMOJmgouegE971EGmPZ7FQQb++Pyyq65mCCuqYeEh4ytvuP22TFBYqaH2ZiJGh6RIPCUsQ1DCBRc5B747rc0zLvdwuuaBWzQvosIAwgurgoIKO/gbu3MorOcE6Qav7PdovPJcrqKWhxi2P/Yp48smFLFgraHFTdaKBnwhq3/KwoHMsr+QE6wU1jnSJB4VTCTrpiFxCh4WDEVQLJ5mDUg5Qt5pW0MuF7+ITwPxwRM9qOkEXf5AUHc68vFJAWCcop5kiwzP/MsgJRtDk8BzKK4WDdYKyi48I16NnfmlHg7WCcpAUC2527rmlHRHWC2oc6RKfAfx44J5V2nFhR0GJyaFU6gyyCtX+J9YtH66frKTw6PUeBq/gADu1nBm8J2gVzUGSwY2d6RJPCY9d72HwAg7wbswb1gnKaaaRcBTUefhdEoygE2AnQXVn5TPY5lSwTlDOg47F5Dkod7LawlpB19eDmtQWSZd4jvBCyys5wXpBjSNd4vnBiy2v5AQjaFh4s09fcHklJzitoLopmfgus4Hbw6mR65WkpS0ITiqo9s4K8V1mA6+3cPRyOmlpC4IRNCiszO5ukpa2IBhBw8Jmd3IUFuuatjwTOKmgs5+DmhpXrFeeZqiwbfYMpxV03rC5bgjavxqCBoKtyyshqHY1BA0C26nGHLR/NQT1D4crS7I8GEG9w5RX8gkjqGeYaaRfeL6CJqlBS3kl3/BsBQ1ZoK4PprySfxhBvbXsUMBGQocJhRHUT8tuP7YhocOEwrMVNOoclPJKweD5ChoPprxSQBhBXWHKKwWFEdQNprxSYBhBXeBKz2aum1PaOcEIOh1u7jZSzEEDwgg6EW5PEiBoWBhBJ8GPp7AQNCyMoBPgzhlW5qBBYQS1himvFBNGUEu47/sp4WlnCyOoFdz/9anotDOGEdQcHvx2X27aecMIagpTXikJjKBmMOWVEsEIagJTXikZjKDjsEV5Jc8tAyPoKGx43bO0tOcCI+ggbH5Zvqi0ZwRnK6heHb8tW5dX8tYy8Ga1TAXtuSfOZ8tTyiv5aRl4azUE1cOUV5IBI6gWtr+JWPw7nSmcq6BB56BT7nEX/05nCmcraDDYV5VOm9dJvc2CYQTtwt7KK1lVNsm4w0LDCLoNeyyvhKB+YAR9DK/llRDUD4ygbSjl+yw/c1APMIKuo7Ipw7TnD0cXdHRgSdBl3JgpF44t6PjULHqXUV5JMrx4QbeyEf9mLRFeuKCdXMS/WUuETQRdvT46Oi2K+7dHL643i4mCipqD7qQi/s1aImwg6P1P58Xqh/OHs9Pi6mXRLCYL6itxd3jvk5JH2guDDQT9Uun46fT+3UWx+vGiWeQu6Nx/CHw2sMkufj2Krt5cby3Kx56VMUyJDaVSZ0BYhhp89uHspPjyojazWTRPpPtkOcCUV8oINhL0/u1Jeai0O4JmKijllbKCTQRdvT6tLJ3FHJTySpnBBoKu/ax38/VR/Em+R/HDp7jEpr1k2EDQq6MqTj2dB/WVuD0s6QwssNRvkrwlbgtTXilPeCGCUl4pVziVoP372wBbTXmlfOFEgg5cM+J9q8f15HpQuXACQSsd4glqMHryU0eC4fiCqk04JW4Em90XhKCC4USCRpmDmt61hqCC4VSCOic+ClvcVMkcVC4cX9Cx/a6fraa80kzgBIL6SXwQ9lReCTg9PEdBp1YIEf9mLRGen6DTC9iIf7OWCM9M0Im1Ez20DBwGnpWgvssrAaeHZyQo5ZXmCM9GUE5lzhOeiaDt1FN8fwNbwrMQ9PHISHx/A1vC+QvaOXAX39/AlnDuglJeaeZw3oJSXmn2cM6CUl5pAXC+gu7oySWd84RzFXR39GyuMhXf38CWcJaCar5xR9CZwhkKqr0eBEFnCmcnaN/lSsxB5wlnJijllZYGZyXo+MWe4vsb2BLOSFCTa5HF9zewJZyLoIaXyovvb2BLOA9BjW/kEN/fwJZwDoLyu9YLhuULanUbnPj+BraEpQtqeZem+P4GtoRlC2p9E7H4/ga2hAULOuUed/H9DWwJixWU8krA9WoyBY1UXqk7SIt/s5YIixQ0VnmlnVKl4t+sJcIRBTX9MiheeSUElQ/HE3SssvJmNbPELVoeaAtBpcOyBK3WiNllzEHFwxEEbSwYF5TySsD7qwUXdCPmiJ+UVwLWrRZP0MGgvBKwfjURgnKoAty3WnBBx08vdZ83TFz/quL7G9gSjiDocOyJZgb3jMvi+xvYEk4s6OTySgi6EDipoA57aQRdCJxQ0J6pqYg5qP2lfuLf6UzhZIJG+LXj6bDh17IBWgbeXS2NoANv/xg8qA6Czg12FHRSlG++E+yCC2qEsAk1DZvw4XAsrzQ8uDEHnRscW1Dn8kpxBAWWAscV1Ed5pRhzUGAxcExBKa8EbA3HE9R0Vie+y4BjwrEENT/oEN9lwDHhKIJaHROL7zLgmHAEQSmvBDwdDi4oJxSBXeDAglZ6Wp70Ft9lwDHhoILWZtp+ry2+y4BjwgEFbbREUGAHOJSgj1IiKLADHEbQjpHbt8UbuCq+y4BjwiEE7f8xTZPRVHyXAceE/QvaU14JQYGnwL4F7f1JVwQFngL7FbSxT9s2c1DgCbBHQR/lE7/VwNnA3gSlvBJwCNiToJPKKzklDrwM2Iug08oruSUOvAzYg6D7xz0BEx85yhLf38CWsLOgcSskjZ2nEt/fwJawo6B6WxAU2BfsPILGTRxBlwZnJihz0KXBuQkKvDAYQYFFwwgKLBpGUGDRMIICi4YRFFg0jKDAomEEBRYNJxWUnzoCHl0toaD67y3FdxlwTBhBgUXDCAosGk4pKHNQ4PHVUgoKDDy6GoICS4YRFFg0jKDAomEEBRYNIyiwaBhBgUXDCAosGkZQYNGwIEGb75UKzWPGv7Ukvr+BLWE5grbfzBeax4x/KUR8fwNbwggKLBpGUGDRsBxBmYMC61aTIygwsGY1BAWWDCMosGjYXtD7t0cvrhEUWKigD2enxdVLe0E3hzntz81t/mwdoWt/ik5/gKR/tBh+ejjEv1lLhK0FvX93Uax+vLAVdGOe0sfn7ef0pMGjm5aNz0uNpA2cGrYWdPXmurj/6bz837MyTKmiNmbzn/0otp/TkwaPmj5NZBfKdMUvL1pBqzD+cDCCAk+CrQV9HEGtBGUOCjwJthZ04hzUe+LAy4CtBX04O5l0FO87ceBlwNaCch4UOCZsL2gn0iUOvAwYQYFFwwgKLBpGUGDRMIICi4YRFFg0jKDAomEEBRYNIyiwaBhBgUXDCAosGkZQYNEwggKLhh0F1Yf5nSC+g5bn2rLy+WLL6DJaRlBapuUmlM8XW0aX0XK2ghKE71CpEyCIoVCpEyCIoVCpEyCIoVCpEyCIoVDeXqlzW3KcuDo6OvrDRdtyxATqChbdZiO1XrecYLtXr4+OTlNss/L1Qt3yjHHi0+lWyxET+FLp0W02Uut1ywm2uyp6tPrhPME2K18v1C2NEyUefjvfajleAp++/3fZTrfZOK2vW06w3V8qDz+dJthm5euFusXFokS5h6n2O03LMROo3pZus7Far1pOtN17GxulZeXrhbrlGaNEuc+pRpOm5ZgJVJp0m43Vev3RSLLdVXGuBNusfL1QghG0jk+nixtB64i93fdvT4oU26x8vVCCOWgduxOjKI2uEs1BO4JGbXn1ujowy3kO2i3PGCWqXczDPy+almMmUL0t3WZjtd5OLiJv99rPFNusvL1SmvOg35/HPhNZRfrzoJG3uzrzWh2YZXwelCBChEqdAEEMhUqdAEEMhUqdAEEMhUqdAEEMhUqdAEEMhUqdAEEMhUqdAEEMhUqdQF5x8/Tj7be/mq5drtq39vCr3P2xfvaDUt/8rlkuKVTqBPKKUlCLtQcEHY4PTyrq8pvfv74/2F8uKlTqBPKKKILeHatK0LvjV3WDu0vr18s6VOoEJMbtt788V+rwtvxTOvH1vVKVFpU3P6938dUz6rBZ79UWWD3+iHQFvf3253oXffvd39TT/5aPV2tVA2LbQBs3BzVV/ymt3F1uWllEqNQJSIzb56VHl5VMl08/tnvXu+PDUo9a0HosK59ar/fo1tqr569aZEfQ5+sXu31+UK9a/b96pXbt7QQq6mb9qXi1u2xbidolyUKlTkBi1O/++s+3v3b8uKwF/V8lU2Vfs8qG+27t6pZKHUFfdaj2qXbt7QS2BD3cXbatLCNU6gQkxuMetvxzqeo4rMe4Uo61POUjT359XK+JD+t9dovs7uK3dtWt+Vtr7ybQN4K2rSwjVOoEJEZX0GbnuyXo3XF5ENPa1z0MKieqTz+2iKGg+6eOhuegTSsBO0BQqNQJSIyOoDdPtvbE6/OgN5VSN5oRtIpqrGsQ3S6+GYK3d/FP9g70H13sO4rvTglmHCp1AhKjI+jX96WOpUR3xwftQVKl1O3zfUFre7aQnoOkzQsfFOt/67V3Eyg+NOc9d5ZtKzF7JF2o1AlIjI6g9Vmg9XnJzWmmchb45B+PO+sNuJ6aFi2iOc10sPPC7Wmm7ijaUO1kc2fZtrKIUKkTWE4sZtDzGip1AssJBJ0SKnUCM4j6m53e3e7m2V+GBR1+lcWGSp0AQQyFSp0AQQyFSp0AQQyFSp0AQQyFSp0AQQyFSp0AQQyFSp0AQQzF/wEBry92NZaWdQAAAABJRU5ErkJggg==" /><!-- --></p>
+</div>
+<div id="model-diagnostics" class="section level2">
+<h2>Model Diagnostics</h2>
+<p>Let’s assess if this linear model is reliable</p>
+<div id="linearity" class="section level3">
+<h3>Linearity</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(bicycle_model$residuals ~<span class="st"> </span>divvy_trulia$median_sell_price_1000s)
+<span class="kw">abline</span>(<span class="dt">h =</span> <span class="dv">0</span>, <span class="dt">lty =</span> <span class="dv">3</span>)</code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<p>Is there any apparent pattern in the residuals plot? What does this indicate about the linearity of the relationship between runs and at-bats?</p>
+<p><strong>There isn’t any apparent pattern. It supports the linear condition.</strong></p>
+</div>
+<div id="nearly-normal-residuals" class="section level3">
+<h3>Nearly normal residuals</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">hist</span>(bicycle_model$residuals)</code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">qqnorm</span>(bicycle_model$residuals)
+<span class="kw">qqline</span>(bicycle_model$residuals)</code></pre></div>
+<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAqAAAAHgCAMAAABNUi8GAAAAflBMVEUAAAAAADoAAGYAOjoAOpAAZrY6AAA6ADo6AGY6OgA6OpA6kNtmAABmADpmZmZmkJBmtrZmtv+QOgCQkDqQkGaQtpCQ27aQ2/+2ZgC2Zjq2Zma225C2/7a2///bkDrbtmbb25Db2//b/7bb/9vb////tmb/25D//7b//9v////bDqvOAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAV3UlEQVR4nO2di3rjKJpASU2S7l2nZzqZ3Y3mUpre2TiJ3/8FV4DulmQLAfoR53xfJS6VLGw4xeUXAnUBEIza+wMALIGgIBoEBdEgKIgGQUE0CAqiQVAQDYKCaBAURIOgIBoEBdEgKIgGQUE0CAqiQVAQDYKCaBAURIOgIBoEBdEgKIgGQUE0CAqiQVAQDYKCaBAURIOgIBoEBdEgKIgGQUE0CAqiQVAQDYKCaBB0lkKp1+rX14t6Wv3e7zf1+NH+7aw0r8NTrg6WyvLj5/j9lr//XP0xDgCCzlIJqiXZLGh1gc68y/zBRlD18D4h6NfLDwSFPoWt4LYKWr1UVzJOHWwFrd56LWihEBQGFEaVVtDP5+rvJ/2qVA///awe/qf6h7ORuDS1XnOOftkTrKwbcv1vp+baUwdLq2CV3sN78/420WJcBecCgs5S2D5iLWjZVG7Ny8d/v6geWp7zRBNdvbLy6gv1atXrg7Wg2v9G0C5RBIUxVaP618oNK2hVlVWalKY6K9vOafW3tg49ae3smaeeoL0eQtFYOX2wq0F//LTv7ydKEw8jKiX++aJerUy1H+ZX2Q7vbQ/AqlS31LrSe+oJ2v2LqRov8wev+6D9RBEURmglStOSd8IZnWqnrLltBXvqhj4LgprR++Mfi4I2XYRBoggKI7QSlU+/awObNvls2/NpQY2ftsa9auJLc8xcUNXSdwdtemVbf9aDrEGiCAoj6ub8T8/31qC2shwJasdDemj+H8pKV/36v+FBm145DENRgxoQdBajhBHqqg86Laip6caDpDqiZAPzozDT8OCVoPRBLwi6QNGGjq5G8bM1qKn2BjVod8+oqyunD14LOpFodiDoLEVzV7wfB7UvF/qg40HSQMa2Bp06eC1oP9EzcVAYUjeqZ9W7k2TmdiyO4h/eyzaO2WAD+H8eGHp9cELQXqI6VJ9jHYqgESmuZijNHYQGBAXRICiIBkFBNAgKokFQEA2CgmgQFESDoCAaBAXRICiIBkFBNAgKokFQEA2CgmgQFESDoCAaBAXRICiIBkFBNOsEbZ5bzPHxQtiFVYKWzQOI5/7jiQDhWCPo91u3MgaPIkIU1gj69dIu+X+mkYcoUIOCaFb2QesqlD4oRGLdKL5ZUYj6EyJBHBREg6AgGgL1IBoC9SAaz2EmBXAXIQSdD9SvTxfyYE6IIILeU4OuuBwcn1kfggh6R6AeQaFjoUENI+jtQD2CQsuSDIEEjX05SJhFFxAU9uXGeDmkoOeF/VAQFAy3RAgkaKHU6fM/P/oBpy2Xg6PS92Ay+BhGUL2lT2FqT8JMMM/ASHWZ0iJcoP7zFy3o3Ix6BIWhBOr60OSBuy52g68XHf38/t8LNSjMoyb+FkfQS9nUm1bVrZeDAzLucEYV9FLa4ftZzYyREDR3pnubkfqg8S8HiTFV/hFH8dEvB2lxf/EjKERnzWRLBIXYrCp7BIXIrCt6BIWorH2WAkEhFFOj8tXljqAQiKm45vpiR1AIw8SdIZdHJREUwnAtqFOZIyiE4UpQtyJHUAjEsA/quhICgkIo+qN45/JGUIiAe3EjKARny0JHCApruA6+315na1NZIyis4Dr4Pj3NeHzGthT9nrjL5SAKc7HNhdLcuo4hgsL9rBd0czkjKNzPakG3FzOCwiLqxuIKS31QH8sUIygsMfZvzSjeSxkjKCxwcwx0871+PkG05EJdDsLgLqivXQgQFBZwFtRb+SIoLHE7Dj/7Nn8fIHKSIS4HoXDZMcjnJkMICr7xWrYICp7xW7QICl7xvYcggsIVG3aq9F6uCApjHEfuzVv9gqAwYv/g/OCa3k/c5XLgj/2D804XRdBccBU0TJEiKIxx64MGKtFAgn6/2d2OZ3ZJQlDROIziQ3Q/7YW9n6gpm23i2S8+D8IVZxBBv99aLdnIKwcClmYQQXtbyLIV4vEJ1rybi3s/8UINmhdhizJUH7SuQumDHp7AJRloFP/1YkfxM/Ungh6FoM27ScD7ibtcDvYhfDEiKLgToRQJ1IMrwZt3k4j3EzUE6jMgThESZgI3IpVg5EC9allxOZBHtAKkBgUH4hUfgXpYT8TSI1APa4naPyMOCiuJW3QICuuIXHKBBC2r5t10Q0um2x2K6OGXQIOkh/eqG/p0QdCDEb/YAoaZvt+qIRKCHokdSi1ooL54/EDQ47DL3ZWwgfriCUEPwz5FFqgPWmv59TI3nwlBU2OnEgs2ireN/Pcbgh6C3SZPEAeFO9ivuBAULEszzHYsLQQFw8KCTLvOjURQ0CwsabdvUSEoaOYF3bmkEBQ0s4LuXVAICobpPuj+j+YgKFimRvECSglBYRYJhYSgmTMf/ty/edcgaN7Mhz+FlBCCZo3Y6FILgmbNnKAymncNgmbNjKCCSgdB82ayDyqpcBwE/Xo56ac2Z9dk8JsuhOV6FC+nedc4CFo8fnw+P12KpyjpQmSElcx6QfUTcWf1OrvBjOd0IS7SCsZN0KKSc+5xOM/pQkxkNe8alyb+6evl8cOuyxA+XYiIwFJxGiSph/fvt01+SswKkFgohJmgRl7zrkFQsAgtERdBqzb+8aOYWTrZd7oQB6kF4iDo+eG91IOkTYZKzY9Mkdm8a9YLqhdeKhfWrfOcLkRAcGm4xUG1oATqD4PkwnCvQYtNN+Ml50lmyG3eNc590HanmcDpQmCEl4TjKF6ph/c46UJYpBcEcdCskd28axA0ZxIoBQTNmBQKYaWgzRaHGsJMaSO/eddQg+ZKIiWAoJmSSgEEEvT77UY3IJX8OShpNO+a1X3QU9sNXeiDls028ewXL5KEcj9IDdpu5HUxN0W3Xg48k1LmO0wW+c3eQ1qYLNJshbhwVkp5dDSSynt3QRem21GDCsZ2P5c2nRHFWkGLLg66MGG5nUlCH1Qa3WpMaRSBew26SDOSmp2Sl0buHA919VM4xEFzomnXjy3ozRin13TBH2r4IokycFlZ5A4zCdQLRA1fplEELs8k3X6ck0C9PIaj98OO4gdBzjkIM8kjtdF7g8tDczdXZZoP1HdBqnvTBS8kN3pvcHlo7ubjctSgwkhw9N7g0sTfM1mEQL0gUhy9NwSKgxKoF4TpeNZjpEtqWU+g/uioRsq07sE3OAja1I4E6lOgrTgTzXOXQP3jR/l0+XxmZZEESHb03uAWqD/r1e1Ym0k8VXtu2vTMBH29fP760/yZ4Y6Hk5PMrNRQbeczvcFRg0ug/mSm3C0IWp1zq4OaZm6lRb/qTG5w1ODQB9VT6YvTchN/83ZTotmVBFbG1Nv2GpcwU/GkG/HlOvLW7aaU80w4tjnvfqad2cRBj8Zw3J5u57MGQY9G775R0p3PmjD34j2mC/fTdDsP0fmsca5Bt+2hcISsE0cTUlKHaNtr3Jt49osXRjtVvjeKTx93QdmGRhiHadUHuAvKRl7CqGcr7f0xPOMsKPvFi0MdpVnv4z6K3zRXBEFDcEA/iYMeiEPmKYIehmNmqctsJmU2mus9uhkyXbiPA7buhtWC1ouGlNxJEsVh83OtoOdmj85SMYqXw3Gzc6Wg7TzPaizPIx9SOGrzrlkpaLuoTfn4L5p4IRw6L10F5VanGI6dla5NPJNFhHDk5l3jPEj6/OWOpeo9pAuL1Pl4xHtIFvcw06Z1GxDUD6r7ddAcdQ3Ub7sTf9jsjEvCqyreDbc600UNXxwzSxE0WdTo1TGzFEETZTAqog+KoMIY5R+jeAQVRT7Zh6AJctjqcgIXQc1EkWLLbFAE3UJWeecg6PnhvXz8uGfDOR/pwpi8ss4lUG+XXuSx413IqXnXuDzV+WoEZTbTHlzl23HH7xb3GrRgwnJ8Btmm3TxwBNTi3AfdOFvk0JkaimFl2bl55Mx0HMXrxzrjpAstvXubdd156faPOyrEQZNheO9dIajjibtc7viooZ/9n4fOSwRNgya/2sa92YOTUfzgxDu26PKcLmhU73e7/vzR3TRQgyZA099Ug7ozDxBUPuPeZiZ1p8U5zLTxoaRsMng7vTHR8QftV7gF6quf5bZAaFaZvImrB+PyyjqXW532FhK3OmPQtuVN9zOfxt3iMFnkN1t1MlkkAmr4MsNcc69BF3c79pdu1lzNDckPlz6omSbCZJHgdELm6abBZT6oj1h9thl+P6N77/t9kF0JFAe16+MsGJxrft/P9L337AgjaL3CmO4OzDy5lGl2340aDY+yzTEHQZs2fr59720AMjeUyjS77+VqZnK2OeYyir85fJ9fh7nrvt79CXNkODWZPuiqE3v2zUENuol2Tkj7yFHG/6FdatDbD8S3MSj6oOvp3dvMunG3OPRB71n8++aOs1ln+iL9e+8ZTg4Z4yLoMxOWgzG8946gTk38pu091qabF1PBz7yzKsggyWe6WdFWn+34KOPhkSXMIMljuhkxaN5x0xJokOQv3XwYzfgkhwwbJoswSPLK9ZNHcAk2WST25ZKnX20ydu+BoCKoxVTjahSCTBbxmW4WtFVmrk8ezeMgaPH4UT5dPp+ZUe8Jpag8Z3EZJJ0uZ70EOM8k+UFReS7gFqj//PWn+RMh3aOT0VKfTrgF6vWjxwjqAzPdk9Z9Hoc+qN7eozjRxPugH/KkdZ/CJcxUPOmR/KZBPIIaclyubiXEQfejN3Sn8pwDQXfDVJvUnTdYLejn80k/ycEuH1uh43kXawU18Xm9+A2B+k0wZ+lO1gpa6On0hR4gFZsm1mdeMEyqu5eVgpo9ju1DHyy/6A7dz7tZLehrbSmCukP3835cBLXdTwL1jtC6r8GlD2qWp9/4cGe+pUP3cxVrBT0/vH+96Lqz4E6SE3Q/17E6Dno2y4V8PrMNjQuK7udKuJMUk3afzZ0/R0IgaEQUT2yuBkGjobJf69MFBI1FMzKi+7kKBI0EsSU3EDQKiuGRIwgag95Tm/t+kPRA0AjwUJw7CBqcblVFhkfrQdDQ5PNNg4CggWnvbe78OVIFQYPCmgxbQdCQqP6vPL6ybxA0IGrwO4uv7B0EDUbX7URQdxA0FGr0+vjfOAiBBP1+u7EK8+GLa/gFGcW7EkbQstlDNtfNZHvNO2puIoig2W/HrQavjv1dAxNE0N5uiXNPzx+60JroEs9vboca1DtNm84UJh+E6oPWVWiGfdBB8JOF57cSaBTf7KU0+3DyYctsIvh52O8aA+KgXumee+9miRz0q0YCQX0y6H1SefqAQL1HRnNDqDw9QKDeH8wNCQBhJl/UA3ae3/QLgXpP9NcNoffpD2pQP9h1Q+h9eodA/XbU6J7mkb7b7kQO1KuWVZcTilJNk46goSAO6k5r56VVk96nbxDUhXZA1M73ZO26QCCoA91YnYFRaBB0FYOqs/5Jsx6SQHHQbjB0kDioaruXXSC+qTWpOwMSpgb9fru1SU1iRTrZqGNmBIJNFrmxzVdaJTvubtpDaX2HRAnVBz2r5d26Eylc1Z8SP6w6qT2jwCBpkp6YvShnfzwk/AscBgTtdSTbl4M2vG/p4AyIQEhBe3NGfFzOI30pL4NKsd+i9+9cDsdDNO/RyFLQq5ZaDV9OCHr1fohDjoJeT+yYEXQmBo+fEUHQ9ufo5UTLbk/Az5jkLuhkH3QpBI+ecclyFD9ouadG8ctvhYhkKajzPUqa9+jkKagjSX7oxMlFUB/zOvBzBzIRdDpetO4S+LkHeQg6F3FffQmIDYKuuQJEB0Hvej9+7kUegm7sg6LnfhxS0MkblPiZJEcU1MOQfXw52IsDCuphyN6/Gn7uCoLeczHYjZQFnelX+hQUP/cmYUFnu5re+qA07/uTrqALFaWnBRXQUwCHFNQP+CkBBJ27PH6KIF1BfYc7ry8OAkhY0JBrd+GnFFIWNBg073JA0Gskf7bsQNArBH+0DEHQETTvskDQIVI/V7Yg6AChHytjELQHzbs8JAm6954E6CkQQYIGvTN0B/gpETmCBp/8sQzNu0wQtJ86iANB90wWbiJH0B37oDTvchEk6G6jePQUjCRBd0LQR4ErsheU5l02uQsq5XPADJkLKuRjwCxZC0rzLp+cBZXwGeAGGQsq4CPATbIVlOY9DXYTFOAudhJ0A1E/CYmlkhiCkpjoxBCUxEQnhqAkJjoxBCUx0YkhKImJTgxBSUx0YghKYqITQ1ASE52YHEEBJkBQEA2CgmgQFESDoCAaBAXRICiIBkFBNAgKokFQEA2CgmgQFESDoCAaMYJ+vymlTvHS+/z1Z5R0zko9vEdJyRDra0UrMCmCfr9VxViqp1jpfb38iFKS5+prneMZGutrxSswKYJ+Pr9WP8tY2VvVa1GS+n7TdUwR6/9drK91iVdgUgS1xKprzup0jlKScf/fRftaXYrBC0yWoEW87I0k6C/v0dIyRBY0fIGJEvQccZQUpyRtDROxExpX0AgFJknQc7wxEoJ6SSxCgQkSNGb9SRPvI60YBSZA0NLG08oofpZN8O6Ig6RLVEHjFJgAQS2leo2aXpySjBxmiilopAKTIujnc8z2/RKtJCMH6uMJGqvApAha2nV3jzeaKOPe6owmaKwCkyIowCQICqJBUBANgoJoEBREg6AgGgQF0SAoiAZBQTQICqJBUBANgoJoEBREg6AgGgQF0SAoiAZBQTQICqJBUBANgoJoEBREg6AgGgQF0SAoiAZBQTQICqJBUBANgs7x9WJXH1I//vly5zpu59fqXRPndgfPt5czqi8yeaEMQdAl7Pqz97oye17zD99vemmv5XXhmnMR1IKgS3gWtF7I1q5qe+MiCGpB0CUaQf/yrMxyrd36zPbF12//pTcmsoc/q5Me//3SnKcXrS2UeV8t29dLXXUWT/aQ+dGe83vVp3htL2L+rUlPH428wK8UEHSJRlC9qVr9xzTQZ6UN0po9flzaw23XUR/QNuqVle3r1+5qF7OIZytod45NoLmI/tNc2FS55zwNRdAlGkFPpl22NWBll13Y+6xtOjUVYy2d/WNryq/f3m17XgvarrR8th7q471zmkRaQdsLR978SBQIukSvD1r9sIJVEtlOZG3TpT3cuNXvY56VWhR0eI6xshW0d+F8DUXQJUaC1nGnWtDapkt7uBW0acqrLuSPf3Q16GQTPzhnJGhzYbuzcJYtPIIuMlWDXpph+LAGrc/r16Dmd6+J7wZJjx/NNYfnTNWgDUXMpe7lgKBLDAVtIz+9PuhrLyA07oOaruO5a+JNmOn77fEPM6CyXc7hOUNBh5GmTONOCLrEUFAzqjY1WTeKN0Gl+rCWrh3Ff7892YpRnTq3CmOoqob+lacf1avX4Tn1yKg/itcXNlVpzM1sBIGgS4wENXFJM15p4qDWvOZwMYqDmi1oirqiNdTdyupkfSf1d9sH7c4xcadRHNRWsXE3sxEEgu7B3/KUzQUEBdEgKIgGQUE0CAqiQVAQDYKCaBAURIOgIBoEBdEgKIgGQUE0CAqiQVAQDYKCaBAURIOgIBoEBdEgKIgGQUE0CAqiQVAQDYKCaBAURPP/HWeE7iqMGlAAAAAASUVORK5CYII=" /><!-- --></p>
+<p>Based on the histogram and the normal probability plot, does the nearly normal residuals condition appear to be met? <strong>Yes</strong></p>
+</div>
+<div id="constant-variability" class="section level3">
+<h3>Constant variability*</h3>
+<p>Based on the plot in (1), does the constant variability condition appear to be met?</p>
+<p><em>Based upon the residual plot, there appears to be constant variability</em></p>
 <p>Statistical analysis: linear regression between the number of Divvy docks and the median sell price. There are 50 zip codes and about 90 neighborhoods in Chicago.</p>
+</div>
+</div>
+</div>
+<div id="conclusion" class="section level1">
+<h1>Conclusion</h1>
 </div>
     </section>
   </div>
