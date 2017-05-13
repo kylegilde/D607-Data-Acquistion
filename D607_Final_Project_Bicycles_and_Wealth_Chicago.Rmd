@@ -19,13 +19,24 @@ knitr::opts_chunk$set(
                       ,cache = TRUE
                       )
 ```
+#Introduction
+
+**One of the best parts of summer in a large city is getting to use the bike-share. Being able to borrow bikes is a fun & convenient way to get around town.**
+
+![](http://4.bp.blogspot.com/-sB28m3dp6Pk/Uc9Vxw3iBwI/AAAAAAAACPo/hvC0puqEl7A/s1600/IMG_0966.JPG)
+
+**Chicago is no different in this respect. However, since its inception in 2013, Chicago's Divvy bike-share program has been a recurring target of the local press, accusing the program of catering to more white and affluent parts of the city:**
+
+[Divvy Membership Skews White and Wealthy, But Hopefully Not for Long](http://chi.streetsblog.org/2015/09/10/divvy-membership-skews-white-and-wealthy-but-hopefully-not-for-long/)
+
+[Report: In Chicago, Bike Amenities Correlate With Gentrication](http://chi.streetsblog.org/2016/01/15/report-in-chicago-bike-amenities-correlate-with-gentrication/)
+
+[Divvy expansion leaves some areas feeling like third wheel](http://chicago.suntimes.com/news/divvy-expansion-leaves-some-areas-feeling-like-third-wheel/)
+
+**This project will use publicly available data to attempt to confirm or disconfirm these accusations.**
 
 # Research Question
 **Are the Divvy bike-share stations disproportionately located in Chicago's wealthier neighborhoods/zip codes?**
-Motivation...
-http://chi.streetsblog.org/2015/09/10/divvy-membership-skews-white-and-wealthy-but-hopefully-not-for-long/
-
-#Introduction
 
 #Hypotheses
 $H_0: B_1 = 0$ **There is no correlation between the number of Divvy station docks and median cost of homes in a neighborhood.**
@@ -121,7 +132,7 @@ if (!trulia_file %in% list.files(getwd())){
 ###Clean and summarize the scraped data
 ```{r cleaning}
 trulia_data <- read.csv(trulia_file, stringsAsFactors = F)
-View(trulia_data)
+
 trulia_df <- trulia_data %>% 
   transmute(sell_price = as.integer(str_replace_all(price, "\\$|\\+|,", "")),
          zip_code = as.character(zip_code)
@@ -219,8 +230,8 @@ divvy_trulia <-
          zip_code = zip_code)
 
 glimpse(divvy_trulia)
-View(divvy_trulia)
-divvy_trulia$zip_code
+
+#divvy_trulia$zip_code
 ```
 
 #Inference
