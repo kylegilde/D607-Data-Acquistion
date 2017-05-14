@@ -8,46 +8,52 @@ output:
     highlight: github
     toc: true
     toc_depth: 2
-
 ---
+<style type="text/css">
+body{
+  font-family: Helvetica;
+  font-size: 14pt;
+}
+</style>
+<body>
 ```{r knitr_options, echo=FALSE}
 knitr::opts_chunk$set(
                       warning = FALSE
                       ,error = FALSE
                       ,message = FALSE
                       ,tidy = TRUE
-                      ,cache = TRUE
+                      #,cache = TRUE
                       )
 ```
 #Introduction
 
-**One of the best parts of summer in a large city is getting to use the bike-share. Being able to borrow bikes is a fun & convenient way to get around town.**
+One of the best parts of summer in a large city is getting to use the bike-share program. Borrowing bikes and riding them from station to station is a fun, convenient & healthy way to get around town.
 
 ![](http://4.bp.blogspot.com/-sB28m3dp6Pk/Uc9Vxw3iBwI/AAAAAAAACPo/hvC0puqEl7A/s1600/IMG_0966.JPG)
 
-**Chicago is no different in this respect. However, since its inception in 2013, Chicago's Divvy bike-share program has been a recurring target of the local press, accusing the program of catering to more white and affluent parts of the city:**
+Chicago is no different in this respect. However, since its inception in 2013, Chicago's Divvy bike-share program has been a recurring target of the local press. As in the examples listed below, these reports accuse the program of disproportionately locating bike-share stations in more white and affluent parts of the city. 
 
-[Divvy Membership Skews White and Wealthy, But Hopefully Not for Long](http://chi.streetsblog.org/2015/09/10/divvy-membership-skews-white-and-wealthy-but-hopefully-not-for-long/)
+[Divvy Membership Skews White and Wealthy, But Hopefully Not for Long  (StreetsBlog, 9/10/15)](http://chi.streetsblog.org/2015/09/10/divvy-membership-skews-white-and-wealthy-but-hopefully-not-for-long/)
 
-[Report: In Chicago, Bike Amenities Correlate With Gentrication](http://chi.streetsblog.org/2016/01/15/report-in-chicago-bike-amenities-correlate-with-gentrication/)
+[Report: In Chicago, Bike Amenities Correlate With Gentrication (StreetsBlog, 1/15/16)](http://chi.streetsblog.org/2016/01/15/report-in-chicago-bike-amenities-correlate-with-gentrication/)
 
-[Divvy expansion leaves some areas feeling like third wheel](http://chicago.suntimes.com/news/divvy-expansion-leaves-some-areas-feeling-like-third-wheel/)
+[Divvy expansion leaves some areas feeling like third wheel (Suntimes, 4/26/15)](http://chicago.suntimes.com/news/divvy-expansion-leaves-some-areas-feeling-like-third-wheel/)
 
-**This project will use publicly available data to attempt to confirm or disconfirm these accusations.**
+This project will use publicly available data to attempt to confirm or disconfirm these accusations.
 
 # Research Question
-**Are the Divvy bike-share stations disproportionately located in Chicago's wealthier neighborhoods/zip codes?**
+
+Are the Divvy bike-share stations disproportionately located in Chicago's wealthier zip codes?
 
 #Hypotheses
-$H_0: B_1 = 0$ **There is no correlation between the number of Divvy station docks and median cost of homes in a neighborhood.**
 
-$H_A: B_1 > 0$ **There is a positive correlation between the number of Divvy station docks and the median cost of homes in a neighborhood.**
+$H_0: B_1 = 0$ There is no relationship between the median sell price of homes and the number of Divvy station docks in Chicago zip codes.
 
-
+$H_A: B_1 > 0$ There is a positive relationship between the median sell price of homes and the number of Divvy station docks in Chicago zip codes.
 
 #The Variables & Sources of Data
 
-**Loaded Packages**
+Required R Packages 
 ```{r load_packages, echo = FALSE, comment = ""} 
 #create vector with all needed packages
 load_packages <- c("prettydoc", "knitr", "jsonlite", "ggmap", "tidyverse", "stringr", "rvest", "psych")
@@ -68,14 +74,16 @@ data.frame(t(t(install_load(load_packages))), fix.empty.names = FALSE)
 ```
 
 ##The Explanatory Variable: Sell Prices from Trulia.com
-The median cost of single-family homes for sale on Trulia.com for each neighborhood/zip code will be used as a proxy for the wealth of the neighborhood/zip code. This was the first publicly available data I found on the web.
 
- as a proxy to determine the wealth of the neighborhood/zip code. The data will be scraped off of the 300 browse pages and is contained in some JSON on each page. The site appears to have more than 16K homes for sale in Chicago.
++ There was very little publicly available data on wealth at the intra-city granularity. Consequently, a zip code's median sell price for single-family homes on Trulia.com will be used as a proxy to measure the wealth of that part of Chicago. 
 
-The properties that were bank-owned or in default were not included in this study because their sell prices were not publically listed on the site.
+
++ After filtering to [single-family homes for sale in Chicago](https://www.trulia.com/for_sale/Chicago,IL/SINGLE-FAMILY_HOME_type/), approximately 4,500 sell prices were scraped from the JSON present on 150 browse pages.
+
++ However, this data set is likely not a true representative sample of home values in each zip code. Properties that were bank-owned or in default could not be included in this study because their sell prices were not publicly listed.
 
 ###Web Scraping
-```{r trulia}
+```{r trulia, tidy=F}
 
 #Inputs to loop
 base_url <- "https://www.trulia.com/for_sale/Chicago,IL/SINGLE-FAMILY_HOME_type/"
@@ -96,9 +104,9 @@ if (!trulia_file %in% list.files(getwd())){
                           )
     #get html    
     trulia_html <- current_url %>%
-    read_html() %>%
-    html_nodes("script") %>%
-    html_text()
+      read_html() %>%
+      html_nodes("script") %>%
+      html_text()
     
     #get json from html
     json_text <- trulia_html[str_detect(trulia_html, reg_ex1)]
@@ -129,14 +137,14 @@ if (!trulia_file %in% list.files(getwd())){
   
 ```
 
-###Clean and summarize the scraped data
+###Clean and summarize the scraped data by zip code
+
 ```{r cleaning}
 trulia_data <- read.csv(trulia_file, stringsAsFactors = F)
 
 trulia_df <- trulia_data %>% 
   transmute(sell_price = as.integer(str_replace_all(price, "\\$|\\+|,", "")),
          zip_code = as.character(zip_code)
-         #neighborhood = str_replace(location, ", Chicago, IL", "")
          ) %>% 
   na.omit() %>% 
   group_by(zip_code) %>% 
@@ -144,8 +152,16 @@ trulia_df <- trulia_data %>%
             n = n())
 
 glimpse(trulia_df)
-hist(trulia_df$median_sell_price, breaks = 10)
+```
 
+The median sell prices are not normally distributed.
+
+```{r hist}
+hist(trulia_df$median_sell_price, breaks = 10)
+```
+
+
+```{r exploration, echo = F}
 #Data inspection functions
 # options(scipen = 9)
 # View(describe(trulia_df))
@@ -155,15 +171,17 @@ hist(trulia_df$median_sell_price, breaks = 10)
 # sapply(trulia_df,  function(x) length(unique(x)))
 # #value frequencies
 # sapply(trulia_df[, 2:3], function(x) table(x))
-
 ```
 
 
 ##The Response Variable: Divvy Station Docks from City of Chicago API
 
-Since stations can have differing numbers of docks, the number of Divvy station docks in each neighborhood/zip code. The source of these data will be the [City of Chicago's Divvy Bicycle Stations API](https://data.cityofchicago.org/Transportation/Divvy-Bicycle-Stations/bbyy-e7gq).
+Since stations can have differing numbers of docks, the number of Divvy station docks in each zip code will be used as the explanatory variable. The source of these data will be the [City of Chicago's Divvy Bicycle Stations API](https://data.cityofchicago.org/Transportation/Divvy-Bicycle-Stations/bbyy-e7gq).
 
-###The Divvy API has 20 variables and 581 observations. Each observation is a Divvy station, and each station has a certain number of docks for bikes.
+###The Divvy API has 20 variables and 581 observations. 
+
+Each observation is a Divvy station, and each station has a certain number of docks for bikes.
+
 ```{r api}
 
 feed <- "https://feeds.divvybikes.com/stations/stations.json"
@@ -176,11 +194,13 @@ glimpse(divvy_data)
 
 
 ###The 2 variables needed are the `totalDocks` and `postalCode`. However, the `postalCode` values are mostly missing.
+
 ```{r nozips, comment="", collapse=T}
 table(divvy_data$postalCode == "")
 ```
 
-###Fortunately, the data set includes the longitude/latitude coordinates, and we can use ggmap to obtain the addresses from the Google Maps API.
+###Fortunately, since the data set includes the longitude & latitude of each station, we can use ggmap to obtain the addresses from the Google Maps API.
+
 ```{r ggmap}
 coordinates <- cbind(divvy_data$longitude, divvy_data$latitude)  
 divvy_file <- "DivvyAddresses.csv"
@@ -199,7 +219,12 @@ divvy <- cbind(divvy_data, read.csv(divvy_file))
 ```
 
 
-###Next, let's transform the data so that we have the number of bicycle docks in each zip code. One station not in service was removed.
+###Next, let's transform the data so that we have the number of bicycle docks in each zip code. 
+
++ One station not in service was removed.
+
++ ggmaps failed to return the zip code for one of the stations. This value was manually inserted.
+
 ```{r tidyup, tidy=F}
 
 ##one of the address values returned by ggmap is missing the zip code
@@ -211,69 +236,77 @@ divvy_df <- divvy %>%
   filter(status == "IN_SERVICE") %>%
   select(zip_code, totalDocks) %>%
   group_by(zip_code) %>%
-  summarise(docks = sum(totalDocks))
+  summarise(docks = sum(totalDocks)) %>% 
+  arrange(desc(docks))
 
 kable(head(divvy_df))
-glimpse(divvy_df)
 ```
-##Combine the Data Sets
-+ The response variable is left joined to the explanatory variable by zip code.
-+ Note that zip codes not starting with "606" are not in the city of Chicago proper and were removed.
+
+##Combining the Data Sets
+
++ Zip codes not starting with "606" are not in the city of Chicago proper and were removed.
+
++ The `median_sell_price` was converted to the median sell price in thousands of US dollars (`median_sell_price_1000s`).
+
++ After left-joining the response variable to the explanatory variable by zip code, the data set now contains 53 observations containing the median sell price and number of Divvy station docks by zip code.
 
 
-```{r combine}
-divvy_trulia <- 
-  left_join(trulia_df, divvy_df, by = "zip_code") %>% 
+```{r combine, tidy = F}
+divvy_trulia <- left_join(trulia_df, divvy_df, by = "zip_code") %>% 
   filter(str_detect(zip_code, "606")) %>% 
   transmute(docks = ifelse(is.na(docks), 0, docks),
          median_sell_price_1000s = median_sell_price/1000,
          zip_code = zip_code)
 
 glimpse(divvy_trulia)
-
-#divvy_trulia$zip_code
 ```
 
-#Inference
-##Linear Regression Model
+#Linear Regression Model
+
+Let's take our bivariate data and create a linear model, using the median sell price as the explanatory variable and the number of bicycle docks as the response variable.
+
+
+##Model Summary
 
 ```{r}
 bicycle_model <- lm(docks ~ median_sell_price_1000s, divvy_trulia)
 summary(bicycle_model)
 
-lm_coef <- coef(bicycle_model)
+(intercept <- coef(bicycle_model)[1])
+(slope <- coef(bicycle_model)[2])
 ```
 
 
 ##Scatter Plot using ggplot2
 ```{r scatter}
-a <- ggplot(divvy_trulia, aes(median_sell_price_1000s, docks))
-
-a + geom_point() + geom_abline(aes(intercept = lm_coef[1], slope = lm_coef[2]))
-
+a <- ggplot(bicycle_model, aes(median_sell_price_1000s, docks))
+a + geom_point() + geom_abline(aes(intercept = intercept, slope = slope))
 ```
 
+##Model Interpretation
 
++ This linear model is expressed as $\widehat{DivvyDocks} = 75.81994 + 0.1870611*{MedianSellPrice}$
 
++ If we cast the model in terms of whole Divvy docks, for each additional $\$5,346$ increase in the median sell price of single-family homes, the model expects an increase of $1$ Divvy station dock for the zip code.
 
++ In this model, multiple $R^2$ is $0.3888$, which means that the model's least-squares line accounts for approximately $39\%$ of the variation in the the number of Divvy station docks in a zip code. 
 
 ##Model Diagnostics
 
-Let's assess if this linear model is reliable
+Let's assess if this linear model is reliable.
 
-###Linearity
+###Linearity: Do the variables have a linear relationship?
+
+Yes, both the scatter plots of the variables and the residuals support a linear relationship.
 
 ```{r residuals, eval=TRUE}
-
 plot(bicycle_model$residuals ~ divvy_trulia$median_sell_price_1000s)
 abline(h = 0, lty = 3) 
 ```
 
-Is there any apparent pattern in the residuals plot? What does this indicate about the linearity of the relationship between runs and at-bats?
-    
-**There isn't any apparent pattern. It supports the linear condition.**
-    
-###Nearly normal residuals
+###Nearly normal residuals: Are the model's residuals distributed normally?
+
+No, per the histogram and Q-Q plot, the residuals are not normally distributed.
 
 ```{r hist-res, eval=TRUE}
 hist(bicycle_model$residuals)
@@ -284,19 +317,21 @@ qqnorm(bicycle_model$residuals)
 qqline(bicycle_model$residuals)  
 ```
 
-Based on the histogram and the normal probability plot, does the nearly normal residuals condition appear to be met?
-    **Yes**
+###Homoscedasticity: Is there constant variability among the residuals?
 
-###Constant variability*
+Based on the scatter plot of the residuals shown above, there is not constant variability.
 
-Based on the plot in (1), does the constant variability condition appear to be met?
-    
-*Based upon the residual plot, there appears to be constant variability*
+###Independent observations: Are the data from a random sample and not from a time series?
 
-
-
-Statistical analysis: linear regression between the number of Divvy docks and the median sell price. There are 50 zip codes and about 90 neighborhoods in Chicago.
+As stated previously, we can't confirm that this is a simple random sample.
 
 #Conclusion
 
+Since this was a one-side hypothesis test, the p-value is half of the tiny value listed in the regression summary. This would lead us to reject the null hypothesis that there is no relationship between our variables in favor of the alternative hypothesis. However, this is a **very tentative conclusion** given that the data clearly violated 2 of the model's necessary conditions.
 
+```{r unlink, echo = F}
+# unlink(trulia_file)
+# unlink(divvy_file)
+```
+
+</body>
