@@ -1,0 +1,278 @@
+---
+title: "DATA 607 Final Project: Bicycles and Wealth in Chicago"
+author: "Kyle Gilde"
+date: "May 6, 2017"
+output: 
+  prettydoc::html_pretty:
+    theme: architect
+    highlight: github
+    toc: true
+    toc_depth: 2
+---
+<style type="text/css">
+body{
+  font-family: Helvetica;
+  font-size: 14pt;
+}
+</style>
+<body>
+```{r knitr_options, echo=FALSE}
+knitr::opts_chunk$set(
+                      warning = FALSE
+                      ,error = FALSE
+                      ,message = FALSE
+                      ,tidy = TRUE
+                      #,cache = TRUE
+                      )
+```
+#Introduction
+
+One of the best parts of summer in a large city is getting to use the bike-share program. 
+
+![](http://4.bp.blogspot.com/-sB28m3dp6Pk/Uc9Vxw3iBwI/AAAAAAAACPo/hvC0puqEl7A/s1600/IMG_0966.JPG)
+
+Chicago is no different in this respect. However, Chicago's Divvy bike-share program has been accused of disproportionately locating bike-share stations in more white and affluent parts of the city. 
+
+[Divvy Membership Skews White and Wealthy, But Hopefully Not for Long  (StreetsBlog, 9/10/15)](http://chi.streetsblog.org/2015/09/10/divvy-membership-skews-white-and-wealthy-but-hopefully-not-for-long/)
+
+[Report: In Chicago, Bike Amenities Correlate With Gentrication (StreetsBlog, 1/15/16)](http://chi.streetsblog.org/2016/01/15/report-in-chicago-bike-amenities-correlate-with-gentrication/)
+
+[Divvy expansion leaves some areas feeling like third wheel (Suntimes, 4/26/15)](http://chicago.suntimes.com/news/divvy-expansion-leaves-some-areas-feeling-like-third-wheel/)
+
+This project will use publicly available data to attempt to confirm or disconfirm these accusations.
+
+# Research Question
+
+Are the Divvy bike-share stations disproportionately located in Chicago's wealthier zip codes?
+
+#Hypotheses
+
+$H_0: B_1 = 0$ There is no relationship between the median sell price of homes and the number of Divvy station docks in Chicago zip codes.
+
+$H_A: B_1 > 0$ There is a positive relationship between the median sell price of homes and the number of Divvy station docks in Chicago zip codes.
+
+#The Variables & Sources of Data
+
+```{r load_packages, echo = FALSE, comment = "", results='hide'} 
+#create vector with all needed packages
+load_packages <- c("prettydoc", "knitr", "jsonlite", "ggmap", "tidyverse", "stringr", "rvest", "psych")
+
+#see if we need to install any of them
+install_load <- function(pkg){
+  #CODE SOURCE: https://gist.github.com/stevenworthington/3178163
+  new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
+  if (length(new.pkg)) 
+    install.packages(new.pkg, dependencies = TRUE)
+  sapply(pkg, require, character.only = TRUE, quietly = TRUE, warn.conflicts = FALSE)
+}
+
+#excute function and display the loaded packages
+data.frame(t(t(install_load(load_packages))), fix.empty.names = FALSE)
+
+#(.packages())
+```
+
+##The Explanatory Variable: Sell Prices from Trulia.com
+
++ A zip code's median sell price for single-family homes on Trulia.com will be used as a proxy to measure the wealth of that part of Chicago. 
+
++ I scraped 4,500 sell prices from the JSON present on 150 browse pages
+
+###Web Scraping
+```{r trulia, tidy=F}
+
+#Inputs to loop
+base_url <- "https://www.trulia.com/for_sale/Chicago,IL/SINGLE-FAMILY_HOME_type/"
+pages <- 150
+trulia_file <- "Trulia_file.csv"
+aggregate_df <- data.frame()
+reg_ex1 <- "var appState = "
+reg_ex2 <- ";\\n  var googleMapURL ="
+my_samp <- seq(1, 3, by = .01)
+
+#Loop to scrape pages
+if (!trulia_file %in% list.files(getwd())){
+  for (i in 1:pages){
+    #pagination
+    current_url <- ifelse(i == 1,
+                          base_url,
+                          paste0(base_url, i, "_p/")
+                          )
+    #get html    
+    trulia_html <- current_url %>%
+      read_html() %>%
+      html_nodes("script") %>%
+      html_text()
+    
+    #get json from html
+    json_text <- trulia_html[str_detect(trulia_html, reg_ex1)]
+    begin <- as.integer(str_locate(json_text, reg_ex1)[1, 2])
+    ending <- as.integer(str_locate(json_text, reg_ex2)[1, 1]) - 1
+    
+    #parse the JSON
+    json <- json_text %>%
+      str_sub(begin, ending) %>%
+      str_trim() %>%
+      fromJSON()
+  
+    #store data in DF  
+    current_df <- data.frame(iteration = i,
+                            id = json$page$cards$id,
+                            price = json$page$cards$price,
+                            zip_code = json$page$cards$zip,
+                            location = json$page$cards$footer$location)
+  
+    aggregate_df <- rbind(aggregate_df, current_df)
+  
+    #delay
+    rand_delay <- sample(my_samp, 1, replace = T)
+    Sys.sleep(rand_delay)
+  }
+  write.csv(aggregate_df, file = trulia_file)
+}  
+  
+```
+
+###Summarized the scraped data by zip code
+
+```{r cleaning}
+trulia_data <- read.csv(trulia_file, stringsAsFactors = F)
+
+trulia_df <- trulia_data %>% 
+  transmute(sell_price = as.integer(str_replace_all(price, "\\$|\\+|,", "")),
+         zip_code = as.character(zip_code)
+         ) %>% 
+  na.omit() %>% 
+  group_by(zip_code) %>% 
+  summarise(median_sell_price = median(sell_price),
+            n = n())
+
+glimpse(trulia_df)
+```
+
+
+##The Response Variable: Divvy Station Docks from City of Chicago API
+
+```{r api, results='hide', echo=F}
+
+feed <- "https://feeds.divvybikes.com/stations/stations.json"
+if (!exists("divvy_data")){  
+  divvy_data <- fromJSON(feed)$stationBeanList
+}
+glimpse(divvy_data)
+
+```
+
+
+###The 2 variables needed are the `totalDocks` and `postalCode`. However, the `postalCode` values are mostly missing.
+
+```{r nozips, comment="", collapse=T}
+table(divvy_data$postalCode == "")
+```
+
+###Fortunately, since the data set includes the longitude & latitude of each station, we can use ggmap to obtain the addresses from the Google Maps API.
+
+```{r ggmap}
+coordinates <- cbind(divvy_data$longitude, divvy_data$latitude)  
+divvy_file <- "DivvyAddresses.csv"
+
+if (!divvy_file %in% list.files(getwd()))
+{  
+  ##Code citation: http://stackoverflow.com/a/22919546
+  address <- do.call(rbind,
+                    lapply(1:nrow(coordinates),
+                    function(i)revgeocode(coordinates[i, ])))
+  write.csv(data.frame(address = address), file = divvy_file)
+  }
+
+
+divvy <- cbind(divvy_data, read.csv(divvy_file))
+```
+
+
+
+```{r tidyup, tidy=F, results='hide', echo=F}
+
+##one of the address values returned by ggmap is missing the zip code
+missing_zip <- "730-798 W 28th St, Chicago, IL, USA"
+
+divvy_df <- divvy %>% 
+  mutate(zip_code = str_trim(str_extract(divvy$address, " [\\d]{5}"))) %>% 
+  mutate(zip_code = ifelse(address == missing_zip, "60616", zip_code)) %>% 
+  filter(status == "IN_SERVICE") %>%
+  select(zip_code, totalDocks) %>%
+  group_by(zip_code) %>%
+  summarise(docks = sum(totalDocks)) %>% 
+  arrange(desc(docks))
+
+kable(head(divvy_df))
+```
+
+##Combined the Data Sets using a Left Join
+
+The final data set now contains 53 observations containing the median sell price and number of Divvy station docks by zip code.
+
+
+```{r combine, tidy = F}
+divvy_trulia <- left_join(trulia_df, divvy_df, by = "zip_code") %>% 
+  filter(str_detect(zip_code, "606")) %>% 
+  transmute(docks = ifelse(is.na(docks), 0, docks),
+         median_sell_price_1000s = median_sell_price/1000,
+         zip_code = zip_code)
+
+glimpse(divvy_trulia)
+```
+
+#Linear Regression Model
+
+##Model Summary
+
+```{r}
+bicycle_model <- lm(docks ~ median_sell_price_1000s, divvy_trulia)
+summary(bicycle_model)
+
+(intercept <- coef(bicycle_model)[1])
+(slope <- coef(bicycle_model)[2])
+```
+
+
+##Scatter Plot using ggplot2
+```{r scatter}
+a <- ggplot(bicycle_model, aes(median_sell_price_1000s, docks))
+a + geom_point() + geom_abline(aes(intercept = intercept, slope = slope))
+```
+
+##Model Interpretation
+
++ If we cast the model in terms of whole Divvy docks, for each additional $\$5,346$ increase in the median sell price of single-family homes, the model expects an increase of $1$ Divvy station dock for the zip code.
+
++ In this model, multiple $R^2$ is $0.3888$, which means that the model's least-squares line accounts for approximately $39\%$ of the variation in the the number of Divvy station docks in a zip code. 
+
+##Model Diagnostics: Were the necessary conditions met? 
+
+While there appears to be linearity, the residuals are not normally distributed and they lack constant variability. We are also uncertain that the sample is representative.
+
+```{r residuals, eval=TRUE}
+plot(bicycle_model$residuals ~ divvy_trulia$median_sell_price_1000s)
+abline(h = 0, lty = 3) 
+```
+
+```{r hist-res, eval=TRUE}
+hist(bicycle_model$residuals)
+```
+
+```{r qq-res, eval=TRUE}
+qqnorm(bicycle_model$residuals)
+qqline(bicycle_model$residuals)  
+```
+
+#Conclusion
+
+Since this was a one-side hypothesis test, the p-value is half of the tiny value listed in the regression summary. This would lead us to reject the null hypothesis that there is no relationship between our variables in favor of the alternative hypothesis. However, this is a **very tentative conclusion** given that the data clearly violated 2 of the model's necessary conditions.
+
+```{r unlink, echo = F}
+# unlink(trulia_file)
+# unlink(divvy_file)
+```
+
+</body>
