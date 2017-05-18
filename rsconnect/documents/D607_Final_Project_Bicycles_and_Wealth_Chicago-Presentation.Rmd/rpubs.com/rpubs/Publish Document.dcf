@@ -1,0 +1,8 @@
+name: Publish Document
+title:
+account: rpubs
+server: rpubs.com
+appId: https://api.rpubs.com/api/v1/document/278011/f8ecd33196a54711a72370716db1134a
+bundleId: https://api.rpubs.com/api/v1/document/278011/f8ecd33196a54711a72370716db1134a
+url: http://rpubs.com/kylegilde/278011
+when: 1495077138.75353

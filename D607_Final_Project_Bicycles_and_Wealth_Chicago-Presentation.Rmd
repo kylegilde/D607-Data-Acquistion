@@ -6,8 +6,6 @@ output:
   prettydoc::html_pretty:
     theme: architect
     highlight: github
-    toc: true
-    toc_depth: 2
 ---
 <style type="text/css">
 body{
@@ -227,17 +225,17 @@ glimpse(divvy_trulia)
 
 ##Model Summary
 
-```{r}
+```{r, echo=F}
 bicycle_model <- lm(docks ~ median_sell_price_1000s, divvy_trulia)
 summary(bicycle_model)
 
-(intercept <- coef(bicycle_model)[1])
-(slope <- coef(bicycle_model)[2])
+intercept <- coef(bicycle_model)[1]
+slope <- coef(bicycle_model)[2]
 ```
 
 
 ##Scatter Plot using ggplot2
-```{r scatter}
+```{r scatter, echo=F}
 a <- ggplot(bicycle_model, aes(median_sell_price_1000s, docks))
 a + geom_point() + geom_abline(aes(intercept = intercept, slope = slope))
 ```
@@ -252,16 +250,16 @@ a + geom_point() + geom_abline(aes(intercept = intercept, slope = slope))
 
 While there appears to be linearity, the residuals are not normally distributed and they lack constant variability. We are also uncertain that the sample is representative.
 
-```{r residuals, eval=TRUE}
+```{r residuals, eval=TRUE, echo=F}
 plot(bicycle_model$residuals ~ divvy_trulia$median_sell_price_1000s)
 abline(h = 0, lty = 3) 
 ```
 
-```{r hist-res, eval=TRUE}
+```{r hist-res, eval=TRUE, echo=F}
 hist(bicycle_model$residuals)
 ```
 
-```{r qq-res, eval=TRUE}
+```{r qq-res, eval=TRUE, echo=F}
 qqnorm(bicycle_model$residuals)
 qqline(bicycle_model$residuals)  
 ```
